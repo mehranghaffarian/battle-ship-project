@@ -2,6 +2,8 @@
 # include <stdlib.h>
 # include <windows.h>
 
+int point1 = 0, point2 = 0;
+
 typedef struct ships_data1{
     int arr1[4];//xs, xe, ys, ye->->xs:x_start, ye:y_end
     struct ships_data1* next;
@@ -11,7 +13,7 @@ typedef struct ships_data2{
     struct ships_data2* next;
 }ships2;
 
-char board1[10][10], board2[10][10];//board1 : the board where player1 puts his/her ships in//board2 : the board where player2 puts his/her ships in
+char board1[10][10] = {"\0"}, board2[10][10] = {"\0"};//board1 : the board where player1 puts his/her ships in//board2 : the board where player2 puts his/her ships in
 
 ships1* head1;
 ships2* head2;
@@ -79,10 +81,13 @@ int check_value2(ships2* curr, int arr[]){
 void remove_ship1(int arr[]){
     ships1* curr = head1;
 
-    if(check_value1(head1, arr)) {
+    if(check_value1(head1, arr) && head1->next != NULL) {
         ships1 *hold = head1;
         head1 = head1->next;
         free(hold);
+    }
+    else if(check_value1(head1, arr) && head1->next == NULL){
+        head1->arr1[0] = -1;
     }
     else{
         while(! check_value1(curr->next, arr))
@@ -127,12 +132,10 @@ int find_length(int arr[]){
         if (len == 0)
             len++;
     }
-
     return len;
 }
 
-//S:a ship is in this place but it has not been a target, W:this place has no ship and has been a target,
-//E:this place has no ship and has not been a target , C:complete explosion has happened
+//S:a ship is in this place but it has not been a target, W:this place has no ship and has been a target,//C:complete explosion has happened
 
 void fill_board1(int arr[]){
     if(find_length(arr) == 1)
@@ -141,7 +144,7 @@ void fill_board1(int arr[]){
 //is the ship in a row?
     else if(arr[1] == arr[3]){
         for(int i = arr[0];i <= arr[2];i++)
-            board1[arr[1]][i] = 'S';
+            board1[i][arr[1]] = 'S';
     }
 
 //is the ship in a column?
@@ -157,7 +160,7 @@ void fill_board2(int arr[]){
 //is the ship in a row?
     else if(arr[1] == arr[3]){
         for(int i = arr[0];i <= arr[2];i++)
-            board2[arr[1]][i] = 'S';
+            board2[i][arr[1]] = 'S';
     }
 
 //is the ship in a column?
@@ -170,12 +173,15 @@ void get_inputs(int player){
     if(player == 1) {
         int counter = 0, ships_sum = 21, arr[4];
 
-        printf("player%d please enter the x and y of the ships(ships end and first) in order. if it is a ship with length of 1 please enter its start x and y twice",
+        printf("\nplayer%d please enter the x and y of the ships(ships end and first) in order. if it is a ship with length of 1 please enter its start x and y twice\n",
                player);
 
         while (counter < ships_sum) {
             scanf("%d %d", &arr[0], &arr[1]);
             scanf("%d %d", &arr[2], &arr[3]);
+
+            for(int f = 0;f < 4;f++)
+                arr[f] -= 1;//beacuse of the fact that arrays start from 0
 
             if (counter == 0)
                 head1 = new_ship1(arr);
@@ -191,12 +197,15 @@ void get_inputs(int player){
     else {
         int counter = 0, ships_sum = 21, arr[4];
 
-        printf("player%d please enter the x and y of the ships(ships end and first) in order. if it is a ship with length of 1 please enter its start x and y twice",
+        printf("\nplayer%d please enter the x and y of the ships(ships end and first) in order. if it is a ship with length of 1 please enter its start x and y twice\n",
                player);
 
         while (counter < ships_sum) {
             scanf("%d %d", &arr[0], &arr[1]);
             scanf("%d %d", &arr[2], &arr[3]);
+
+            for(int f = 1;f <= 4;f++)
+                arr[f] -=1;//beacuse of the fact that arrays start from 0
 
             if (counter == 0)
                 head2 = new_ship2(arr);
@@ -210,35 +219,55 @@ void get_inputs(int player){
         }
     }
 }
-void print(void){
-    for(int i = 0;i < 10;i++){
-        for(int j = 0;j < 10;j++)
-            printf(" E |");
-
+void print(int player){
+    if(player == 1) {
+        printf("  ");
+        for(int x = 1;x <= 10;x++){
+            printf("  %.2d",x);
+        }
+        printf("\n   _________________________________________");
         printf("\n");
+        for (int i = 0; i < 10; i++) {
+            printf("%.2d |", 1 + i);
+            for (int j = 0; j < 10; j++)
+                printf(" %c |", board1[i][j]);
 
-        for(int k = 0;k < 10;k++)
-            printf("___|");
+            printf("\n   |");
 
-        printf("\n");
+            for (int k = 0; k < 10; k++)
+                printf("___|");
+
+            printf("\n");
+        }
     }
-}
-int count_ships(int player){
-    if(player == 1){
+    else {
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++)
+                printf(" %c |", board2[i][j]);
 
-    }
-    else{
+            printf("\n");
 
+            for (int k = 0; k < 10; k++)
+                printf("___|");
+
+            printf("\n");
+        }
     }
 }
 
 int main(void) {
     get_inputs(1);
-    get_inputs(2);
+//    get_inputs(2);
 
-    while(count_ships(1) != 0 || count_ships(2) != 0){
-
-    }
-
+//    while(head1->arr1[0] != -1 && head2->arr2[0] != -1){
+//
+//    }
+print(1);
     return 0;
 }
+//1 1
+//1 10
+//2 1
+//2 10
+//3 1
+//3 1
