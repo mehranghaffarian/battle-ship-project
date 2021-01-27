@@ -172,13 +172,83 @@ void fill_board2(int arr[]){
             board2[arr[0]][i] = 'S';
 
 }
-bool is_located(int arr[]){
-    bool located;
+bool check_around(int array[], int player){
+    bool is_located = 0;
 
-    if(find_length(arr) == 1 && board1[arr[0]][arr[1]] == 'S')
-       located = 0;
+    if(player == 1) {
+        for (int i = array[0] - 1; i <= array[0] + 1; i++)
+            if (array[1] + 1 < 10 && board1[i][array[1] + 1] == 'S')
+                is_located = 1;
 
+        for (int i = array[0] - 1; i <= array[0] + 1; i++)
+            if (array[1] - 1 >= 0 && board1[i][array[1] - 1] == 'S')
+                is_located = 1;
 
+        if ((array[0] - 1 >= 0 && board1[array[0] - 1][array[1]] == 'S') ||
+            (array[0] + 1 < 10 && board1[array[0] + 1][array[1]] == 'S'))
+            is_located = 1;
+    }
+    else{
+            for (int i = array[0] - 1; i <= array[0] + 1; i++)
+                if (array[1] + 1 < 10 && board1[i][array[1] + 1] == 'S')
+                    is_located = 1;
+
+            for (int i = array[0] - 1; i <= array[0] + 1; i++)
+                if (array[1] - 1 >= 0 && board1[i][array[1] - 1] == 'S')
+                    is_located = 1;
+
+            if ((array[0] - 1 >= 0 && board1[array[0] - 1][array[1]] == 'S') ||
+                (array[0] + 1 < 10 && board1[array[0] + 1][array[1]] == 'S'))
+                is_located = 1;
+    }
+        return is_located;
+}
+bool is_located(int arr[], int player){
+    bool located = 0;
+    int array[2];
+
+    if(player == 1){
+        if (find_length(arr) == 1) {
+            array[0] = arr[0];
+            array[1] = arr[1];
+            if(check_around(array, player) && board1[arr[0]][arr[1]] == 'S')
+                located = 1;
+        }
+
+        else {
+            if (arr[0] == arr[2]) {
+                for (int i = arr[1]; i <= arr[3]; i++) {
+                    array[0] = arr[0];
+                    array[1] = arr[];
+                    if (board1[arr[0]][i] == 'S')
+                        located = 1;
+                }
+            }
+            else if (arr[1] == arr[3]) {
+                for (int i = arr[0]; i <= arr[2]; i++) {
+                    if (board1[i][arr[1]] == 'S')
+                        located = 1;
+                }
+            }
+        }
+    }
+    else{
+        if (find_length(arr) == 1 && board2[arr[0]][arr[1]] == 'S')
+            located = 1;
+
+        else {
+            if (arr[0] == arr[2]) {
+                for (int i = arr[1]; i <= arr[3]; i++)
+                    if (board2[arr[0]][i] == 'S')
+                        located = 1;
+            } else if (arr[1] == arr[3]) {
+                for (int i = arr[0]; i <= arr[2]; i++)
+                    if (board2[i][arr[1]] == 'S')
+                        located = 1;
+            }
+        }
+    }
+    return located;
 }
 void get_inputs(int player){
     if(player == 1) {
@@ -194,8 +264,8 @@ void get_inputs(int player){
             for(int f = 0;f < 4;f++)
                 arr[f] -= 1;//beacuse of the fact that arrays start from 0
 
-                if(! is_located(arr)) {
-                    if (arr[0] <= 10 && arr[1] <= 10 && arr[2] <= 10 && arr[3] <= 10) {
+                if(! is_located(arr, 1)) {
+                    if (arr[0] < 10 && arr[1] < 10 && arr[2] < 10 && arr[3] < 10) {
                         if (counter + find_length(arr) <= ships_sum) {
                             if (counter == 0)
                                 head1 = new_ship1(arr);
@@ -210,7 +280,7 @@ void get_inputs(int player){
                     }
                 }
                 else
-                    printf("\nOops!!: your input is not acceptable\n");
+                    printf("\nOops!!: your input is not acceptable. chose other locations\n");
         }
     }
     else {
@@ -284,9 +354,3 @@ int main(void) {
 print(1);
     return 0;
 }
-//1 1
-//1 10
-//2 1
-//2 10
-//3 1
-//3 1
