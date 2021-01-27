@@ -1,6 +1,7 @@
 # include <stdio.h>
 # include <stdlib.h>
 # include <windows.h>
+# include <stdbool.h>
 
 int point1 = 0, point2 = 0;
 
@@ -120,13 +121,15 @@ int find_length(int arr[]){
 
     if(arr[0] == arr[2]) {
         len = arr[3] - arr[1];
+        len += len > 0 ? 1 : -1;
         len = len * (len > 0 ? 1 : -1);
 //for simples ships
         if (len == 0)
             len++;
     }
     else if(arr[1] == arr[3]) {
-        len = arr[0] - arr[2];
+        len = arr[0] - arr[2] + 1;
+        len += len > 0 ? 1 : -1;
         len = len * (len > 0 ? 1 : -1);
 //for simples ships
         if (len == 0)
@@ -135,7 +138,7 @@ int find_length(int arr[]){
     return len;
 }
 
-//S:a ship is in this place but it has not been a target, W:this place has no ship and has been a target,//C:complete explosion has happened
+//S:a ship is in this place but it has not been a target, W:this place has no ship and has been a target, C:complete explosion has happened
 
 void fill_board1(int arr[]){
     if(find_length(arr) == 1)
@@ -169,6 +172,14 @@ void fill_board2(int arr[]){
             board2[arr[0]][i] = 'S';
 
 }
+bool is_located(int arr[]){
+    bool located;
+
+    if(find_length(arr) == 1 && board1[arr[0]][arr[1]] == 'S')
+       located = 0;
+
+
+}
 void get_inputs(int player){
     if(player == 1) {
         int counter = 0, ships_sum = 21, arr[4];
@@ -183,15 +194,23 @@ void get_inputs(int player){
             for(int f = 0;f < 4;f++)
                 arr[f] -= 1;//beacuse of the fact that arrays start from 0
 
-            if (counter == 0)
-                head1 = new_ship1(arr);
+                if(! is_located(arr)) {
+                    if (arr[0] <= 10 && arr[1] <= 10 && arr[2] <= 10 && arr[3] <= 10) {
+                        if (counter + find_length(arr) <= ships_sum) {
+                            if (counter == 0)
+                                head1 = new_ship1(arr);
 
-            else
-                add_end1(new_ship1(arr));
+                            else
+                                add_end1(new_ship1(arr));
 
-            fill_board1(arr);
+                            fill_board1(arr);
 
-            counter += find_length(arr);
+                            counter += find_length(arr);
+                        }
+                    }
+                }
+                else
+                    printf("\nOops!!: your input is not acceptable\n");
         }
     }
     else {
