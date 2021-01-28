@@ -2,12 +2,13 @@
 # include <stdlib.h>
 # include <windows.h>
 
-int point1 = 0, point2 = 0;
+int point1 = 0, point2 = 0, max_size, ships_sum = 21, arr_size[15];
 
 typedef struct ships_data1{
     int arr1[4];//xs, xe, ys, ye->->xs:x_start, ye:y_end
     struct ships_data1* next;
 }ships1;
+
 typedef struct ships_data2{
     int arr2[4];//xs, xe, ys, ye->->xs:x_start, ye:y_end
     struct ships_data2* next;
@@ -138,34 +139,40 @@ int find_length(int arr[]){
 //S:a ship is in this place but it has not been a target, W:this place has no ship and has been a target, C:complete explosion has happened
 
 void fill_board1(int arr[]){
+    int x1 = arr[0] <= arr[2] ? arr[0] : arr[2], x2 = arr[2] >= arr[0] ? arr[2] : arr[0];
+    int y1 = arr[1] <= arr[3] ? arr[1] : arr[3], y2 = arr[1] <= arr[3] ? arr[3] : arr[1];
+
     if(find_length(arr) == 1)
         board1[arr[0]][arr[1]] = 'S';
 
 //is the ship in a row?
     else if(arr[1] == arr[3]){
-        for(int i = arr[0];i <= arr[2];i++)
+        for(int i = x1;i <= x2;i++)
             board1[i][arr[1]] = 'S';
     }
 
 //is the ship in a column?
     else if(arr[0] == arr[2])
-        for(int i = arr[1];i <= arr[3];i++)
+        for(int i = y1;i <= y2;i++)
         board1[arr[0]][i] = 'S';
 
 }
 void fill_board2(int arr[]){
+    int x1 = arr[0] <= arr[2] ? arr[0] : arr[2], x2 = arr[2] >= arr[0] ? arr[2] : arr[0];
+    int y1 = arr[1] <= arr[3] ? arr[1] : arr[3], y2 = arr[1] <= arr[3] ? arr[3] : arr[1];
+
     if(find_length(arr) == 1)
         board2[arr[0]][arr[1]] = 'S';
 
 //is the ship in a row?
     else if(arr[1] == arr[3]){
-        for(int i = arr[0];i <= arr[2];i++)
+        for(int i = x1;i <= x2;i++)
             board2[i][arr[1]] = 'S';
     }
 
 //is the ship in a column?
     else if(arr[0] == arr[2])
-        for(int i = arr[1];i <= arr[3];i++)
+        for(int i = y1;i <= y2;i++)
             board2[arr[0]][i] = 'S';
 
 }
@@ -182,7 +189,7 @@ int is_really_locatable(int array[], int player){
         else if(array[0] - 1 >= 0 && board1[array[0] - 1][array[1]] == 'S')
             is_locatable = 0;
 
-        else if(array[0] - 1 >= 0 && array[1] + 1 <= 9 && board1[array[0] - 1][array[1] - 1] == 'S')
+        else if(array[0] - 1 >= 0 && array[1] + 1 <= 9 && board1[array[0] - 1][array[1] + 1] == 'S')
             is_locatable = 0;
 
         else if(array[1] + 1 <= 9 && board1[array[0]][array[1] + 1] == 'S')
@@ -200,7 +207,7 @@ int is_really_locatable(int array[], int player){
         else if(array[0] + 1 <= 9 && board1[array[0] + 1][array[1]] == 'S')
             is_locatable = 0;
 
-        else if(array[0] + 1 <= 9 && array[1] + 1 <= 9 && board1[array[0] + 1][array[1] - 1] == 'S')
+        else if(array[0] + 1 <= 9 && array[1] + 1 <= 9 && board1[array[0] + 1][array[1] + 1] == 'S')
             is_locatable = 0;
 
     }
@@ -278,13 +285,21 @@ void print(int player){
 }
 void get_inputs(int player){
     if(player == 1) {
-        int counter = 0, ships_sum = 21, arr[4], is_locatable, temp_array[2];
+        int counter = 0,  arr[4], is_locatable, temp_array[2], arr_size1[10] = {0};//arr_size[size of ship][number of this ship]
+
+        arr_size1[1] = arr_size[1];
+        arr_size1[2] = arr_size[2];
+        arr_size1[3] = arr_size[3];
+        arr_size1[5] = arr_size[5];
 
         printf("\nplayer%d please enter the row and column of the ships(ships end and first). if it is a ship with length of 1 please enter its start row and column twice\n",
                player);
 
         while (counter < ships_sum) {
             is_locatable = 1;
+
+            if(counter == 0)//better view for deciding in the first time
+                print(player);
 
             scanf("%d %d", &arr[0], &arr[1]);
             scanf("%d %d", &arr[2], &arr[3]);
@@ -294,6 +309,9 @@ void get_inputs(int player){
 
                 int x1 = arr[0] <= arr[2] ? arr[0] : arr[2], x2 = arr[2] >= arr[0] ? arr[2] : arr[0];
                 int y1 = arr[1] <= arr[3] ? arr[1] : arr[3], y2 = arr[1] <= arr[3] ? arr[3] : arr[1];
+
+                if(arr[0] != arr[2] && arr[1] != arr[3])
+                    is_locatable = 0;
 
                 if(arr[0] == arr[2]){
                     for(int i = y1;i <= y2;i++) {
@@ -312,7 +330,7 @@ void get_inputs(int player){
                     }
                 }
 
-                if(is_locatable == 1) {
+                if(is_locatable == 1 && arr_size1[find_length(arr)] != 0 && find_length(arr) <= max_size) {
                     if (counter + find_length(arr) <= ships_sum) {
                         if (counter == 0)
                             head1 = new_ship1(arr);
@@ -324,16 +342,20 @@ void get_inputs(int player){
 
                         counter += find_length(arr);
                         print(player);
+                        arr_size1[find_length(arr)]--;
                     }
                     else
                         is_locatable = 0;
                 }
+                else
+                    is_locatable = 0;
+
                 if(is_locatable == 0)
                     printf("\nOops!!: your input is not acceptable. chose other locations\n");
         }
     }
     else {
-        int counter = 0, ships_sum = 21, arr[4], is_locatable = 1, temp_array[2];
+        int counter = 0, arr[4], is_locatable = 1, temp_array[2];
 
         printf("\nplayer%d please enter the row and column of the ships(ships end and first). if it is a ship with length of 1 please enter its start row and column twice\n",
                player);
@@ -383,6 +405,16 @@ void get_inputs(int player){
 }
 
 int main(void) {
+    //settings
+    for(int i = 0;i <15;i++)
+        arr_size[i] = 0;
+
+    max_size = 5;
+    arr_size[1] = 4;
+    arr_size[2] = 3;
+    arr_size[3] = 2;
+    arr_size[5] = 1;
+
     get_inputs(1);
 //    get_inputs(2);
 
