@@ -1,6 +1,7 @@
 # include <stdio.h>
 # include <stdlib.h>
 # include <windows.h>
+# include <time.h>
 
 int point1 = 0, point2 = 0, max_size, ships_sum = 21, arr_size[15];
 
@@ -52,32 +53,12 @@ void add_end2(ships2* new){
     curr->next = new;
 }
 int check_value1(ships1* curr, int arr[]){
-    int counter = 0;
-
-    for(int i = 0;i < 4;i++) {
-        if (arr[i] == curr->arr1[i])
-            counter++;
-    }
-
-    if(counter == 4)
+    if((arr[0] == curr->arr1[0] && arr[2] ==curr->arr1[2] && arr[1] == curr->arr1[1] && arr[3] == curr->arr1[3]) || (arr[0] == curr->arr1[2] && arr[2] ==curr->arr1[0] && arr[1] == curr->arr1[3] && arr[3] == curr->arr1[1]))
         return 1;
-
-    else
-        return 0;
 }
 int check_value2(ships2* curr, int arr[]){
-    int counter = 0;
-
-    for(int i = 0;i < 4;i++) {
-        if (arr[i] == curr->arr2[i])
-            counter++;
-    }
-
-    if(counter == 4)
+    if((arr[0] == curr->arr2[0] && arr[2] ==curr->arr2[2] && arr[1] == curr->arr2[1] && arr[3] == curr->arr2[3]) || (arr[0] == curr->arr2[2] && arr[2] ==curr->arr2[0] && arr[1] == curr->arr2[3] && arr[3] == curr->arr2[1]))
         return 1;
-
-    else
-        return 0;
 }
 void remove_ship1(int arr[]){
     ships1* curr = head1;
@@ -139,8 +120,8 @@ int find_length(int arr[]){
 //S:a ship is in this place but it has not been a target, W:this place has no ship and has been a target, C:complete explosion has happened
 
 void fill_board1(int arr[]){
-    int x1 = arr[0] <= arr[2] ? arr[0] : arr[2], x2 = arr[2] >= arr[0] ? arr[2] : arr[0];
-    int y1 = arr[1] <= arr[3] ? arr[1] : arr[3], y2 = arr[1] <= arr[3] ? arr[3] : arr[1];
+    int x1 = arr[0] < arr[2] ? arr[0] : arr[2], x2 = arr[2] > arr[0] ? arr[2] : arr[0];
+    int y1 = arr[1] < arr[3] ? arr[1] : arr[3], y2 = arr[1] < arr[3] ? arr[3] : arr[1];
 
     if(find_length(arr) == 1)
         board1[arr[0]][arr[1]] = 'S';
@@ -180,35 +161,50 @@ int is_really_locatable(int array[], int player){
     int is_locatable = 1;
 
     if(player == 1) {
-        if (array[0] >= 10 || array[1] >= 10 || array[0] <= -1 || array[1] <= -1)
-            is_locatable = 0;
+        if (array[0] >= 10 || array[1] >= 10 || array[0] <= -1 || array[1] <= -1) { is_locatable = 0; }
 
-        else if(array[0] - 1 >= 0 && array[1] - 1 >= 0 && board1[array[0] - 1][array[1] - 1] == 'S')
-            is_locatable = 0;
+        else if(array[0] - 1 >= 0 && array[1] - 1 >= 0 ) {
+            if (board1[array[0] - 1][array[1] - 1] == 'S')
+                is_locatable = 0;
+        }
 
-        else if(array[0] - 1 >= 0 && board1[array[0] - 1][array[1]] == 'S')
+        else if(array[0] - 1 >= 0) {
+            if( board1[array[0] - 1][array[1]] == 'S')
             is_locatable = 0;
+        }
 
-        else if(array[0] - 1 >= 0 && array[1] + 1 <= 9 && board1[array[0] - 1][array[1] + 1] == 'S')
-            is_locatable = 0;
+        else if(array[0] - 1 >= 0 && array[1] + 1 <= 9) {
+            if (board1[array[0] - 1][array[1] + 1] == 'S')
+                is_locatable = 0;
+        }
 
-        else if(array[1] + 1 <= 9 && board1[array[0]][array[1] + 1] == 'S')
-            is_locatable = 0;
+        else if(array[1] + 1 <= 9) {
+            if (board1[array[0]][array[1] + 1] == 'S')
+                is_locatable = 0;
+        }
 
         else if(board1[array[0]][array[1]] == 'S')
             is_locatable = 0;
 
-        else if(array[1] - 1 >= 0 && board1[array[0]][array[1] - 1] == 'S')
+        else if(array[1] - 1 >= 0 ) {
+            if (  board1[array[0]][array[1] - 1] == 'S')
             is_locatable = 0;
+        }
 
-        else if(array[0] + 1 <= 9 && array[1] - 1 >= 0 && board1[array[0] + 1][array[1] - 1] == 'S')
+        else if(array[0] + 1 <= 9 && array[1] - 1 >= 0) {
+            if ( board1[array[0] + 1][array[1] - 1] == 'S')
             is_locatable = 0;
+        }
 
-        else if(array[0] + 1 <= 9 && board1[array[0] + 1][array[1]] == 'S')
-            is_locatable = 0;
+        else if(array[0] + 1 <= 9) {
+            if (board1[array[0] + 1][array[1]] == 'S')
+                is_locatable = 0;
+        }
 
-        else if(array[0] + 1 <= 9 && array[1] + 1 <= 9 && board1[array[0] + 1][array[1] + 1] == 'S')
-            is_locatable = 0;
+        else if(array[0] + 1 <= 9 && array[1] + 1 <= 9 ) {
+            if (board1[array[0] + 1][array[1] + 1] == 'S')
+                is_locatable = 0;
+        }
 
     }
     else{
@@ -307,8 +303,8 @@ void get_inputs(int player){
             for(int f = 0;f < 4;f++)
                 arr[f] -= 1;//because of the fact that arrays start from 0
 
-                int x1 = arr[0] <= arr[2] ? arr[0] : arr[2], x2 = arr[2] >= arr[0] ? arr[2] : arr[0];
-                int y1 = arr[1] <= arr[3] ? arr[1] : arr[3], y2 = arr[1] <= arr[3] ? arr[3] : arr[1];
+                int x1 = arr[0] < arr[2] ? arr[0] : arr[2], x2 = arr[2] > arr[0] ? arr[2] : arr[0];
+                int y1 = arr[1] < arr[3] ? arr[1] : arr[3], y2 = arr[1] < arr[3] ? arr[3] : arr[1];
 
                 if(arr[0] != arr[2] && arr[1] != arr[3])
                     is_locatable = 0;
