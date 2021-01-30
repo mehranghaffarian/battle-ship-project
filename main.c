@@ -3,7 +3,7 @@
 # include <windows.h>
 # include <time.h>
 
-int point1 = 0, point2 = 0, max_size, ships_sum = 21, arr_size[15];
+int point1, point2, max_size, ships_sum = 21, arr_size[15], map_size = 10;
 
 typedef struct ships_data1{
     int arr1[4];//xs, xe, ys, ye->->xs:x_start, ye:y_end
@@ -68,7 +68,7 @@ void remove_ship1(int arr[]){
         head1 = head1->next;
         free(hold);
     }
-    else if(check_value1(head1, arr) && head1->next == NULL){
+    if(check_value1(head1, arr) && head1->next == NULL){
         head1->arr1[0] = -1;
     }
     else{
@@ -81,12 +81,15 @@ void remove_ship1(int arr[]){
     }
 }
 void remove_ship2(int arr[]){
-    ships2* curr = head1;
+    ships2* curr = head2;
 
-    if(check_value2(head2, arr)) {
+    if(check_value2(head2, arr) && head2->next != NULL) {
         ships2 *hold = head2;
         head2 = head2->next;
         free(hold);
+    }
+    if(check_value2(head2, arr) && head2->next == NULL){
+        head2->arr2[0] = -1;//end of game
     }
     else{
         while(! check_value2(curr->next, arr))
@@ -108,7 +111,7 @@ int find_length(int arr[]){
             len++;
     }
     else if(arr[1] == arr[3]) {
-        len = arr[0] - arr[2] + 1;
+        len = arr[0] - arr[2] ;
         len = (len > 0 ? (len + 1) * 1 : -1 * (len - 1));
 //for simples ships
         if (len == 0)
@@ -116,9 +119,7 @@ int find_length(int arr[]){
     }
     return len;
 }
-
 //S:a ship is in this place but it has not been a target, W:this place has no ship and has been a target, C:complete explosion has happened
-
 void fill_board1(int arr[]){
     int x1 = arr[0] < arr[2] ? arr[0] : arr[2], x2 = arr[2] > arr[0] ? arr[2] : arr[0];
     int y1 = arr[1] < arr[3] ? arr[1] : arr[3], y2 = arr[1] < arr[3] ? arr[3] : arr[1];
@@ -139,8 +140,8 @@ void fill_board1(int arr[]){
 
 }
 void fill_board2(int arr[]){
-    int x1 = arr[0] <= arr[2] ? arr[0] : arr[2], x2 = arr[2] >= arr[0] ? arr[2] : arr[0];
-    int y1 = arr[1] <= arr[3] ? arr[1] : arr[3], y2 = arr[1] <= arr[3] ? arr[3] : arr[1];
+    int x1 = arr[0] < arr[2] ? arr[0] : arr[2], x2 = arr[2] > arr[0] ? arr[2] : arr[0];
+    int y1 = arr[1] < arr[3] ? arr[1] : arr[3], y2 = arr[1] < arr[3] ? arr[3] : arr[1];
 
     if(find_length(arr) == 1)
         board2[arr[0]][arr[1]] = 'S';
@@ -156,52 +157,54 @@ void fill_board2(int arr[]){
         for(int i = y1;i <= y2;i++)
             board2[arr[0]][i] = 'S';
 
+
 }
 int is_really_locatable(int array[], int player){
     int is_locatable = 1;
 
     if(player == 1) {
-        if (array[0] >= 10 || array[1] >= 10 || array[0] <= -1 || array[1] <= -1) { is_locatable = 0; }
+        if (array[0] >= 10 || array[1] >= 10 || array[0] <= -1 || array[1] <= -1)
+            is_locatable = 0;
 
-        else if(array[0] - 1 >= 0 && array[1] - 1 >= 0 ) {
+       if(array[0] - 1 >= 0 && array[1] - 1 >= 0 ) {
             if (board1[array[0] - 1][array[1] - 1] == 'S')
                 is_locatable = 0;
         }
 
-        else if(array[0] - 1 >= 0) {
+       if(array[0] - 1 >= 0) {
             if( board1[array[0] - 1][array[1]] == 'S')
             is_locatable = 0;
         }
 
-        else if(array[0] - 1 >= 0 && array[1] + 1 <= 9) {
+      if(array[0] - 1 >= 0 && array[1] + 1 <= 9) {
             if (board1[array[0] - 1][array[1] + 1] == 'S')
                 is_locatable = 0;
         }
 
-        else if(array[1] + 1 <= 9) {
+      if(array[1] + 1 <= 9) {
             if (board1[array[0]][array[1] + 1] == 'S')
                 is_locatable = 0;
         }
 
-        else if(board1[array[0]][array[1]] == 'S')
+       if(board1[array[0]][array[1]] == 'S')
             is_locatable = 0;
 
-        else if(array[1] - 1 >= 0 ) {
+       if(array[1] - 1 >= 0 ) {
             if (  board1[array[0]][array[1] - 1] == 'S')
             is_locatable = 0;
         }
 
-        else if(array[0] + 1 <= 9 && array[1] - 1 >= 0) {
+       if(array[0] + 1 <= 9 && array[1] - 1 >= 0) {
             if ( board1[array[0] + 1][array[1] - 1] == 'S')
             is_locatable = 0;
         }
 
-        else if(array[0] + 1 <= 9) {
+      if(array[0] + 1 <= 9) {
             if (board1[array[0] + 1][array[1]] == 'S')
                 is_locatable = 0;
         }
 
-        else if(array[0] + 1 <= 9 && array[1] + 1 <= 9 ) {
+      if(array[0] + 1 <= 9 && array[1] + 1 <= 9 ) {
             if (board1[array[0] + 1][array[1] + 1] == 'S')
                 is_locatable = 0;
         }
@@ -211,77 +214,113 @@ int is_really_locatable(int array[], int player){
         if (array[0] >= 10 || array[1] >= 10 || array[0] <= -1 || array[1] <= -1)
             is_locatable = 0;
 
-        else if(array[0] - 1 >= 0 && array[1] - 1 >= 0 && board2[array[0] - 1][array[1] - 1] == 'S')
+        if(array[0] - 1 >= 0 && array[1] - 1 >= 0 ) {
+            if (board2[array[0] - 1][array[1] - 1] == 'S')
+                is_locatable = 0;
+        }
+
+        if(array[0] - 1 >= 0) {
+            if( board2[array[0] - 1][array[1]] == 'S')
+                is_locatable = 0;
+        }
+
+        if(array[0] - 1 >= 0 && array[1] + 1 <= 9) {
+            if (board2[array[0] - 1][array[1] + 1] == 'S')
+                is_locatable = 0;
+        }
+
+        if(array[1] + 1 <= 9) {
+            if (board2[array[0]][array[1] + 1] == 'S')
+                is_locatable = 0;
+        }
+
+        if(board2[array[0]][array[1]] == 'S')
             is_locatable = 0;
 
-        else if(array[0] - 1 >= 0 && board2[array[0] - 1][array[1]] == 'S')
-            is_locatable = 0;
+        if(array[1] - 1 >= 0 ) {
+            if (  board1[array[0]][array[1] - 1] == 'S')
+                is_locatable = 0;
+        }
 
-        else if(array[0] - 1 >= 0 && array[1] + 1 <= 9 && board2[array[0] - 1][array[1] - 1] == 'S')
-            is_locatable = 0;
+        if(array[0] + 1 <= 9 && array[1] - 1 >= 0) {
+            if ( board2[array[0] + 1][array[1] - 1] == 'S')
+                is_locatable = 0;
+        }
 
-        else if(array[1] + 1 <= 9 && board2[array[0]][array[1] + 1] == 'S')
-            is_locatable = 0;
+        if(array[0] + 1 <= 9) {
+            if (board2[array[0] + 1][array[1]] == 'S')
+                is_locatable = 0;
+        }
 
-        else if(board2[array[0]][array[1]] == 'S')
-            is_locatable = 0;
+        if(array[0] + 1 <= 9 && array[1] + 1 <= 9 ) {
+            if (board2[array[0] + 1][array[1] + 1] == 'S')
+                is_locatable = 0;
+        }
 
-        else if(array[1] - 1 >= 0 && board2[array[0]][array[1] - 1] == 'S')
-            is_locatable = 0;
-
-        else if(array[0] + 1 <= 9 && array[1] - 1 >= 0 && board2[array[0] + 1][array[1] - 1] == 'S')
-            is_locatable = 0;
-
-        else if(array[0] + 1 <= 9 && board2[array[0] + 1][array[1]] == 'S')
-            is_locatable = 0;
-
-        else if(array[0] + 1 <= 9 && array[1] + 1 <= 9 && board2[array[0] + 1][array[1] - 1] == 'S')
-            is_locatable = 0;
     }
         return is_locatable;
 }
 void print(int player){
     if(player == 1) {
         printf("  ");
-        for(int x = 1;x <= 10;x++){
+        for(int x = 1;x <= map_size;x++)
             printf("  %.2d",x);
-        }
-        printf("\n   _________________________________________");
+
+        printf("\n   ");
+
+        for(int i = 1;i <= 4 * map_size;i++)
+            printf("_");
+
         printf("\n");
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < map_size; i++) {
             printf("%.2d |", 1 + i);
-            for (int j = 0; j < 10; j++)
+            for (int j = 0; j < map_size; j++)
                 printf(" %c |", board1[i][j]);
 
             printf("\n   |");
 
-            for (int k = 0; k < 10; k++)
+            for (int k = 0; k < map_size; k++)
                 printf("___|");
 
             printf("\n");
         }
+//        system("CLS");
 //        printf("\n enter any key to continue\n");
 //        char wait;
 //        scanf("%c",&wait);
-//        system("cls");
     }
     else {
-        for (int i = 0; i < 10; i++) {
-            for (int j = 0; j < 10; j++)
+        printf("  ");
+        for(int x = 1;x <= map_size;x++)
+            printf("  %.2d",x);
+
+        printf("\n   ");
+
+        for(int i = 1;i <= 4 * map_size;i++)
+            printf("_");
+
+        printf("\n");
+        for (int i = 0; i < map_size; i++) {
+            printf("%.2d |", 1 + i);
+            for (int j = 0; j < map_size; j++)
                 printf(" %c |", board2[i][j]);
 
-            printf("\n");
+            printf("\n   |");
 
-            for (int k = 0; k < 10; k++)
+            for (int k = 0; k < map_size; k++)
                 printf("___|");
 
             printf("\n");
         }
+//        system("CLS");
+//        printf("\n enter any key to continue\n");
+//        char wait;
+//        scanf("%c",&wait);
     }
 }
 void get_inputs(int player){
     if(player == 1) {
-        int counter = 0,  arr[4], is_locatable, temp_array[2], arr_size1[10] = {0};//arr_size[size of ship][number of this ship]
+        int counter = 0,  arr[4], is_locatable, temp_array[2], arr_size1[15] = {0};//arr_size[size of ship][number of this ship]
 
         arr_size1[1] = arr_size[1];
         arr_size1[2] = arr_size[2];
@@ -317,7 +356,7 @@ void get_inputs(int player){
                             is_locatable = 0;
                     }
                 }
-                else if(arr[1] == arr[3]){
+                if(arr[1] == arr[3]){
                     for(int i = x1;i <= x2;i++) {
                         temp_array[1] = arr[1];
                         temp_array[0] = i;
@@ -351,28 +390,44 @@ void get_inputs(int player){
         }
     }
     else {
-        int counter = 0, arr[4], is_locatable = 1, temp_array[2];
+        int counter = 0,  arr[4], is_locatable, temp_array[2], arr_size2[15] = {0};//arr_size[size of ship][number of this ship]
+
+        arr_size2[1] = arr_size[1];
+        arr_size2[2] = arr_size[2];
+        arr_size2[3] = arr_size[3];
+        arr_size2[5] = arr_size[5];
 
         printf("\nplayer%d please enter the row and column of the ships(ships end and first). if it is a ship with length of 1 please enter its start row and column twice\n",
                player);
 
         while (counter < ships_sum) {
+            is_locatable = 1;
+
+            if(counter == 0)//better view for deciding in the first time
+                print(player);
+
             scanf("%d %d", &arr[0], &arr[1]);
             scanf("%d %d", &arr[2], &arr[3]);
 
             for(int f = 0;f < 4;f++)
                 arr[f] -= 1;//because of the fact that arrays start from 0
 
+            int x1 = arr[0] < arr[2] ? arr[0] : arr[2], x2 = arr[2] > arr[0] ? arr[2] : arr[0];
+            int y1 = arr[1] < arr[3] ? arr[1] : arr[3], y2 = arr[1] < arr[3] ? arr[3] : arr[1];
+
+            if(arr[0] != arr[2] && arr[1] != arr[3])
+                is_locatable = 0;
+
             if(arr[0] == arr[2]){
-                for(int i = arr[1];i <= arr[3];i++) {
+                for(int i = y1;i <= y2;i++) {
                     temp_array[0] = arr[0];
                     temp_array[1] = i;
                     if (is_really_locatable(temp_array, player) == 0)
                         is_locatable = 0;
                 }
             }
-            else if(arr[1] == arr[3]){
-                for(int i = arr[0];i <= arr[2];i++) {
+            if(arr[1] == arr[3]){
+                for(int i = x1;i <= x2;i++) {
                     temp_array[1] = arr[1];
                     temp_array[0] = i;
                     if (is_really_locatable(temp_array, player) == 0)
@@ -380,7 +435,7 @@ void get_inputs(int player){
                 }
             }
 
-            if(is_locatable == 1) {
+            if(is_locatable == 1 && arr_size2[find_length(arr)] != 0 && find_length(arr) <= max_size) {
                 if (counter + find_length(arr) <= ships_sum) {
                     if (counter == 0)
                         head2 = new_ship2(arr);
@@ -392,31 +447,109 @@ void get_inputs(int player){
 
                     counter += find_length(arr);
                     print(player);
+                    arr_size2[find_length(arr)]--;
                 }
+                else
+                    is_locatable = 0;
             }
             else
+                is_locatable = 0;
+
+            if(is_locatable == 0)
                 printf("\nOops!!: your input is not acceptable. chose other locations\n");
         }
     }
 }
+int is_shotable(int temp_row, int temp_column, int player){
 
-int main(void) {
+}
+void  print_shotable(int player){
+    if(player == 1) {
+        printf("  ");
+
+        for (int x = 1; x <= map_size; x++)
+            printf("  %.2d", x);
+
+        printf("\n   ");
+
+        for (int i = 1; i <= 4 * map_size; i++)
+            printf("_");
+
+        printf("\n");
+        for (int i = 0; i < map_size; i++) {
+            printf("%.2d |", 1 + i);
+            for (int j = 0; j < map_size; j++) {
+                printf(" ");
+                printf("%c", board2[i][j] != 'S' ? board2[i][j] : ' ');
+                printf(" |");
+            }
+
+            printf("\n   |");
+
+            for (int k = 0; k < map_size; k++)
+                printf("___|");
+
+            printf("\n");
+        }
+    }
+    else{
+        printf("  ");
+
+        for (int x = 1; x <= map_size; x++)
+            printf("  %.2d", x);
+
+        printf("\n   ");
+
+        for (int i = 1; i <= 4 * map_size; i++)
+            printf("_");
+
+        printf("\n");
+        for (int i = 0; i < map_size; i++) {
+            printf("%.2d |", 1 + i);
+            for (int j = 0; j < map_size; j++) {
+                printf(" ");
+                printf("%c", board1[i][j] != 'S' ? board1[i][j] : ' ');
+                printf(" |");
+            }
+            printf("\n   |");
+
+            for (int k = 0; k < map_size; k++)
+                printf("___|");
+
+            printf("\n");
+        }
+    }
+}
+
+int main(void){
     //settings
-    for(int i = 0;i <15;i++)
-        arr_size[i] = 0;
-
     max_size = 5;
     arr_size[1] = 4;
     arr_size[2] = 3;
     arr_size[3] = 2;
     arr_size[5] = 1;
+    int player1 = 1, player2 = 2;
+    get_inputs(2);
+//settings
 
-    get_inputs(1);
-//    get_inputs(2);
+    while(head1->arr1[0] != -1 || head2->arr2[0] != -1){
+        int temp_row, temp_column;
+        //player1 shots player2
+        do {
+            print_shotable(1);
+            scanf("%d %d", &temp_row, &temp_column);
 
-//    while(head1->arr1[0] != -1 && head2->arr2[0] != -1){
-//
-//    }
+        }while(is_shotable(temp_row, temp_column, player1));
+//player2 shots player1
+        do {
+            print_shotable(2);
+            scanf("%d %d", &temp_row, &temp_column);
+
+
+
+        }while(is_shotable(temp_row, temp_column, player2));
+    }
+
 
     return 0;
 }
