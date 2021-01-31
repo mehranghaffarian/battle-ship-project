@@ -15,10 +15,7 @@ typedef struct ships_data2{
     struct ships_data2* next;
 }ships2;
 
-char board1[10][10] = {"\0"}, board2[10][10] = {"\0"};//board1 : the board where player1 puts his/her ships in//board2 : the board where player2 puts his/her ships in
-
-ships1* head1;
-ships2* head2;
+char board1[50][50], board2[50][50];//board1 : the board where player1 puts his/her ships in//board2 : the board where player2 puts his/her ships in
 
 ships1* new_ship1(int arr[4]){
     ships1* new = (ships1*)malloc(sizeof(ships1));
@@ -38,14 +35,14 @@ ships2* new_ship2(int arr[4]){
 
     return new;
 }
-void add_end1(ships1* new){
+void add_end1(ships1* head1, ships1* new){
     ships1* curr = head1;
 
     for(;curr->next != NULL;curr = curr->next);
 
     curr->next = new;
 }
-void add_end2(ships2* new){
+void add_end2(ships2* head2, ships2* new){
     ships2* curr = head2;
 
     for(;curr->next != NULL;curr = curr->next);
@@ -60,16 +57,17 @@ int check_value2(ships2* curr, int arr[]){
     if((arr[0] == curr->arr2[0] && arr[2] ==curr->arr2[2] && arr[1] == curr->arr2[1] && arr[3] == curr->arr2[3]) || (arr[0] == curr->arr2[2] && arr[2] ==curr->arr2[0] && arr[1] == curr->arr2[3] && arr[3] == curr->arr2[1]))
         return 1;
 }
-void remove_ship1(int arr[]){
-    ships1* curr = head1;
+void remove_ship1(ships1** head1, int arr[]){
+    ships1* curr = *head1;
 
-    if(check_value1(head1, arr) && head1->next != NULL) {
-        ships1 *hold = head1;
-        head1 = head1->next;
-        free(hold);
-    }
-    if(check_value1(head1, arr) && head1->next == NULL){
-        head1->arr1[0] = -1;
+    if(check_value1(*head1, arr)){
+        if((*head1)->next != NULL) {
+            ships1 *hold = *head1;
+            head1 = (*head1)->next;
+            free(hold);
+        }
+        if((*head1)->next == NULL)
+            (*head1)->arr1[0] = -1;
     }
     else{
         while(! check_value1(curr->next, arr))
@@ -80,16 +78,17 @@ void remove_ship1(int arr[]){
         free(hold);
     }
 }
-void remove_ship2(int arr[]){
-    ships2* curr = head2;
+void remove_ship2(ships2** head2, int arr[]){
+    ships1* curr = *head2;
 
-    if(check_value2(head2, arr) && head2->next != NULL) {
-        ships2 *hold = head2;
-        head2 = head2->next;
-        free(hold);
-    }
-    if(check_value2(head2, arr) && head2->next == NULL){
-        head2->arr2[0] = -1;//end of game
+    if(check_value2(*head2, arr)){
+        if((*head2)->next != NULL) {
+            ships1* hold = *head2;
+            head2 = (*head2)->next;
+            free(hold);
+        }
+        if((*head2)->next == NULL)
+            (*head2)->arr2[0] = -1;
     }
     else{
         while(! check_value2(curr->next, arr))
@@ -119,7 +118,7 @@ int find_length(int arr[]){
     }
     return len;
 }
-//S:a ship is in this place but it has not been a target, W:this place has no ship and has been a target, C:complete explosion has happened
+//S:a ship is in this place but it has not been a exploded, W:this place has no ship and has been a target, C:complete explosion has happened, E:explosion has happened, T:this place has been a target but did not have any ship
 void fill_board1(int arr[]){
     int x1 = arr[0] < arr[2] ? arr[0] : arr[2], x2 = arr[2] > arr[0] ? arr[2] : arr[0];
     int y1 = arr[1] < arr[3] ? arr[1] : arr[3], y2 = arr[1] < arr[3] ? arr[3] : arr[1];
@@ -318,7 +317,7 @@ void print(int player){
 //        scanf("%c",&wait);
     }
 }
-void get_inputs(int player){
+void get_inputs(ships1* head1, ships2* head2, int player){
     if(player == 1) {
         int counter = 0,  arr[4], is_locatable, temp_array[2], arr_size1[15] = {0};//arr_size[size of ship][number of this ship]
 
@@ -371,7 +370,7 @@ void get_inputs(int player){
                             head1 = new_ship1(arr);
 
                         else
-                            add_end1(new_ship1(arr));
+                            add_end1(head1, new_ship1(arr));
 
                         fill_board1(arr);
 
@@ -441,7 +440,7 @@ void get_inputs(int player){
                         head2 = new_ship2(arr);
 
                     else
-                        add_end2(new_ship2(arr));
+                        add_end2(head2, new_ship2(arr));
 
                     fill_board2(arr);
 
@@ -461,7 +460,17 @@ void get_inputs(int player){
     }
 }
 int is_shotable(int temp_row, int temp_column, int player){
+    if(player == 1){
+        int is_shotable = 1;
 
+        if(temp_row > 9 || temp_row < 0 || temp_column > 9 || temp_column < 0)
+            is_shotable = 0;
+
+        if(board2[temp_row][temp_column] == 'C' || board2[temp_row][temp_column] == 'E' || board2[temp_row][temp_column] == 'T')
+            is_shotable = 0;
+
+        return is_shotable;
+    }
 }
 void  print_shotable(int player){
     if(player == 1) {
@@ -522,14 +531,18 @@ void  print_shotable(int player){
 }
 
 int main(void){
+    int arr[4] = {-5, -5, -5, -5};
+    ships1* head1 = new_ship1(arr);
+    ships2* head2 = new_ship2(arr);
     //settings
+    map_size = 10;
     max_size = 5;
     arr_size[1] = 4;
     arr_size[2] = 3;
     arr_size[3] = 2;
     arr_size[5] = 1;
     int player1 = 1, player2 = 2;
-    get_inputs(2);
+    get_inputs(head1, head2, 2);
 //settings
 
     while(head1->arr1[0] != -1 || head2->arr2[0] != -1){
@@ -538,7 +551,7 @@ int main(void){
         do {
             print_shotable(1);
             scanf("%d %d", &temp_row, &temp_column);
-
+            is_shotable(temp_row - 1, temp_column - 1, 1);
         }while(is_shotable(temp_row, temp_column, player1));
 //player2 shots player1
         do {
