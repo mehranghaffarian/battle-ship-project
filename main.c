@@ -118,7 +118,7 @@ int find_length(int arr[]){
     }
     return len;
 }
-//S:a ship is in this place but it has not been a exploded, W:this place has no ship and has been a target, C:complete explosion has happened, E:explosion has happened, T:this place has been a target but did not have any ship
+//S:a ship is in this place but it has not been a exploded, C:complete explosion has happened, E:explosion has happened, T:this place has been a target but did not have any ship
 void fill_board1(int arr[]){
     int x1 = arr[0] < arr[2] ? arr[0] : arr[2], x2 = arr[2] > arr[0] ? arr[2] : arr[0];
     int y1 = arr[1] < arr[3] ? arr[1] : arr[3], y2 = arr[1] < arr[3] ? arr[3] : arr[1];
@@ -460,13 +460,24 @@ void get_inputs(ships1* head1, ships2* head2, int player){
     }
 }
 int is_shotable(int temp_row, int temp_column, int player){
+    int is_shotable = 1;
+
     if(player == 1){
-        int is_shotable = 1;
 
         if(temp_row > 9 || temp_row < 0 || temp_column > 9 || temp_column < 0)
             is_shotable = 0;
 
         if(board2[temp_row][temp_column] == 'C' || board2[temp_row][temp_column] == 'E' || board2[temp_row][temp_column] == 'T')
+            is_shotable = 0;
+
+        return is_shotable;
+    }
+    else if(player == 2){
+
+        if(temp_row > 9 || temp_row < 0 || temp_column > 9 || temp_column < 0)
+            is_shotable = 0;
+
+        if(board1[temp_row][temp_column] == 'C' || board1[temp_row][temp_column] == 'E' || board1[temp_row][temp_column] == 'T')
             is_shotable = 0;
 
         return is_shotable;
@@ -529,6 +540,71 @@ void  print_shotable(int player){
         }
     }
 }
+void fill_around(int row, int column, int player){//board of player must be filled
+    if(player == 1){
+
+        for(int i = row - 1;i <= row + 1;row++)
+            if(i > -1 && i < 10){
+                for(int j = column - 1;j <= column + 1;j++){
+                    if(j < 10 && j > -1)
+                        board1[i][j] = board1[i][j] == ' ' ? 'T' : board1[i][j];
+                }
+            }
+    }
+    else{
+        for(int i = row - 1;i <= row + 1;row++)
+            if(i > -1 && i < 10){
+                for(int j = column - 1;j <= column + 1;j++){
+                    if(j < 10 && j > -1)
+                        board2[i][j] = board2[i][j] == ' ' ? 'T' : board2[i][j];
+                }
+            }
+    }
+}
+int shot_it(ships1** head1, ships2** head2, int row, int column, int player){
+    int status = 0, temp_arr[4];//0:the target did not have any ship -> next player, 1:the target had ship -> player prize
+
+    //player 1 shots player 2
+    if(player == 1){
+        if(board2[row][column] == 'S'){
+            status = 1;
+            point1++;
+            board2[row][column] = 'E';
+            if((row - 1 > -1 && column - 1 > -1 && board2[row - 1][column - 1] == 'E')||(row - 1 > -1 && board2[row - 1][column] == 'E')||(row - 1 > -1 && column + 1 < 10 && board2[row - 1][column + 1] == 'E')||(column - 1 > -1 && board2[row][column - 1] == 'E')||(column + 1 < 10 && board2[row][column + 1] == 'E')||(row + 1 < 10 && column - 1 > -1 && board2[row + 1][column - 1] == 'E')||(row + 1 < 10 && board2[row + 1][column] == 'E')||(row + 1 < 10 && column + 1 < 10 && board2[row + 1][column + 1] == 'E')){
+                ships2* curr = *head2;
+
+                while(curr != NULL){
+                    if(((curr->arr2[0] <= row && row <= curr->arr2[2]) || (curr->arr2[2] <= row && row <= curr->arr2[0]))  &&  ((curr->arr2[1] <= column && curr->arr2[3] >= column) || (curr->arr2[3] <= column && curr->arr2[1] >= column))){
+
+                    }
+
+                    curr = curr->next;
+                }
+            }
+            else{
+                point1 += 25;
+                fill_around(row, column, 2);
+                temp_arr[0] = temp_arr[2] = row;
+                temp_arr[1] = temp_arr[3] = column;
+                remove_ship2((ships2 **) head2, temp_arr);
+            }
+        }
+        else {
+            status = 0;
+            board2[row][column] = 'T';
+        }
+    }
+    if(player == 2){
+        if(board1[row][column] == 'S'){
+            status = 1;
+            point2++;
+            board1[row][column] = 'E';
+        }
+        else
+            status = 0;
+    }
+    return status;
+}
 
 int main(void){
     int arr[4] = {-5, -5, -5, -5};
@@ -542,27 +618,51 @@ int main(void){
     arr_size[3] = 2;
     arr_size[5] = 1;
     int player1 = 1, player2 = 2;
-    get_inputs(head1, head2, 2);
+//    get_inputs(head1, head2, 2);
 //settings
+board2[1][5] = 'S';
 
     while(head1->arr1[0] != -1 || head2->arr2[0] != -1){
-        int temp_row, temp_column;
+        int temp_row, temp_column, turn = 1;
+
         //player1 shots player2
         do {
             print_shotable(1);
             scanf("%d %d", &temp_row, &temp_column);
-            is_shotable(temp_row - 1, temp_column - 1, 1);
-        }while(is_shotable(temp_row, temp_column, player1));
-//player2 shots player1
-        do {
-            print_shotable(2);
-            scanf("%d %d", &temp_row, &temp_column);
 
+            if(is_shotable(temp_row - 1, temp_column - 1, 1))
+                turn = shot_it(&head1, &head2, temp_row - 1, temp_column - 1, 1);
 
+            else
+                turn = 2;
 
-        }while(is_shotable(temp_row, temp_column, player2));
-    }
+        }while(! is_shotable(temp_row - 1, temp_column - 1, player1) || turn == 1);
+
+        //player2 shots player1
+//        do {
+//            print_shotable(2);
+//            scanf("%d %d", &temp_row, &temp_column);
+//
+//
+//
+//        }while(! is_shotable(temp_row, temp_column, player2) && turn == 2);
+   }
+
 
 
     return 0;
 }
+//player1->mehran???
+//be careful about the surrounding places of a complete exploded ship
+// be careful about map size errors
+//players points
+//player chooses the name(saved or new)
+//bot can be a constant player
+//bot is obligation but its map is not(has++)
+//loading last game is obligation
+//these are obligations Score Board Exit choose from available users new user
+//rocket is orbitrary->-2
+//saving is obligation->-1
+//saving the whole game is arbitrary
+// 1->25---2->12---3->8---5->5
+//is it true in the function (shot_it(remove_ship1((ships1 **) head2, temp_arr);))
