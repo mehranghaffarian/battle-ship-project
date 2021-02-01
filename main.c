@@ -3,7 +3,7 @@
 # include <windows.h>
 # include <time.h>
 
-int point1, point2, max_size, ships_sum = 21, arr_size[15], map_size = 10;
+int point1, point2, max_size, ships_sum = 21, arr_size[15], map_size = 10, shot_point[15];
 
 typedef struct ships_data1{
     int arr1[4];//xs, xe, ys, ye->->xs:x_start, ye:y_end
@@ -570,28 +570,62 @@ int shot_it(ships1** head1, ships2** head2, int row, int column, int player){
             status = 1;
             point1++;
             board2[row][column] = 'E';
+
+            //if any surrounding place has been exploded we have to judge whether it was complete explosion or a simple explosion
             if((row - 1 > -1 && column - 1 > -1 && board2[row - 1][column - 1] == 'E')||(row - 1 > -1 && board2[row - 1][column] == 'E')||(row - 1 > -1 && column + 1 < 10 && board2[row - 1][column + 1] == 'E')||(column - 1 > -1 && board2[row][column - 1] == 'E')||(column + 1 < 10 && board2[row][column + 1] == 'E')||(row + 1 < 10 && column - 1 > -1 && board2[row + 1][column - 1] == 'E')||(row + 1 < 10 && board2[row + 1][column] == 'E')||(row + 1 < 10 && column + 1 < 10 && board2[row + 1][column + 1] == 'E')){
                 ships2* curr = *head2;
 
                 while(curr != NULL){
+                    int is_colmplete_explosion = 1;
                     if(((curr->arr2[0] <= row && row <= curr->arr2[2]) || (curr->arr2[2] <= row && row <= curr->arr2[0]))  &&  ((curr->arr2[1] <= column && curr->arr2[3] >= column) || (curr->arr2[3] <= column && curr->arr2[1] >= column))){
+                        int row1 = curr->arr2[0] < curr->arr2[2] ? curr->arr2[0] : curr->arr2[2], row2 = curr->arr2[0] > curr->arr2[2] ? curr->arr2[0] : curr->arr2[2];
+                        int column1 = curr->arr2[1] < curr->arr2[3] ? curr->arr2[1] : curr->arr2[3], column2 = curr->arr2[1] > curr->arr2[3] ? curr->arr2[1] : curr->arr2[3];
 
+                        for(int i = row1;i <= row2;i++){
+                            if(i > -1 && i < 10){
+                                for(int j = column1;j <= column2;j++){
+                                    if(j > -1 && j < 10){
+                                        if(board2[i][j] != 'E')
+                                            is_colmplete_explosion = 0;
+                                    }
+                                }
+                            }
+                        }
+                        if(is_colmplete_explosion == 1)
+                        {
+                            temp_arr[0] = curr->arr2[0];
+                            temp_arr[1] = curr->arr2[1];
+                            temp_arr[2] = curr->arr2[2];
+                            temp_arr[3] = curr->arr2[3];
+
+                            point1 += shot_point[find_length(temp_arr)];
+                            remove_ship2(head2, temp_arr);
+
+                            for(int i =row1;i <= row2;i++){
+                                for(int j = column1;j <= column2;j++){
+                                    fill_around(i, j, 2);
+                                    board2[i][j] = 'C';
+                                }
+                            }
+                            printf("\nNICE SHOT!! COMPLETE EXPLOSION\n");
+                        }
                     }
-
                     curr = curr->next;
                 }
             }
             else{
-                point1 += 25;
+                point1 += shot_point[1];
                 fill_around(row, column, 2);
                 temp_arr[0] = temp_arr[2] = row;
                 temp_arr[1] = temp_arr[3] = column;
-                remove_ship2((ships2 **) head2, temp_arr);
+                remove_ship2(head2, temp_arr);
+                printf("\nWELL DONE?! COMPLETE EXPLOSION\n");
             }
         }
         else {
             status = 0;
             board2[row][column] = 'T';
+            printf("\nOops?! NO ship\n");
         }
     }
     if(player == 2){
@@ -599,9 +633,63 @@ int shot_it(ships1** head1, ships2** head2, int row, int column, int player){
             status = 1;
             point2++;
             board1[row][column] = 'E';
+
+            //if any surrounding place has been exploded we have to judge whether it was complete explosion or a simple explosion
+            if((row - 1 > -1 && column - 1 > -1 && board1[row - 1][column - 1] == 'E')||(row - 1 > -1 && board1[row - 1][column] == 'E')||(row - 1 > -1 && column + 1 < 10 && board1[row - 1][column + 1] == 'E')||(column - 1 > -1 && board1[row][column - 1] == 'E')||(column + 1 < 10 && board1[row][column + 1] == 'E')||(row + 1 < 10 && column - 1 > -1 && board1[row + 1][column - 1] == 'E')||(row + 1 < 10 && board1[row + 1][column] == 'E')||(row + 1 < 10 && column + 1 < 10 && board1[row + 1][column + 1] == 'E')){
+                ships1* curr = *head1;
+
+                while(curr != NULL){
+                    int is_colmplete_explosion = 1;
+                    if(((curr->arr1[0] <= row && row <= curr->arr1[2]) || (curr->arr1[2] <= row && row <= curr->arr1[0]))  &&  ((curr->arr1[1] <= column && curr->arr1[3] >= column) || (curr->arr1[3] <= column && curr->arr1[1] >= column))){
+                        int row1 = curr->arr1[0] < curr->arr1[2] ? curr->arr1[0] : curr->arr1[2], row2 = curr->arr1[0] > curr->arr1[2] ? curr->arr1[0] : curr->arr1[2];
+                        int column1 = curr->arr1[1] < curr->arr1[3] ? curr->arr1[1] : curr->arr1[3], column2 = curr->arr1[1] > curr->arr1[3] ? curr->arr1[1] : curr->arr1[3];
+
+                        for(int i = row1;i <= row2;i++){
+                            if(i > -1 && i < 10){
+                                for(int j = column1;j <= column2;j++){
+                                    if(j > -1 && j < 10){
+                                        if(board1[i][j] != 'E')
+                                            is_colmplete_explosion = 0;
+                                    }
+                                }
+                            }
+                        }
+                        if(is_colmplete_explosion == 1)
+                        {
+                            temp_arr[0] = curr->arr1[0];
+                            temp_arr[1] = curr->arr1[1];
+                            temp_arr[2] = curr->arr1[2];
+                            temp_arr[3] = curr->arr1[3];
+
+                            point2 += shot_point[find_length(temp_arr)];
+                            remove_ship1(head1, temp_arr);
+
+                            for(int i =row1;i <= row2;i++){
+                                for(int j = column1;j <= column2;j++){
+                                    fill_around(i, j, 2);
+                                    board1[i][j] = 'C';
+                                }
+                            }
+                            printf("\nNICE SHOT!! COMPLETE EXPLOSION\n");
+                        }
+                    }
+                    curr = curr->next;
+                }
+            }
+            else{
+                point2 += shot_point[1];
+                fill_around(row, column, 1);
+                temp_arr[0] = temp_arr[2] = row;
+                temp_arr[1] = temp_arr[3] = column;
+                remove_ship1(head1, temp_arr);
+                printf("\nWELL DONE?! COMPLETE EXPLOSION\n");
+            }
         }
-        else
+        else {
             status = 0;
+            board1[row][column] = 'T';
+            printf("\nOops?! NO ship\n");
+        }
     }
     return status;
 }
@@ -613,39 +701,59 @@ int main(void){
     //settings
     map_size = 10;
     max_size = 5;
+    shot_point[1] = 25;
+    shot_point[2] = 12;
+    shot_point[3] = 8;
+    shot_point[5] = 5;
     arr_size[1] = 4;
     arr_size[2] = 3;
     arr_size[3] = 2;
     arr_size[5] = 1;
-    int player1 = 1, player2 = 2;
+    int player1 = 1, player2 = 2, a;
 //    get_inputs(head1, head2, 2);
 //settings
-board2[1][5] = 'S';
+//// FOR TEST
+int barr[4] = {4, 3, 4, 7};
+for(int j = 3;j < 8;j++)
+    board2[4][j] = 'S';
+head1 = new_ship1(barr);
+for(int j = 3;j < 8;j++)
+        board1[4][j] = 'S';
+head2 = new_ship2(barr);
+////FOR TEST
 
-    while(head1->arr1[0] != -1 || head2->arr2[0] != -1){
-        int temp_row, temp_column, turn = 1;
+    while(head1->arr1[0] != -1 && head2->arr2[0] != -1){
+        int temp_row, temp_column, turn;
 
         //player1 shots player2
         do {
             print_shotable(1);
+            printf("\nplayer1 chose your target:\n");
             scanf("%d %d", &temp_row, &temp_column);
+            a = is_shotable(temp_row - 1, temp_column - 1, 1);
 
-            if(is_shotable(temp_row - 1, temp_column - 1, 1))
+            if(a)
                 turn = shot_it(&head1, &head2, temp_row - 1, temp_column - 1, 1);
 
             else
-                turn = 2;
+                printf("\ntarget is not acceptable\n");
 
-        }while(! is_shotable(temp_row - 1, temp_column - 1, player1) || turn == 1);
+        }while(a == 0 || turn);
 
         //player2 shots player1
-//        do {
-//            print_shotable(2);
-//            scanf("%d %d", &temp_row, &temp_column);
-//
-//
-//
-//        }while(! is_shotable(temp_row, temp_column, player2) && turn == 2);
+        do {
+            print_shotable(2);
+            printf("\nplayer2 chose your target:\n");
+            scanf("%d %d", &temp_row, &temp_column);
+            a = is_shotable(temp_row - 1, temp_column - 1, player2);
+
+            if(a)
+                turn = shot_it(&head1, &head2, temp_row - 1, temp_column - 1, 2);
+
+            else
+                printf("\ntarget is not acceptable\n");
+
+        }while(a == 0 || turn);
    }
 
 
@@ -658,11 +766,10 @@ board2[1][5] = 'S';
 //players points
 //player chooses the name(saved or new)
 //bot can be a constant player
-//bot is obligation but its map is not(has++)
+//////bot is obligation but its map is not(has++)
 //loading last game is obligation
 //these are obligations Score Board Exit choose from available users new user
 //rocket is orbitrary->-2
 //saving is obligation->-1
 //saving the whole game is arbitrary
-// 1->25---2->12---3->8---5->5
 //is it true in the function (shot_it(remove_ship1((ships1 **) head2, temp_arr);))
