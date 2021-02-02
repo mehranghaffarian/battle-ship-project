@@ -680,17 +680,20 @@ int main(void){
 //settings
 //// FOR TEST
     int carr[4] = {2, 2, 2, 3};
-for(int j = 2;j <= 3;j++)
-    board2[2][j] = 'S';
+    board2[2][2] = 'S';
+    board2[2][3] = 'S';
 head2 = new_ship2(carr);
-for(int j = 2;j <= 3;j++)
-        board1[2][j] = 'S';
-    head1 = new_ship1(carr);
+        board1[2][2] = 'S';
+        board1[2][3] = 'S';
+head1 = new_ship1(carr);
     int barr[4] = {0, 0, 0, 0};
     add_end2(head2, new_ship2(barr));
     add_end1(head1, new_ship1(barr));
+    board1[0][0] = 'S';
+    board2[0][0] = 'S';
+    print(1);
 ////FOR TEST
-print(1);
+
     while(head1->arr1[0] != -1 && head2->arr2[0] != -1){
         int temp_row, temp_column, turn;
 
@@ -734,7 +737,7 @@ print(1);
 
 
     printf("\n\nplayer1:%d  --  player2:%d", point1, point2);
-    printf("\nthe winer is player%d\n", point1 > point2 ? 1 : 2);
+    printf("\nthe winner is player%d\n", point1 > point2 ? 1 : 2);
 print(2);
     return 0;
 }
