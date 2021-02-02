@@ -543,26 +543,30 @@ void  print_shotable(int player){
 void fill_around(int row, int column, int player){//board of player must be filled
     if(player == 1){
 
-        for(int i = row - 1;i <= row + 1;row++)
-            if(i > -1 && i < 10){
-                for(int j = column - 1;j <= column + 1;j++){
-                    if(j < 10 && j > -1)
-                        board1[i][j] = board1[i][j] == ' ' ? 'T' : board1[i][j];
+        for(int i = row - 1;i <= row + 1;row++) {
+            if (i > -1 && i < 10) {
+                for (int j = column - 1; j <= column + 1; j++) {
+                    if (j < 10 && j > -1)
+                        if (board1[i][j] != 'E')
+                            board1[i][j] = 'T';
                 }
             }
+        }
     }
     else{
-        for(int i = row - 1;i <= row + 1;row++)
-            if(i > -1 && i < 10){
-                for(int j = column - 1;j <= column + 1;j++){
-                    if(j < 10 && j > -1)
-                        board2[i][j] = board2[i][j] == ' ' ? 'T' : board2[i][j];
+        for(int i = row - 1;i <= row + 1;row++) {
+            if (i > -1 && i < 10) {
+                for (int j = column - 1; j <= column + 1; j++) {
+                    if (j < 10 && j > -1)
+                        if (board2[i][j] != 'E')
+                            board2[i][j] = 'T';
                 }
             }
+        }
     }
 }
 int shot_it(ships1** head1, ships2** head2, int row, int column, int player){
-    int status = 0, temp_arr[4];//0:the target did not have any ship -> next player, 1:the target had ship -> player prize
+    int status = 0;//0:the target did not have any ship -> next player, 1:the target had ship -> player prize
 
     //player 1 shots player 2
     if(player == 1){
@@ -572,7 +576,7 @@ int shot_it(ships1** head1, ships2** head2, int row, int column, int player){
             board2[row][column] = 'E';
 
             //if any surrounding place has been exploded we have to judge whether it was complete explosion or a simple explosion
-            if((row - 1 > -1 && column - 1 > -1 && board2[row - 1][column - 1] == 'E')||(row - 1 > -1 && board2[row - 1][column] == 'E')||(row - 1 > -1 && column + 1 < 10 && board2[row - 1][column + 1] == 'E')||(column - 1 > -1 && board2[row][column - 1] == 'E')||(column + 1 < 10 && board2[row][column + 1] == 'E')||(row + 1 < 10 && column - 1 > -1 && board2[row + 1][column - 1] == 'E')||(row + 1 < 10 && board2[row + 1][column] == 'E')||(row + 1 < 10 && column + 1 < 10 && board2[row + 1][column + 1] == 'E')){
+            if((row - 1 > -1 && board2[row - 1][column] == 'E')||(column - 1 > -1 && board2[row][column - 1] == 'E')||(board2[row][column] == 'E')||(column + 1 < 10 && board2[row][column + 1] == 'E')||(row + 1 < 10 && board2[row + 1][column] == 'E')){
                 ships2* curr = *head2;
 
                 while(curr != NULL){
@@ -582,29 +586,20 @@ int shot_it(ships1** head1, ships2** head2, int row, int column, int player){
                         int column1 = curr->arr2[1] < curr->arr2[3] ? curr->arr2[1] : curr->arr2[3], column2 = curr->arr2[1] > curr->arr2[3] ? curr->arr2[1] : curr->arr2[3];
 
                         for(int i = row1;i <= row2;i++){
-                            if(i > -1 && i < 10){
                                 for(int j = column1;j <= column2;j++){
-                                    if(j > -1 && j < 10){
                                         if(board2[i][j] != 'E')
                                             is_colmplete_explosion = 0;
-                                    }
-                                }
                             }
                         }
                         if(is_colmplete_explosion == 1)
                         {
-                            temp_arr[0] = curr->arr2[0];
-                            temp_arr[1] = curr->arr2[1];
-                            temp_arr[2] = curr->arr2[2];
-                            temp_arr[3] = curr->arr2[3];
-
-                            point1 += shot_point[find_length(temp_arr)];
-                            remove_ship2(head2, temp_arr);
+                            point1 += shot_point[find_length(curr->arr2)];
+                            remove_ship2(head2, curr->arr2);
 
                             for(int i =row1;i <= row2;i++){
                                 for(int j = column1;j <= column2;j++){
-                                    fill_around(i, j, 2);
                                     board2[i][j] = 'C';
+                                    fill_around(i, j, 2);
                                 }
                             }
                             printf("\nNICE SHOT!! COMPLETE EXPLOSION\n");
@@ -612,14 +607,6 @@ int shot_it(ships1** head1, ships2** head2, int row, int column, int player){
                     }
                     curr = curr->next;
                 }
-            }
-            else{
-                point1 += shot_point[1];
-                fill_around(row, column, 2);
-                temp_arr[0] = temp_arr[2] = row;
-                temp_arr[1] = temp_arr[3] = column;
-                remove_ship2(head2, temp_arr);
-                printf("\nWELL DONE?! COMPLETE EXPLOSION\n");
             }
         }
         else {
@@ -635,7 +622,7 @@ int shot_it(ships1** head1, ships2** head2, int row, int column, int player){
             board1[row][column] = 'E';
 
             //if any surrounding place has been exploded we have to judge whether it was complete explosion or a simple explosion
-            if((row - 1 > -1 && column - 1 > -1 && board1[row - 1][column - 1] == 'E')||(row - 1 > -1 && board1[row - 1][column] == 'E')||(row - 1 > -1 && column + 1 < 10 && board1[row - 1][column + 1] == 'E')||(column - 1 > -1 && board1[row][column - 1] == 'E')||(column + 1 < 10 && board1[row][column + 1] == 'E')||(row + 1 < 10 && column - 1 > -1 && board1[row + 1][column - 1] == 'E')||(row + 1 < 10 && board1[row + 1][column] == 'E')||(row + 1 < 10 && column + 1 < 10 && board1[row + 1][column + 1] == 'E')){
+            if((row - 1 > -1 && board1[row - 1][column] == 'E')||(column - 1 > -1 && board1[row][column - 1] == 'E')||(board1[row][column] == 'E')||(column + 1 < 10 && board1[row][column + 1] == 'E')||(row + 1 < 10 && board1[row + 1][column] == 'E')){
                 ships1* curr = *head1;
 
                 while(curr != NULL){
@@ -645,29 +632,20 @@ int shot_it(ships1** head1, ships2** head2, int row, int column, int player){
                         int column1 = curr->arr1[1] < curr->arr1[3] ? curr->arr1[1] : curr->arr1[3], column2 = curr->arr1[1] > curr->arr1[3] ? curr->arr1[1] : curr->arr1[3];
 
                         for(int i = row1;i <= row2;i++){
-                            if(i > -1 && i < 10){
                                 for(int j = column1;j <= column2;j++){
-                                    if(j > -1 && j < 10){
                                         if(board1[i][j] != 'E')
                                             is_colmplete_explosion = 0;
-                                    }
-                                }
                             }
                         }
                         if(is_colmplete_explosion == 1)
                         {
-                            temp_arr[0] = curr->arr1[0];
-                            temp_arr[1] = curr->arr1[1];
-                            temp_arr[2] = curr->arr1[2];
-                            temp_arr[3] = curr->arr1[3];
-
-                            point2 += shot_point[find_length(temp_arr)];
-                            remove_ship1(head1, temp_arr);
+                            point2 += shot_point[find_length(curr->arr1)];
+                            remove_ship1(head1, curr->arr1);
 
                             for(int i =row1;i <= row2;i++){
                                 for(int j = column1;j <= column2;j++){
-                                    fill_around(i, j, 2);
                                     board1[i][j] = 'C';
+                                    fill_around(i, j, 1);
                                 }
                             }
                             printf("\nNICE SHOT!! COMPLETE EXPLOSION\n");
@@ -675,14 +653,6 @@ int shot_it(ships1** head1, ships2** head2, int row, int column, int player){
                     }
                     curr = curr->next;
                 }
-            }
-            else{
-                point2 += shot_point[1];
-                fill_around(row, column, 1);
-                temp_arr[0] = temp_arr[2] = row;
-                temp_arr[1] = temp_arr[3] = column;
-                remove_ship1(head1, temp_arr);
-                printf("\nWELL DONE?! COMPLETE EXPLOSION\n");
             }
         }
         else {
@@ -713,13 +683,19 @@ int main(void){
 //    get_inputs(head1, head2, 2);
 //settings
 //// FOR TEST
-int barr[4] = {4, 3, 4, 7};
-for(int j = 3;j < 8;j++)
-    board2[4][j] = 'S';
-head1 = new_ship1(barr);
-for(int j = 3;j < 8;j++)
-        board1[4][j] = 'S';
+int barr[4] = {0, 0, 0, 2};
+for(int j = 0;j < 3;j++)
+    board2[0][j] = 'S';
+board1[2][0] = 'S';
+    head1 = new_ship1(barr);
+    int carr[4] = {2, 0, 2, 0};
+    add_end1(head1, new_ship1(carr));
+for(int j = 0;j < 3;j++)
+        board1[0][j] = 'S';
 head2 = new_ship2(barr);
+    board2[2][0] = 'S';
+    head2 = new_ship2(barr);
+    add_end2(head2, new_ship2(carr));
 ////FOR TEST
 
     while(head1->arr1[0] != -1 && head2->arr2[0] != -1){
@@ -727,37 +703,46 @@ head2 = new_ship2(barr);
 
         //player1 shots player2
         do {
-            print_shotable(1);
-            printf("\nplayer1 chose your target:\n");
-            scanf("%d %d", &temp_row, &temp_column);
-            a = is_shotable(temp_row - 1, temp_column - 1, 1);
+            if(head1->arr1[0] != -1 && head2->arr2[0] != -1) {
+                print_shotable(1);
+                printf("player1:%d  --  player2:%d\n", point1, point2);
+                printf("player1 chose your target:\n");
+                scanf("%d %d", &temp_row, &temp_column);
+                a = is_shotable(temp_row - 1, temp_column - 1, 1);
 
-            if(a)
-                turn = shot_it(&head1, &head2, temp_row - 1, temp_column - 1, 1);
+                if (a)
+                    turn = shot_it(&head1, &head2, temp_row - 1, temp_column - 1, 1);
 
-            else
-                printf("\ntarget is not acceptable\n");
+                else
+                    printf("\ntarget is not acceptable\n");
+            }
 
-        }while(a == 0 || turn);
+        }while((a == 0 || turn) && head1->arr1[0] != -1 && head2->arr2[0] != -1);
 
         //player2 shots player1
         do {
-            print_shotable(2);
-            printf("\nplayer2 chose your target:\n");
-            scanf("%d %d", &temp_row, &temp_column);
-            a = is_shotable(temp_row - 1, temp_column - 1, player2);
+            if(head1->arr1[0] != -1 && head2->arr2[0] != -1) {
+                print_shotable(2);
+                printf("player1:%d  --  player2:%d\n", point1, point2);
+                printf("player2 chose your target:\n");
+                scanf("%d %d", &temp_row, &temp_column);
+                a = is_shotable(temp_row - 1, temp_column - 1, player2);
 
-            if(a)
-                turn = shot_it(&head1, &head2, temp_row - 1, temp_column - 1, 2);
+                if (a)
+                    turn = shot_it(&head1, &head2, temp_row - 1, temp_column - 1, 2);
 
-            else
-                printf("\ntarget is not acceptable\n");
+                else
+                    printf("\ntarget is not acceptable\n");
+            }
 
-        }while(a == 0 || turn);
+        }while((a == 0 || turn) && head1->arr1[0] != -1 && head2->arr2[0] != -1);
    }
 
 
 
+    printf("\n\nplayer1:%d  --  player2:%d", point1, point2);
+    printf("\nthe winer is player%d\n", point1 > point2 ? 1 : 2);
+print(2);
     return 0;
 }
 //player1->mehran???
@@ -767,9 +752,8 @@ head2 = new_ship2(barr);
 //player chooses the name(saved or new)
 //bot can be a constant player
 //////bot is obligation but its map is not(has++)
-//loading last game is obligation
+/////loading last game is obligation
 //these are obligations Score Board Exit choose from available users new user
 //rocket is orbitrary->-2
-//saving is obligation->-1
+/////saving is obligation->-1
 //saving the whole game is arbitrary
-//is it true in the function (shot_it(remove_ship1((ships1 **) head2, temp_arr);))
