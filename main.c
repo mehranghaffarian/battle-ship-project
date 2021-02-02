@@ -135,7 +135,7 @@ void fill_board1(int arr[]){
 //is the ship in a column?
     else if(arr[0] == arr[2])
         for(int i = y1;i <= y2;i++)
-        board1[arr[0]][i] = 'S';
+            board1[arr[0]][i] = 'S';
 
 }
 void fill_board2(int arr[]){
@@ -165,45 +165,45 @@ int is_really_locatable(int array[], int player){
         if (array[0] >= 10 || array[1] >= 10 || array[0] <= -1 || array[1] <= -1)
             is_locatable = 0;
 
-       if(array[0] - 1 >= 0 && array[1] - 1 >= 0 ) {
+        if(array[0] - 1 >= 0 && array[1] - 1 >= 0 ) {
             if (board1[array[0] - 1][array[1] - 1] == 'S')
                 is_locatable = 0;
         }
 
-       if(array[0] - 1 >= 0) {
+        if(array[0] - 1 >= 0) {
             if( board1[array[0] - 1][array[1]] == 'S')
-            is_locatable = 0;
+                is_locatable = 0;
         }
 
-      if(array[0] - 1 >= 0 && array[1] + 1 <= 9) {
+        if(array[0] - 1 >= 0 && array[1] + 1 <= 9) {
             if (board1[array[0] - 1][array[1] + 1] == 'S')
                 is_locatable = 0;
         }
 
-      if(array[1] + 1 <= 9) {
+        if(array[1] + 1 <= 9) {
             if (board1[array[0]][array[1] + 1] == 'S')
                 is_locatable = 0;
         }
 
-       if(board1[array[0]][array[1]] == 'S')
+        if(board1[array[0]][array[1]] == 'S')
             is_locatable = 0;
 
-       if(array[1] - 1 >= 0 ) {
+        if(array[1] - 1 >= 0 ) {
             if (  board1[array[0]][array[1] - 1] == 'S')
-            is_locatable = 0;
+                is_locatable = 0;
         }
 
-       if(array[0] + 1 <= 9 && array[1] - 1 >= 0) {
+        if(array[0] + 1 <= 9 && array[1] - 1 >= 0) {
             if ( board1[array[0] + 1][array[1] - 1] == 'S')
-            is_locatable = 0;
+                is_locatable = 0;
         }
 
-      if(array[0] + 1 <= 9) {
+        if(array[0] + 1 <= 9) {
             if (board1[array[0] + 1][array[1]] == 'S')
                 is_locatable = 0;
         }
 
-      if(array[0] + 1 <= 9 && array[1] + 1 <= 9 ) {
+        if(array[0] + 1 <= 9 && array[1] + 1 <= 9 ) {
             if (board1[array[0] + 1][array[1] + 1] == 'S')
                 is_locatable = 0;
         }
@@ -257,7 +257,7 @@ int is_really_locatable(int array[], int player){
         }
 
     }
-        return is_locatable;
+    return is_locatable;
 }
 void print(int player){
     if(player == 1) {
@@ -341,51 +341,51 @@ void get_inputs(ships1* head1, ships2* head2, int player){
             for(int f = 0;f < 4;f++)
                 arr[f] -= 1;//because of the fact that arrays start from 0
 
-                int x1 = arr[0] < arr[2] ? arr[0] : arr[2], x2 = arr[2] > arr[0] ? arr[2] : arr[0];
-                int y1 = arr[1] < arr[3] ? arr[1] : arr[3], y2 = arr[1] < arr[3] ? arr[3] : arr[1];
+            int x1 = arr[0] < arr[2] ? arr[0] : arr[2], x2 = arr[2] > arr[0] ? arr[2] : arr[0];
+            int y1 = arr[1] < arr[3] ? arr[1] : arr[3], y2 = arr[1] < arr[3] ? arr[3] : arr[1];
 
-                if(arr[0] != arr[2] && arr[1] != arr[3])
-                    is_locatable = 0;
+            if(arr[0] != arr[2] && arr[1] != arr[3])
+                is_locatable = 0;
 
-                if(arr[0] == arr[2]){
-                    for(int i = y1;i <= y2;i++) {
-                        temp_array[0] = arr[0];
-                        temp_array[1] = i;
-                        if (is_really_locatable(temp_array, player) == 0)
-                            is_locatable = 0;
-                    }
-                }
-                if(arr[1] == arr[3]){
-                    for(int i = x1;i <= x2;i++) {
-                        temp_array[1] = arr[1];
-                        temp_array[0] = i;
-                        if (is_really_locatable(temp_array, player) == 0)
-                            is_locatable = 0;
-                    }
-                }
-
-                if(is_locatable == 1 && arr_size1[find_length(arr)] != 0 && find_length(arr) <= max_size) {
-                    if (counter + find_length(arr) <= ships_sum) {
-                        if (counter == 0)
-                            head1 = new_ship1(arr);
-
-                        else
-                            add_end1(head1, new_ship1(arr));
-
-                        fill_board1(arr);
-
-                        counter += find_length(arr);
-                        print(player);
-                        arr_size1[find_length(arr)]--;
-                    }
-                    else
+            if(arr[0] == arr[2]){
+                for(int i = y1;i <= y2;i++) {
+                    temp_array[0] = arr[0];
+                    temp_array[1] = i;
+                    if (is_really_locatable(temp_array, player) == 0)
                         is_locatable = 0;
+                }
+            }
+            if(arr[1] == arr[3]){
+                for(int i = x1;i <= x2;i++) {
+                    temp_array[1] = arr[1];
+                    temp_array[0] = i;
+                    if (is_really_locatable(temp_array, player) == 0)
+                        is_locatable = 0;
+                }
+            }
+
+            if(is_locatable == 1 && arr_size1[find_length(arr)] != 0 && find_length(arr) <= max_size) {
+                if (counter + find_length(arr) <= ships_sum) {
+                    if (counter == 0)
+                        head1 = new_ship1(arr);
+
+                    else
+                        add_end1(head1, new_ship1(arr));
+
+                    fill_board1(arr);
+
+                    counter += find_length(arr);
+                    print(player);
+                    arr_size1[find_length(arr)]--;
                 }
                 else
                     is_locatable = 0;
+            }
+            else
+                is_locatable = 0;
 
-                if(is_locatable == 0)
-                    printf("\nOops!!: your input is not acceptable. chose other locations\n");
+            if(is_locatable == 0)
+                printf("\nOops!!: your input is not acceptable. chose other locations\n");
         }
     }
     else {
@@ -575,7 +575,8 @@ int shot_it(ships1** head1, ships2** head2, int row, int column, int player){
             point1++;
             board2[row][column] = 'E';
 
-            //if any surrounding place has been exploded we have to judge whether it is a complete explosion or a simple explosion
+            //if any surrounding place has been exploded we have to judge whether it was complete explosion or a simple explosion
+            if((row - 1 > -1 && board2[row - 1][column] == 'E')||(column - 1 > -1 && board2[row][column - 1] == 'E')||(board2[row][column] == 'E')||(column + 1 < 10 && board2[row][column + 1] == 'E')||(row + 1 < 10 && board2[row + 1][column] == 'E')){
                 ships2* curr = *head2;
 
                 while(curr != NULL){
@@ -585,9 +586,9 @@ int shot_it(ships1** head1, ships2** head2, int row, int column, int player){
                         int column1 = curr->arr2[1] < curr->arr2[3] ? curr->arr2[1] : curr->arr2[3], column2 = curr->arr2[1] > curr->arr2[3] ? curr->arr2[1] : curr->arr2[3];
 
                         for(int i = row1;i <= row2;i++){
-                                for(int j = column1;j <= column2;j++){
-                                        if(board2[i][j] != 'E')
-                                            is_colmplete_explosion = 0;
+                            for(int j = column1;j <= column2;j++){
+                                if(board2[i][j] != 'E')
+                                    is_colmplete_explosion = 0;
                             }
                         }
                         if(is_colmplete_explosion == 1)
@@ -606,6 +607,7 @@ int shot_it(ships1** head1, ships2** head2, int row, int column, int player){
                     }
                     curr = curr->next;
                 }
+            }
         }
         else {
             status = 0;
@@ -619,7 +621,8 @@ int shot_it(ships1** head1, ships2** head2, int row, int column, int player){
             point2++;
             board1[row][column] = 'E';
 
-            //if any surrounding place has been exploded we have to judge whether it is a complete explosion or a simple explosion
+            //if any surrounding place has been exploded we have to judge whether it was complete explosion or a simple explosion
+            if((row - 1 > -1 && board1[row - 1][column] == 'E')||(column - 1 > -1 && board1[row][column - 1] == 'E')||(board1[row][column] == 'E')||(column + 1 < 10 && board1[row][column + 1] == 'E')||(row + 1 < 10 && board1[row + 1][column] == 'E')){
                 ships1* curr = *head1;
 
                 while(curr != NULL){
@@ -629,9 +632,9 @@ int shot_it(ships1** head1, ships2** head2, int row, int column, int player){
                         int column1 = curr->arr1[1] < curr->arr1[3] ? curr->arr1[1] : curr->arr1[3], column2 = curr->arr1[1] > curr->arr1[3] ? curr->arr1[1] : curr->arr1[3];
 
                         for(int i = row1;i <= row2;i++){
-                                for(int j = column1;j <= column2;j++){
-                                        if(board1[i][j] != 'E')
-                                            is_colmplete_explosion = 0;
+                            for(int j = column1;j <= column2;j++){
+                                if(board1[i][j] != 'E')
+                                    is_colmplete_explosion = 0;
                             }
                         }
                         if(is_colmplete_explosion == 1)
@@ -650,6 +653,7 @@ int shot_it(ships1** head1, ships2** head2, int row, int column, int player){
                     }
                     curr = curr->next;
                 }
+            }
         }
         else {
             status = 0;
@@ -662,8 +666,8 @@ int shot_it(ships1** head1, ships2** head2, int row, int column, int player){
 
 int main(void){
     int arr[4] = {-5, -5, -5, -5};
-    ships1* head1 = new_ship1(arr);
-    ships2* head2 = new_ship2(arr);
+    ships1* head1;// = new_ship1(arr);
+    ships2* head2;// = new_ship2(arr);
     //settings
     map_size = 10;
     max_size = 5;
@@ -679,19 +683,19 @@ int main(void){
 //    get_inputs(head1, head2, 2);
 //settings
 //// FOR TEST
-    int carr[4] = {2, 2, 2, 3};
-    board2[2][2] = 'S';
-    board2[2][3] = 'S';
-head2 = new_ship2(carr);
-        board1[2][2] = 'S';
-        board1[2][3] = 'S';
-head1 = new_ship1(carr);
-    int barr[4] = {0, 0, 0, 0};
-    add_end2(head2, new_ship2(barr));
-    add_end1(head1, new_ship1(barr));
-    board1[0][0] = 'S';
-    board2[0][0] = 'S';
-    print(1);
+    int barr[4] = {1, 1, 1, 2};
+    for(int j = 1;j < 3;j++)
+        board2[1][j] = 'S';
+    board1[3][2] = 'S';
+    head1 = new_ship1(barr);
+    int carr[4] = {3, 2, 3, 2};
+    add_end1(head1, new_ship1(carr));
+    for(int j = 1;j < 3;j++)
+        board1[1][j] = 'S';
+    board2[3][2] = 'S';
+    head2 = new_ship2(barr);
+    add_end2(head2, new_ship2(carr));
+    print(2);
 ////FOR TEST
 
     while(head1->arr1[0] != -1 && head2->arr2[0] != -1){
@@ -732,13 +736,16 @@ head1 = new_ship1(carr);
             }
 
         }while((a == 0 || turn) && head1->arr1[0] != -1 && head2->arr2[0] != -1);
-   }
+    }
 
 
 
     printf("\n\nplayer1:%d  --  player2:%d", point1, point2);
     printf("\nthe winner is player%d\n", point1 > point2 ? 1 : 2);
-print(2);
+    printf("the player1 board is as bellow\n");
+    print(1);
+    printf("the player2 board is as bellow\n");
+    print(2);
     return 0;
 }
 //player1->mehran???
