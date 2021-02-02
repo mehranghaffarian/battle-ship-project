@@ -547,7 +547,7 @@ void fill_around(int row, int column, int player){//board of player must be fill
             if (i > -1 && i < 10) {
                 for (int j = column - 1; j <= column + 1; j++) {
                     if (j < 10 && j > -1)
-                        if (board1[i][j] != 'E')
+                        if (board1[i][j] != 'E' && board1[i][j] != 'C')
                             board1[i][j] = 'T';
                 }
             }
@@ -558,7 +558,7 @@ void fill_around(int row, int column, int player){//board of player must be fill
             if (i > -1 && i < 10) {
                 for (int j = column - 1; j <= column + 1; j++) {
                     if (j < 10 && j > -1)
-                        if (board2[i][j] != 'E')
+                        if (board2[i][j] != 'E' && board2[i][j] != 'C')
                             board2[i][j] = 'T';
                 }
             }
@@ -575,8 +575,7 @@ int shot_it(ships1** head1, ships2** head2, int row, int column, int player){
             point1++;
             board2[row][column] = 'E';
 
-            //if any surrounding place has been exploded we have to judge whether it was complete explosion or a simple explosion
-            if((row - 1 > -1 && board2[row - 1][column] == 'E')||(column - 1 > -1 && board2[row][column - 1] == 'E')||(board2[row][column] == 'E')||(column + 1 < 10 && board2[row][column + 1] == 'E')||(row + 1 < 10 && board2[row + 1][column] == 'E')){
+            //if any surrounding place has been exploded we have to judge whether it is a complete explosion or a simple explosion
                 ships2* curr = *head2;
 
                 while(curr != NULL){
@@ -596,7 +595,7 @@ int shot_it(ships1** head1, ships2** head2, int row, int column, int player){
                             point1 += shot_point[find_length(curr->arr2)];
                             remove_ship2(head2, curr->arr2);
 
-                            for(int i =row1;i <= row2;i++){
+                            for(int i = row1;i <= row2;i++){
                                 for(int j = column1;j <= column2;j++){
                                     board2[i][j] = 'C';
                                     fill_around(i, j, 2);
@@ -607,7 +606,6 @@ int shot_it(ships1** head1, ships2** head2, int row, int column, int player){
                     }
                     curr = curr->next;
                 }
-            }
         }
         else {
             status = 0;
@@ -621,8 +619,7 @@ int shot_it(ships1** head1, ships2** head2, int row, int column, int player){
             point2++;
             board1[row][column] = 'E';
 
-            //if any surrounding place has been exploded we have to judge whether it was complete explosion or a simple explosion
-            if((row - 1 > -1 && board1[row - 1][column] == 'E')||(column - 1 > -1 && board1[row][column - 1] == 'E')||(board1[row][column] == 'E')||(column + 1 < 10 && board1[row][column + 1] == 'E')||(row + 1 < 10 && board1[row + 1][column] == 'E')){
+            //if any surrounding place has been exploded we have to judge whether it is a complete explosion or a simple explosion
                 ships1* curr = *head1;
 
                 while(curr != NULL){
@@ -642,7 +639,7 @@ int shot_it(ships1** head1, ships2** head2, int row, int column, int player){
                             point2 += shot_point[find_length(curr->arr1)];
                             remove_ship1(head1, curr->arr1);
 
-                            for(int i =row1;i <= row2;i++){
+                            for(int i = row1;i <= row2;i++){
                                 for(int j = column1;j <= column2;j++){
                                     board1[i][j] = 'C';
                                     fill_around(i, j, 1);
@@ -653,7 +650,6 @@ int shot_it(ships1** head1, ships2** head2, int row, int column, int player){
                     }
                     curr = curr->next;
                 }
-            }
         }
         else {
             status = 0;
@@ -683,21 +679,18 @@ int main(void){
 //    get_inputs(head1, head2, 2);
 //settings
 //// FOR TEST
-int barr[4] = {0, 0, 0, 2};
-for(int j = 0;j < 3;j++)
-    board2[0][j] = 'S';
-board1[2][0] = 'S';
-    head1 = new_ship1(barr);
-    int carr[4] = {2, 0, 2, 0};
-    add_end1(head1, new_ship1(carr));
-for(int j = 0;j < 3;j++)
-        board1[0][j] = 'S';
-head2 = new_ship2(barr);
-    board2[2][0] = 'S';
-    head2 = new_ship2(barr);
-    add_end2(head2, new_ship2(carr));
+    int carr[4] = {2, 2, 2, 3};
+for(int j = 2;j <= 3;j++)
+    board2[2][j] = 'S';
+head2 = new_ship2(carr);
+for(int j = 2;j <= 3;j++)
+        board1[2][j] = 'S';
+    head1 = new_ship1(carr);
+    int barr[4] = {0, 0, 0, 0};
+    add_end2(head2, new_ship2(barr));
+    add_end1(head1, new_ship1(barr));
 ////FOR TEST
-
+print(1);
     while(head1->arr1[0] != -1 && head2->arr2[0] != -1){
         int temp_row, temp_column, turn;
 
