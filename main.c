@@ -63,7 +63,7 @@ void remove_ship1(ships1** head1, int arr[]){
     if(check_value1(*head1, arr)){
         if((*head1)->next != NULL) {
             ships1 *hold = *head1;
-            head1 = (*head1)->next;
+            (*head1) = (*head1)->next;
             free(hold);
         }
         if((*head1)->next == NULL)
@@ -79,12 +79,12 @@ void remove_ship1(ships1** head1, int arr[]){
     }
 }
 void remove_ship2(ships2** head2, int arr[]){
-    ships1* curr = *head2;
+    ships2* curr = *head2;
 
     if(check_value2(*head2, arr)){
         if((*head2)->next != NULL) {
-            ships1* hold = *head2;
-            head2 = (*head2)->next;
+            ships2* hold = *head2;
+            (*head2) = (*head2)->next;
             free(hold);
         }
         if((*head2)->next == NULL)
@@ -366,8 +366,10 @@ void get_inputs(ships1* head1, ships2* head2, int player){
 
             if(is_locatable == 1 && arr_size1[find_length(arr)] != 0 && find_length(arr) <= max_size) {
                 if (counter + find_length(arr) <= ships_sum) {
-                    if (counter == 0)
-                        head1 = new_ship1(arr);
+                    if (counter == 0) {
+                        for(int i = 0;i < 4;i++)
+                            head1->arr1[i] = arr[i];
+                    }
 
                     else
                         add_end1(head1, new_ship1(arr));
@@ -436,8 +438,10 @@ void get_inputs(ships1* head1, ships2* head2, int player){
 
             if(is_locatable == 1 && arr_size2[find_length(arr)] != 0 && find_length(arr) <= max_size) {
                 if (counter + find_length(arr) <= ships_sum) {
-                    if (counter == 0)
-                        head2 = new_ship2(arr);
+                    if (counter == 0) {
+                        for(int i = 0;i < 4;i++)
+                            head2->arr2[i] = arr[i];
+                    }
 
                     else
                         add_end2(head2, new_ship2(arr));
@@ -576,8 +580,7 @@ int shot_it(ships1** head1, ships2** head2, int row, int column, int player){
             board2[row][column] = 'E';
 
             //if any surrounding place has been exploded we have to judge whether it was complete explosion or a simple explosion
-            if((row - 1 > -1 && board2[row - 1][column] == 'E')||(column - 1 > -1 && board2[row][column - 1] == 'E')||(board2[row][column] == 'E')||(column + 1 < 10 && board2[row][column + 1] == 'E')||(row + 1 < 10 && board2[row + 1][column] == 'E')){
-                ships2* curr = *head2;
+            ships2* curr = *head2;
 
                 while(curr != NULL){
                     int is_colmplete_explosion = 1;
@@ -607,7 +610,6 @@ int shot_it(ships1** head1, ships2** head2, int row, int column, int player){
                     }
                     curr = curr->next;
                 }
-            }
         }
         else {
             status = 0;
@@ -622,8 +624,7 @@ int shot_it(ships1** head1, ships2** head2, int row, int column, int player){
             board1[row][column] = 'E';
 
             //if any surrounding place has been exploded we have to judge whether it was complete explosion or a simple explosion
-            if((row - 1 > -1 && board1[row - 1][column] == 'E')||(column - 1 > -1 && board1[row][column - 1] == 'E')||(board1[row][column] == 'E')||(column + 1 < 10 && board1[row][column + 1] == 'E')||(row + 1 < 10 && board1[row + 1][column] == 'E')){
-                ships1* curr = *head1;
+           ships1* curr = *head1;
 
                 while(curr != NULL){
                     int is_colmplete_explosion = 1;
@@ -652,7 +653,6 @@ int shot_it(ships1** head1, ships2** head2, int row, int column, int player){
                         }
                     }
                     curr = curr->next;
-                }
             }
         }
         else {
@@ -665,12 +665,9 @@ int shot_it(ships1** head1, ships2** head2, int row, int column, int player){
 }
 
 int main(void){
-    ships1* head1;
-//     = (ships1*)calloc(1, sizeof(ships1));
-//    head1->next = NULL;
-    ships2* head2;
-//     = (ships2*)calloc(1, sizeof(ships2));
-//    head2->next = NULL;;
+    int arr[4] = {-5, -5, -5, -5};
+    ships1* head1 = new_ship1(arr);
+    ships2* head2 = new_ship2(arr);
     //settings
     map_size = 10;
     max_size = 5;
