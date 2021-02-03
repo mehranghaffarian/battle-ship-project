@@ -543,7 +543,7 @@ void  print_shotable(int player){
 void fill_around(int row, int column, int player){//board of player must be filled
     if(player == 1){
 
-        for(int i = row - 1;i <= row + 1;row++) {
+        for(int i = row - 1;i <= row + 1;i++) {
             if (i > -1 && i < 10) {
                 for (int j = column - 1; j <= column + 1; j++) {
                     if (j < 10 && j > -1)
@@ -553,8 +553,8 @@ void fill_around(int row, int column, int player){//board of player must be fill
             }
         }
     }
-    else{
-        for(int i = row - 1;i <= row + 1;row++) {
+    if(player == 2){
+        for(int i = row - 1;i <= row + 1;i++) {
             if (i > -1 && i < 10) {
                 for (int j = column - 1; j <= column + 1; j++) {
                     if (j < 10 && j > -1)
@@ -665,9 +665,12 @@ int shot_it(ships1** head1, ships2** head2, int row, int column, int player){
 }
 
 int main(void){
-    int arr[4] = {-5, -5, -5, -5};
-    ships1* head1;// = new_ship1(arr);
-    ships2* head2;// = new_ship2(arr);
+    ships1* head1;
+//     = (ships1*)calloc(1, sizeof(ships1));
+//    head1->next = NULL;
+    ships2* head2;
+//     = (ships2*)calloc(1, sizeof(ships2));
+//    head2->next = NULL;;
     //settings
     map_size = 10;
     max_size = 5;
@@ -680,22 +683,22 @@ int main(void){
     arr_size[3] = 2;
     arr_size[5] = 1;
     int player1 = 1, player2 = 2, a;
-//    get_inputs(head1, head2, 2);
+    get_inputs(head1, head2, 1);
+    get_inputs(head1, head2, 2);
 //settings
 //// FOR TEST
-    int barr[4] = {1, 1, 1, 2};
-    for(int j = 1;j < 3;j++)
-        board2[1][j] = 'S';
-    board1[3][2] = 'S';
-    head1 = new_ship1(barr);
-    int carr[4] = {3, 2, 3, 2};
-    add_end1(head1, new_ship1(carr));
-    for(int j = 1;j < 3;j++)
-        board1[1][j] = 'S';
-    board2[3][2] = 'S';
-    head2 = new_ship2(barr);
-    add_end2(head2, new_ship2(carr));
-    print(2);
+//int barr[4] = {1, 1, 3, 1};
+//    board1[1][1] = 'S';
+//    board1[2][1] = 'S';
+//    board1[3][1] = 'S';
+//    board2[3][1] = 'S';
+//    board2[1][1] = 'S';
+//    board2[2][1] = 'S';
+//    head1 = new_ship1(barr);
+//    head2 = new_ship2(barr);
+//    int carr[4] = {9, 0, 9, 0};
+//    add_end1(head1, new_ship1(carr));
+//    add_end2(head2, new_ship2(carr));
 ////FOR TEST
 
     while(head1->arr1[0] != -1 && head2->arr2[0] != -1){
