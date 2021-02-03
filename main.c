@@ -3,15 +3,17 @@
 # include <windows.h>
 # include <time.h>
 
-int point1, point2, max_size, ships_sum = 21, arr_size[15], map_size = 10, shot_point[15];
+int point1, point2, rocket1, rocket2, max_size, ships_sum = 21, arr_size[15], map_size = 10, shot_point[15];
 
 typedef struct ships_data1{
-    int arr1[4];//xs, xe, ys, ye->->xs:x_start, ye:y_end
+    int arr1[4];
     struct ships_data1* next;
 }ships1;
 
+//row and the column of the start and end of the ships
+
 typedef struct ships_data2{
-    int arr2[4];//xs, xe, ys, ye->->xs:x_start, ye:y_end
+    int arr2[4];
     struct ships_data2* next;
 }ships2;
 
@@ -584,6 +586,7 @@ int shot_it(ships1** head1, ships2** head2, int row, int column, int player){
 
                 while(curr != NULL){
                     int is_colmplete_explosion = 1;
+
                     if(((curr->arr2[0] <= row && row <= curr->arr2[2]) || (curr->arr2[2] <= row && row <= curr->arr2[0]))  &&  ((curr->arr2[1] <= column && curr->arr2[3] >= column) || (curr->arr2[3] <= column && curr->arr2[1] >= column))){
                         int row1 = curr->arr2[0] < curr->arr2[2] ? curr->arr2[0] : curr->arr2[2], row2 = curr->arr2[0] > curr->arr2[2] ? curr->arr2[0] : curr->arr2[2];
                         int column1 = curr->arr2[1] < curr->arr2[3] ? curr->arr2[1] : curr->arr2[3], column2 = curr->arr2[1] > curr->arr2[3] ? curr->arr2[1] : curr->arr2[3];
@@ -628,6 +631,7 @@ int shot_it(ships1** head1, ships2** head2, int row, int column, int player){
 
                 while(curr != NULL){
                     int is_colmplete_explosion = 1;
+
                     if(((curr->arr1[0] <= row && row <= curr->arr1[2]) || (curr->arr1[2] <= row && row <= curr->arr1[0]))  &&  ((curr->arr1[1] <= column && curr->arr1[3] >= column) || (curr->arr1[3] <= column && curr->arr1[1] >= column))){
                         int row1 = curr->arr1[0] < curr->arr1[2] ? curr->arr1[0] : curr->arr1[2], row2 = curr->arr1[0] > curr->arr1[2] ? curr->arr1[0] : curr->arr1[2];
                         int column1 = curr->arr1[1] < curr->arr1[3] ? curr->arr1[1] : curr->arr1[3], column2 = curr->arr1[1] > curr->arr1[3] ? curr->arr1[1] : curr->arr1[3];
@@ -698,6 +702,8 @@ int main(void){
 //    add_end2(head2, new_ship2(carr));
 ////FOR TEST
 
+    printf("\nlets begin the game. player1 will start the game. every turn you have to choose a correct location to attack. if you shot any ship you will get points and be able to shot the other player again.you have to enter the row and the column of your location in this way:row column. if you want to use a rocket enter:-2 -2.then you can decide whether to attack your enemy in a vertical or horizontal way. enter:v column or h row. you can use rocket once(it would cost 100 point).\n");
+
     while(head1->arr1[0] != -1 && head2->arr2[0] != -1){
         int temp_row, temp_column, turn;
 
@@ -708,13 +714,28 @@ int main(void){
                 printf("player1:%d  --  player2:%d\n", point1, point2);
                 printf("player1 chose your target:\n");
                 scanf("%d %d", &temp_row, &temp_column);
-                a = is_shotable(temp_row - 1, temp_column - 1, 1);
 
-                if (a)
-                    turn = shot_it(&head1, &head2, temp_row - 1, temp_column - 1, 1);
+//                if (temp_column == -2) {
+//                    if(rocket1 == 1 && point1 < 100)
+//                        printf("you can not use rocket");
+//
+//                    else{
+//                        char rocket;
+//                        scanf("%c", &rocket);
+//
+//                        if()
+//                    }
+//
+//                }
+ //               else {
+                    a = is_shotable(temp_row - 1, temp_column - 1, 1);
 
-                else
-                    printf("\ntarget is not acceptable\n");
+                    if (a)
+                        turn = shot_it(&head1, &head2, temp_row - 1, temp_column - 1, 1);
+
+                    else
+                        printf("\ntarget is not acceptable\n");
+ //               }
             }
 
         }while((a == 0 || turn) && head1->arr1[0] != -1 && head2->arr2[0] != -1);
