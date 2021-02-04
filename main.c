@@ -684,28 +684,49 @@ int main(void){
     arr_size[3] = 2;
     arr_size[5] = 1;
     int player1 = 1, player2 = 2, a;
-    get_inputs(head1, head2, 1);
-    get_inputs(head1, head2, 2);
+//    get_inputs(head1, head2, 1);
+//    get_inputs(head1, head2, 2);
 //settings
 //// FOR TEST
-//int barr[4] = {1, 1, 3, 1};
-//    board1[1][1] = 'S';
-//    board1[2][1] = 'S';
-//    board1[3][1] = 'S';
-//    board2[3][1] = 'S';
-//    board2[1][1] = 'S';
-//    board2[2][1] = 'S';
-//    head1 = new_ship1(barr);
-//    head2 = new_ship2(barr);
-//    int carr[4] = {9, 0, 9, 0};
-//    add_end1(head1, new_ship1(carr));
+int barr[4] = {1, 1, 3, 1};
+    board1[1][1] = 'S';
+    board1[2][1] = 'S';
+    board1[3][1] = 'S';
+    board2[3][1] = 'S';
+    board2[1][1] = 'S';
+    board2[2][1] = 'S';
+    head1->arr1[0] = barr[0];
+    head1->arr1[1] = barr[1];
+    head1->arr1[2] = barr[2];
+    head1->arr1[3] = barr[3];
+    head2->arr2[0] = barr[0];
+    head2->arr2[1] = barr[1];
+    head2->arr2[2] = barr[2];
+    head2->arr2[3] = barr[3];
+    barr[0] = 9;
+    barr[1] = 0;
+    barr[2] = 9;
+    barr[3] = 0;
+    add_end1(head1, new_ship1(barr));
+    add_end2(head2, new_ship2(barr));
+    board1[9][0] = 'S';
+    board2[9][0] = 'S';
+    board2[0][9] = 'S';
+    board2[1][9] = 'S';
+    barr[0] = 0;
+    barr[1] = 9;
+    barr[2] = 1;
+    barr[3] = 9;
+    add_end2(head2, new_ship2(barr));
+//    int carr[4] = {-5, -5, -5, -5};
 //    add_end2(head2, new_ship2(carr));
+//    add_end1(head1, new_ship1(carr));
 ////FOR TEST
-
+print(2);
     printf("\nlets begin the game. player1 will start the game. every turn you have to choose a correct location to attack. if you shot any ship you will get points and be able to shot the other player again.you have to enter the row and the column of your location in this way:row column. if you want to use a rocket enter:-2 -2.then you can decide whether to attack your enemy in a vertical or horizontal way. enter:v column or h row. you can use rocket once(it would cost 100 point).\n");
 
     while(head1->arr1[0] != -1 && head2->arr2[0] != -1){
-        int temp_row, temp_column, turn;
+        int temp_row, temp_column, temp, turn;
 
         //player1 shots player2
         do {
@@ -721,9 +742,24 @@ int main(void){
 //
 //                    else{
 //                        char rocket;
-//                        scanf("%c", &rocket);
+//                        scanf("%c %d", &rocket, &temp);
 //
-//                        if()
+//                        if(rocket == 'v'){
+//                            int i = 0;
+//                            while(turn == 0){
+//                                turn = shot_it(&head1, &head2, i, temp - 1, 1);
+//                                i++;
+//                            }
+//                            rocket1++;
+//                        }
+//                        else{
+//                            int i = 0;
+//                            while(turn == 0){
+//                                turn = shot_it(&head1, &head2, temp - 1, i, 1);
+//                                i++;
+//                            }
+//                            rocket1++;
+//                        }
 //                    }
 //
 //                }
@@ -777,7 +813,6 @@ int main(void){
 //bot can be a constant player
 //////bot is obligation but its map is not(has++)
 /////loading last game is obligation
-//these are obligations Score Board Exit choose from available users new user
+//these are obligations Exit choose from available users new user
 //rocket is orbitrary->-2
 /////saving is obligation->-1
-//saving the whole game is arbitrary
