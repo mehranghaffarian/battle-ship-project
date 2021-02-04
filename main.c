@@ -54,10 +54,14 @@ void add_end2(ships2* head2, ships2* new){
 int check_value1(ships1* curr, int arr[]){
     if((arr[0] == curr->arr1[0] && arr[2] ==curr->arr1[2] && arr[1] == curr->arr1[1] && arr[3] == curr->arr1[3]) || (arr[0] == curr->arr1[2] && arr[2] ==curr->arr1[0] && arr[1] == curr->arr1[3] && arr[3] == curr->arr1[1]))
         return 1;
+    else
+        return 0;
 }
 int check_value2(ships2* curr, int arr[]){
     if((arr[0] == curr->arr2[0] && arr[2] ==curr->arr2[2] && arr[1] == curr->arr2[1] && arr[3] == curr->arr2[3]) || (arr[0] == curr->arr2[2] && arr[2] ==curr->arr2[0] && arr[1] == curr->arr2[3] && arr[3] == curr->arr2[1]))
         return 1;
+    else
+        return 0;
 }
 void remove_ship1(ships1** head1, int arr[]){
     ships1* curr = *head1;
@@ -617,7 +621,7 @@ int shot_it(ships1** head1, ships2** head2, int row, int column, int player){
         else {
             status = 0;
             board2[row][column] = 'T';
-            printf("\nOops?! NO ship\n");
+           printf("\nOops?! NO ship\n");
         }
     }
     if(player == 2){
@@ -684,40 +688,40 @@ int main(void){
     arr_size[3] = 2;
     arr_size[5] = 1;
     int player1 = 1, player2 = 2, a;
-//    get_inputs(head1, head2, 1);
-//    get_inputs(head1, head2, 2);
+    get_inputs(head1, head2, 1);
+    get_inputs(head1, head2, 2);
 //settings
 //// FOR TEST
-int barr[4] = {1, 1, 3, 1};
-    board1[1][1] = 'S';
-    board1[2][1] = 'S';
-    board1[3][1] = 'S';
-    board2[3][1] = 'S';
-    board2[1][1] = 'S';
-    board2[2][1] = 'S';
-    head1->arr1[0] = barr[0];
-    head1->arr1[1] = barr[1];
-    head1->arr1[2] = barr[2];
-    head1->arr1[3] = barr[3];
-    head2->arr2[0] = barr[0];
-    head2->arr2[1] = barr[1];
-    head2->arr2[2] = barr[2];
-    head2->arr2[3] = barr[3];
-    barr[0] = 9;
-    barr[1] = 0;
-    barr[2] = 9;
-    barr[3] = 0;
-    add_end1(head1, new_ship1(barr));
-    add_end2(head2, new_ship2(barr));
-    board1[9][0] = 'S';
-    board2[9][0] = 'S';
-    board2[0][9] = 'S';
-    board2[1][9] = 'S';
-    barr[0] = 0;
-    barr[1] = 9;
-    barr[2] = 1;
-    barr[3] = 9;
-    add_end2(head2, new_ship2(barr));
+//int barr[4] = {1, 1, 3, 1};
+//    board1[1][1] = 'S';
+//    board1[2][1] = 'S';
+//    board1[3][1] = 'S';
+//    board2[3][1] = 'S';
+//    board2[1][1] = 'S';
+//    board2[2][1] = 'S';
+//    head1->arr1[0] = barr[0];
+//    head1->arr1[1] = barr[1];
+//    head1->arr1[2] = barr[2];
+//    head1->arr1[3] = barr[3];
+//    head2->arr2[0] = barr[0];
+//    head2->arr2[1] = barr[1];
+//    head2->arr2[2] = barr[2];
+//    head2->arr2[3] = barr[3];
+//    barr[0] = 9;
+//    barr[1] = 0;
+//    barr[2] = 9;
+//    barr[3] = 0;
+//    add_end1(head1, new_ship1(barr));
+//    add_end2(head2, new_ship2(barr));
+//    board1[9][0] = 'S';
+//    board2[9][0] = 'S';
+//    board2[0][9] = 'S';
+//    board2[1][9] = 'S';
+//    barr[0] = 0;
+//    barr[1] = 9;
+//    barr[2] = 1;
+//    barr[3] = 9;
+//    add_end2(head2, new_ship2(barr));
 //    int carr[4] = {-5, -5, -5, -5};
 //    add_end2(head2, new_ship2(carr));
 //    add_end1(head1, new_ship1(carr));
@@ -771,7 +775,7 @@ print(2);
 
                     else
                         printf("\ntarget is not acceptable\n");
- //               }
+//                }
             }
 
         }while((a == 0 || turn) && head1->arr1[0] != -1 && head2->arr2[0] != -1);
