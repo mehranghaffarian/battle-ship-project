@@ -3,7 +3,7 @@
 # include <windows.h>
 # include <time.h>
 
-int point1, point2, rocket1, rocket2, max_size, ships_sum = 21, arr_size[15], map_size = 10, shot_point[15];
+int point1 = 100, point2, rocket1, rocket2, max_size, ships_sum = 21, arr_size[15], map_size = 10, shot_point[15];
 
 typedef struct ships_data1{
     int arr1[4];
@@ -740,34 +740,41 @@ print(2);
                 printf("player1 chose your target:\n");
                 scanf("%d %d", &temp_row, &temp_column);
 
-//                if (temp_column == -2) {
-//                    if(rocket1 == 1 && point1 < 100)
-//                        printf("you can not use rocket");
-//
-//                    else{
-//                        char rocket;
-//                        scanf("%c %d", &rocket, &temp);
-//
-//                        if(rocket == 'v'){
-//                            int i = 0;
-//                            while(turn == 0){
-//                                turn = shot_it(&head1, &head2, i, temp - 1, 1);
-//                                i++;
-//                            }
-//                            rocket1++;
-//                        }
-//                        else{
-//                            int i = 0;
-//                            while(turn == 0){
-//                                turn = shot_it(&head1, &head2, temp - 1, i, 1);
-//                                i++;
-//                            }
-//                            rocket1++;
-//                        }
-//                    }
-//
-//                }
- //               else {
+                if (temp_column == -2) {
+                    turn = 0;
+
+                    if(rocket1 == 1 && point1 < 100)
+                        printf("you can not use rocket");
+
+                    else{
+                        char rocket;
+                        scanf("%c %d", &rocket, &temp);
+
+                        if(rocket == 'v'){
+                            int i = 0;
+                            while(turn == 0 && i < 10){
+                                if(board2[i][temp - 1] != 'E' && board2[i][temp - 1] != 'C')
+                                turn = shot_it(&head1, &head2, i, temp - 1, 1);
+
+                                i++;
+                            }
+                            rocket1++;
+                        }
+                        else{
+                            int i = 0;
+                            while(turn == 0 && i < 10){
+                                if(board2[i][temp - 1] != 'E' && board2[i][temp - 1] != 'C')
+                                turn = shot_it(&head1, &head2, temp - 1, i, 1);
+
+                                i++;
+                            }
+                            rocket1++;
+                        }
+                        a = turn = 0;
+                    }
+
+                }
+                else {
                     a = is_shotable(temp_row - 1, temp_column - 1, 1);
 
                     if (a)
@@ -775,9 +782,8 @@ print(2);
 
                     else
                         printf("\ntarget is not acceptable\n");
-//                }
+                }
             }
-
         }while((a == 0 || turn) && head1->arr1[0] != -1 && head2->arr2[0] != -1);
 
         //player2 shots player1
@@ -789,11 +795,47 @@ print(2);
                 scanf("%d %d", &temp_row, &temp_column);
                 a = is_shotable(temp_row - 1, temp_column - 1, player2);
 
-                if (a)
-                    turn = shot_it(&head1, &head2, temp_row - 1, temp_column - 1, 2);
+                if (temp_column == -2) {
+                    turn = 0;
 
-                else
-                    printf("\ntarget is not acceptable\n");
+                    if(rocket2 == 1 && point2 < 100)
+                        printf("you can not use rocket");
+
+                    else{
+                        char rocket;
+                        scanf("%c %d", &rocket, &temp);
+
+                        if(rocket == 'v'){
+                            int i = 0;
+                            while(turn == 0 && i < 10){
+                                if(board1[i][temp - 1] != 'E' && board1[i][temp - 1] != 'C')
+                                    turn = shot_it(&head1, &head2, i, temp - 1, 2);
+
+                                i++;
+                            }
+                            rocket2++;
+                        }
+                        else{
+                            int i = 0;
+                            while(turn == 0 && i < 10){
+                                if(board1[i][temp - 1] != 'E' && board1[i][temp - 1] != 'C')
+                                    turn = shot_it(&head1, &head2, temp - 1, i, 2);
+
+                                i++;
+                            }
+                            rocket2++;
+                        }
+                        a = turn = 0;
+                    }
+
+                }
+                else{
+                    if (a)
+                        turn = shot_it(&head1, &head2, temp_row - 1, temp_column - 1, 2);
+
+                    else
+                        printf("\ntarget is not acceptable\n");
+                }
             }
 
         }while((a == 0 || turn) && head1->arr1[0] != -1 && head2->arr2[0] != -1);
@@ -810,9 +852,7 @@ print(2);
     return 0;
 }
 //player1->mehran???
-//be careful about the surrounding places of a complete exploded ship
 // be careful about map size errors
-//players points
 //player chooses the name(saved or new)
 //bot can be a constant player
 //////bot is obligation but its map is not(has++)
