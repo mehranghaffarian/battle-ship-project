@@ -743,8 +743,11 @@ print(2);
                 if (temp_column == -2) {
                     turn = 0;
 
-                    if(rocket1 == 1 && point1 < 100)
+                    if(rocket1 == 1 || point1 < 100) {
                         printf("you can not use rocket");
+                        turn = 0;
+                        a = 1;
+                    }
 
                     else{
                         char rocket;
@@ -758,7 +761,6 @@ print(2);
 
                                 i++;
                             }
-                            rocket1++;
                         }
                         else{
                             int i = 0;
@@ -768,9 +770,10 @@ print(2);
 
                                 i++;
                             }
-                            rocket1++;
                         }
-                        a = turn = 0;
+                        a = 1;
+                        point1 -= 100;
+                        rocket1++;
                     }
 
                 }
@@ -798,8 +801,11 @@ print(2);
                 if (temp_column == -2) {
                     turn = 0;
 
-                    if(rocket2 == 1 && point2 < 100)
+                    if(rocket2 == 1 || point2 < 100) {
                         printf("you can not use rocket");
+                        turn = 0;
+                        a = 1;
+                    }
 
                     else{
                         char rocket;
@@ -813,7 +819,6 @@ print(2);
 
                                 i++;
                             }
-                            rocket2++;
                         }
                         else{
                             int i = 0;
@@ -823,9 +828,10 @@ print(2);
 
                                 i++;
                             }
-                            rocket2++;
                         }
-                        a = turn = 0;
+                        a = 1;
+                        rocket2++;
+                        point2 -= 100;
                     }
 
                 }
