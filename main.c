@@ -2,8 +2,9 @@
 # include <stdlib.h>
 # include <windows.h>
 # include <time.h>
+# include <string.h>
 
-int point1 = 100, point2, rocket1, rocket2, max_size, ships_sum = 21, arr_size[15], map_size = 10, shot_point[15];
+int point1 = 500, point2, rocket1, rocket2, max_size, ships_sum = 21, arr_size[15], map_size = 10, shot_point[15];
 
 typedef struct ships_data1{
     int arr1[4];
@@ -396,7 +397,7 @@ void get_inputs(ships1* head1, ships2* head2, int player){
                 printf("\nOops!!: your input is not acceptable. chose other locations\n");
         }
     }
-    else {
+    if(player == 2){
         int counter = 0,  arr[4], is_locatable, temp_array[2], arr_size2[15] = {0};//arr_size[size of ship][number of this ship]
 
         arr_size2[1] = arr_size[1];
@@ -466,6 +467,143 @@ void get_inputs(ships1* head1, ships2* head2, int player){
 
             if(is_locatable == 0)
                 printf("\nOops!!: your input is not acceptable. chose other locations\n");
+        }
+    }
+    srand(time(0));
+
+    if(player == 3) {//auto for player1
+        int counter = 0,  arr[4], is_locatable, temp_array[2], arr_size1[15] = {0};//arr_size[size of ship][number of this ship]
+
+        arr_size1[1] = arr_size[1];
+        arr_size1[2] = arr_size[2];
+        arr_size1[3] = arr_size[3];
+        arr_size1[5] = arr_size[5];
+
+        while (counter < ships_sum) {
+            is_locatable = 1;
+
+            arr[2] = rand() % map_size;
+            arr[3] = rand() % map_size;
+
+            if(counter % 2){
+                arr[0] = arr[2];
+                arr[1] = rand() % map_size;
+            }
+            if(counter % 2){
+                arr[1] = arr[3];
+                arr[0] = rand() % map_size;
+            }
+            int x1 = arr[0] < arr[2] ? arr[0] : arr[2], x2 = arr[2] > arr[0] ? arr[2] : arr[0];
+            int y1 = arr[1] < arr[3] ? arr[1] : arr[3], y2 = arr[1] < arr[3] ? arr[3] : arr[1];
+
+            if(arr[0] != arr[2] && arr[1] != arr[3])
+                is_locatable = 0;
+
+            if(arr[0] == arr[2]){
+                for(int i = y1;i <= y2;i++) {
+                    temp_array[0] = arr[0];
+                    temp_array[1] = i;
+                    if (is_really_locatable(temp_array, player) == 0)
+                        is_locatable = 0;
+                }
+            }
+            if(arr[1] == arr[3]){
+                for(int i = x1;i <= x2;i++) {
+                    temp_array[1] = arr[1];
+                    temp_array[0] = i;
+                    if (is_really_locatable(temp_array, player) == 0)
+                        is_locatable = 0;
+                }
+            }
+
+            if(is_locatable == 1 && arr_size1[find_length(arr)] != 0 && find_length(arr) <= max_size) {
+                if (counter + find_length(arr) <= ships_sum) {
+                    if (counter == 0) {
+                        for(int i = 0;i < 4;i++)
+                            head1->arr1[i] = arr[i];
+                    }
+
+                    else
+                        add_end1(head1, new_ship1(arr));
+
+                    fill_board1(arr);
+
+                    counter += find_length(arr);
+                    arr_size1[find_length(arr)]--;
+                }
+                else
+                    is_locatable = 0;
+            }
+            else
+                is_locatable = 0;
+        }
+    }
+    if(player == 4){
+        int counter = 0,  arr[4], is_locatable, temp_array[2], arr_size2[15] = {0};//arr_size[size of ship][number of this ship]
+
+        arr_size2[1] = arr_size[1];
+        arr_size2[2] = arr_size[2];
+        arr_size2[3] = arr_size[3];
+        arr_size2[5] = arr_size[5];
+
+        while (counter < ships_sum) {
+            is_locatable = 1;
+
+            arr[3] = rand() % 10;
+            arr[2] = rand() % 10;
+
+            if(counter % 2){
+                arr[0] = arr[2];
+                arr[1] = rand() % 10;
+            }
+            if(counter % 2) {
+                arr[1] = arr[3];
+                arr[0] = rand() % 10;
+            }
+
+            int x1 = arr[0] < arr[2] ? arr[0] : arr[2], x2 = arr[2] > arr[0] ? arr[2] : arr[0];
+            int y1 = arr[1] < arr[3] ? arr[1] : arr[3], y2 = arr[1] < arr[3] ? arr[3] : arr[1];
+
+            if(arr[0] != arr[2] && arr[1] != arr[3])
+                is_locatable = 0;
+
+            if(arr[0] == arr[2]){
+                for(int i = y1;i <= y2;i++) {
+                    temp_array[0] = arr[0];
+                    temp_array[1] = i;
+                    if (is_really_locatable(temp_array, player) == 0)
+                        is_locatable = 0;
+                }
+            }
+            if(arr[1] == arr[3]){
+                for(int i = x1;i <= x2;i++) {
+                    temp_array[1] = arr[1];
+                    temp_array[0] = i;
+                    if (is_really_locatable(temp_array, player) == 0)
+                        is_locatable = 0;
+                }
+            }
+
+            if(is_locatable == 1 && arr_size2[find_length(arr)] != 0 && find_length(arr) <= max_size) {
+                if (counter + find_length(arr) <= ships_sum) {
+                    if (counter == 0) {
+                        for(int i = 0;i < 4;i++)
+                            head2->arr2[i] = arr[i];
+                    }
+
+                    else
+                        add_end2(head2, new_ship2(arr));
+
+                    fill_board2(arr);
+
+                    counter += find_length(arr);
+                    arr_size2[find_length(arr)]--;
+                }
+                else
+                    is_locatable = 0;
+            }
+            else
+                is_locatable = 0;
         }
     }
 }
@@ -673,10 +811,10 @@ int shot_it(ships1** head1, ships2** head2, int row, int column, int player){
 }
 
 int main(void){
+    //basic settings
     int arr[4] = {-5, -5, -5, -5};
     ships1* head1 = new_ship1(arr);
     ships2* head2 = new_ship2(arr);
-    //settings
     map_size = 10;
     max_size = 5;
     shot_point[1] = 25;
@@ -687,10 +825,136 @@ int main(void){
     arr_size[2] = 3;
     arr_size[3] = 2;
     arr_size[5] = 1;
-    int player1 = 1, player2 = 2, a;
-    get_inputs(head1, head2, 1);
-    get_inputs(head1, head2, 2);
-//settings
+    int player1 = 1, player2 = 2, a, choice = 0;
+    char name1[50] = "\0", name2[50] = "\0";
+//    get_inputs(head1, head2, 1);
+//    get_inputs(head1, head2, 2);
+//basic settings
+
+    printf("please chose one of the choices\n1. Play with a friend\n2. Play with a bot\n3. Load game4. Load last game\n5. Settings\n6. Score board\n7. Exit\n");
+    scanf("%d", &choice);
+
+    if(choice == 1){
+        printf("Second player:\n1. chose from available users\n2. new user\n3. put ships automatically\n4. put ships manually");
+        scanf("%d", &choice);
+
+        if(choice == 1){
+            int i = 0, score, num, check = 0;
+            char name[50];
+            FILE* users = fopen("users.txt", "r+");
+            FILE* number = fopen("number.txt", "r+");
+            fscanf(number, "%d", &num);
+
+            while (i != num) {
+                printf("%d. ", i + 1);
+                fscanf(users, "%s %d", name, &score);
+                printf("%d. %s %d", i + 1, name, score);
+                i++;
+            }
+
+            while(check == 1){
+                printf("chose an index:");
+                scanf("%d", &i);
+
+                rewind(users);
+
+                for (int j = 0; j < i; j++)
+                    fscanf(users, "%s %d", name, &score);
+
+                if(strcmp(name1, name) == 0) {
+                    check = 1;
+                    rewind(users);
+                }
+                else
+                    check = 0;
+            }
+
+            strcpy(name2, name);
+            point2 = score;
+
+            fclose(users);
+            fclose(number);
+            fopen("number.txt", "w+");
+            fprintf(number, "%d", num + 1);
+            fclose(number);
+        }
+        if(choice == 2){
+            printf("please enter the new name:");
+            scanf("%s", name2);
+        }
+        if(choice == 3)
+            get_inputs(head1, head2, 3);
+
+        if(choice == 4)
+            get_inputs(head1, head2, 4);
+
+        printf("First player:\n1. chose from available users\n2. new user\n3. put ships automatically\n4. put ships manually");
+        scanf("%d", &choice);
+
+        if(choice == 1){
+            int i = 0, score, num;
+            char name[50];
+            FILE* users = fopen("users.txt", "r+");
+            FILE* number = fopen("number.txt", "r+");
+            fscanf(number, "%d", &num);
+
+            while(i != num){
+                printf("%d. ", i + 1);
+                fscanf(users, "%s %d", name, &score);
+                printf("%d. %s %d", i + 1, name, score);
+            }
+            printf("chose from above");
+            scanf("%d", &i);
+
+            rewind(users);
+
+            for(int j = 0;j < i;j++)
+                fscanf(users, "%s %d", name, &score);
+
+            strcpy(name1, name);
+            point1 = score;
+
+            fclose(users);
+            fclose(number);
+            fopen("number.txt", "w+");
+            fprintf(number, "%d", num + 1);
+            fclose(number);
+        }
+        if(choice == 2){
+            printf("please enter the new name:");
+            scanf("%s", name1);
+        }
+        if(choice == 3)
+            get_inputs(head1, head2, 3);
+
+        if(choice == 4)
+            get_inputs(head1, head2, 4);
+
+    }
+
+    if(choice == 2){
+
+    }
+
+    if(choice == 3){
+
+    }
+
+    if(choice == 4){
+
+    }
+
+    if(choice == 5){
+
+    }
+
+    if(choice == 6){
+
+    }
+
+
+
+
 //// FOR TEST
 //int barr[4] = {1, 1, 3, 1};
 //    board1[1][1] = 'S';
@@ -725,8 +989,9 @@ int main(void){
 //    int carr[4] = {-5, -5, -5, -5};
 //    add_end2(head2, new_ship2(carr));
 //    add_end1(head1, new_ship1(carr));
+//get_inputs(head1, head2, 3);
+//    print(1);
 ////FOR TEST
-print(2);
     printf("\nlets begin the game. player1 will start the game. every turn you have to choose a correct location to attack. if you shot any ship you will get points and be able to shot the other player again.you have to enter the row and the column of your location in this way:row column. if you want to use a rocket enter:-2 -2.then you can decide whether to attack your enemy in a vertical or horizontal way. enter:v column or h row. you can use rocket once(it would cost 100 point).\n");
 
     while(head1->arr1[0] != -1 && head2->arr2[0] != -1){
@@ -737,16 +1002,15 @@ print(2);
             if(head1->arr1[0] != -1 && head2->arr2[0] != -1) {
                 print_shotable(1);
                 printf("player1:%d  --  player2:%d\n", point1, point2);
-                printf("player1 chose your target:\n");
+                printf("player1 chose your target:");
                 scanf("%d %d", &temp_row, &temp_column);
 
                 if (temp_column == -2) {
                     turn = 0;
 
                     if(rocket1 == 1 || point1 < 100) {
-                        printf("you can not use rocket");
-                        turn = 0;
-                        a = 1;
+                        printf("\nyou can not use rocket\n");
+                        a = 0;
                     }
 
                     else{
@@ -756,7 +1020,7 @@ print(2);
                         if(rocket == 'v'){
                             int i = 0;
                             while(turn == 0 && i < 10){
-                                if(board2[i][temp - 1] != 'E' && board2[i][temp - 1] != 'C')
+                                if(board2[i][temp - 1] != 'E' && board2[i][temp - 1] != 'C' && board2[i][temp - 1] != 'T')
                                 turn = shot_it(&head1, &head2, i, temp - 1, 1);
 
                                 i++;
@@ -765,17 +1029,17 @@ print(2);
                         else{
                             int i = 0;
                             while(turn == 0 && i < 10){
-                                if(board2[i][temp - 1] != 'E' && board2[i][temp - 1] != 'C')
+                                if(board2[temp - 1][i] != 'E' && board2[temp - 1][i] != 'C' && board2[temp - 1][i] != 'T')
                                 turn = shot_it(&head1, &head2, temp - 1, i, 1);
 
                                 i++;
                             }
                         }
                         a = 1;
+                        turn = 0;
                         point1 -= 100;
                         rocket1++;
                     }
-
                 }
                 else {
                     a = is_shotable(temp_row - 1, temp_column - 1, 1);
@@ -794,7 +1058,7 @@ print(2);
             if(head1->arr1[0] != -1 && head2->arr2[0] != -1) {
                 print_shotable(2);
                 printf("player1:%d  --  player2:%d\n", point1, point2);
-                printf("player2 chose your target:\n");
+                printf("player2 chose your target:");
                 scanf("%d %d", &temp_row, &temp_column);
                 a = is_shotable(temp_row - 1, temp_column - 1, player2);
 
@@ -802,9 +1066,8 @@ print(2);
                     turn = 0;
 
                     if(rocket2 == 1 || point2 < 100) {
-                        printf("you can not use rocket");
-                        turn = 0;
-                        a = 1;
+                        printf("\nyou can not use rocket\n");
+                        a = 0;
                     }
 
                     else{
@@ -814,7 +1077,7 @@ print(2);
                         if(rocket == 'v'){
                             int i = 0;
                             while(turn == 0 && i < 10){
-                                if(board1[i][temp - 1] != 'E' && board1[i][temp - 1] != 'C')
+                                if(board1[i][temp - 1] != 'E' && board1[i][temp - 1] != 'C' && board1[i][temp - 1] != 'T')
                                     turn = shot_it(&head1, &head2, i, temp - 1, 2);
 
                                 i++;
@@ -823,17 +1086,17 @@ print(2);
                         else{
                             int i = 0;
                             while(turn == 0 && i < 10){
-                                if(board1[i][temp - 1] != 'E' && board1[i][temp - 1] != 'C')
+                                if(board1[temp - 1][i] != 'E' && board1[temp - 1][i] != 'C' && board1[temp - 1][i] != 'T')
                                     turn = shot_it(&head1, &head2, temp - 1, i, 2);
 
                                 i++;
                             }
                         }
                         a = 1;
+                        turn = 0;
                         rocket2++;
                         point2 -= 100;
                     }
-
                 }
                 else{
                     if (a)
