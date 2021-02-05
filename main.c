@@ -480,19 +480,23 @@ void get_inputs(ships1* head1, ships2* head2, int player){
         arr_size1[3] = arr_size[3];
         arr_size1[5] = arr_size[5];
 
-        while (counter < ships_sum) {
+        while (counter < ships_sum){
             is_locatable = 1;
 
             arr[2] = rand() % map_size;
+            arr[2] = arr[2] < 0 ? arr[2] + map_size : arr[2];
             arr[3] = rand() % map_size;
+            arr[3] = arr[3] < 0 ? arr[3] + map_size : arr[3];
 
             if(counter % 2){
                 arr[0] = arr[2];
                 arr[1] = rand() % map_size;
+                arr[1] = arr[1] < 0 ? arr[1] + map_size : arr[1];
             }
-            if(counter % 2){
+            else{
                 arr[1] = arr[3];
                 arr[0] = rand() % map_size;
+                arr[0] = arr[0] < 0 ? arr[0] + map_size : arr[0];
             }
             int x1 = arr[0] < arr[2] ? arr[0] : arr[2], x2 = arr[2] > arr[0] ? arr[2] : arr[0];
             int y1 = arr[1] < arr[3] ? arr[1] : arr[3], y2 = arr[1] < arr[3] ? arr[3] : arr[1];
@@ -810,6 +814,146 @@ int shot_it(ships1** head1, ships2** head2, int row, int column, int player){
     }
     return status;
 }
+void mutual_play(ships1** head11, ships2** head22){
+    ships1* head1 = (*head11);
+    ships2* head2 = (*head22);
+    int a;
+
+    printf("\n lets begin the game. player1 will start the game. every turn you have to choose a correct location to attack. if you   shot any ship you will get points and be able to shot the other player again. you have to enter the row and the column of your location in this way:row column. if you want to use a rocket enter:-2 -2.then you can decide whether to attack your enemy in a vertical or horizontal way. enter:v column or h row. you can use rocket once(it would cost 100 point).\n");
+
+    while(head1->arr1[0] != -1 && head2->arr2[0] != -1){
+        int temp_row, temp_column, temp, turn;
+
+        //player1 shots player2
+        do {
+            if(head1->arr1[0] != -1 && head2->arr2[0] != -1) {
+                print_shotable(1);
+                printf("player1:%d  --  player2:%d\n", point1, point2);
+                printf("player1 chose your target:\n");
+                scanf("%d %d", &temp_row, &temp_column);
+//                a = 0;
+//
+//                if (temp_column == -2) {
+//                    turn = 0;
+//
+//                    if(rocket1 > 0 || point1 < 100) {
+//                        printf("\nyou can not use rocket\n");
+//                        a = 0;
+//                        break;
+//                    }
+//
+//                    else{
+//                        char rocket;
+//                        scanf("%c %d", &rocket, &temp);
+//
+//                        if(rocket == 'v' && point1 >= 100 && rocket1 == 0){
+//                            int i = 0;
+//                            while(turn == 0 && i < 10){
+//                                if(board2[i][temp - 1] != 'E' && board2[i][temp - 1] != 'C' && board2[i][temp - 1] != 'T') {
+//                                    a = is_shotable(temp - 1, i, 1);
+//                                    turn = shot_it(&head1, &head2, i, temp - 1, 1);
+//                                }
+//                                i++;
+//                            }
+//                        }
+//                        if(rocket == 'h' && point1 >= 100 && rocket1 == 0){
+//                            int i = 0;
+//                            while(turn == 0 && i < 10){
+//                                if(board2[temp - 1][i] != 'E' && board2[temp - 1][i] != 'C' && board2[temp - 1][i] != 'T') {
+//                                    a = is_shotable(temp - 1, i, 1);
+//                                    turn = shot_it(&head1, &head2, temp - 1, i, 1);
+//                                }
+//                                i++;
+//                            }
+//                        }
+//                        if(point1 >= 100 && rocket1 == 0)
+//                        {
+//                            point1 -= 100;
+//                            rocket1++;
+//                        }
+//                    }
+//                }
+                //               else {
+                a = is_shotable(temp_row - 1, temp_column - 1, 1);
+
+                if (a)
+                    turn = shot_it(&head1, &head2, temp_row - 1, temp_column - 1, 1);
+
+                else
+                    printf("\ntarget is not acceptable\n");
+                //               }
+            }
+        }while((a == 0 || turn) && head1->arr1[0] != -1 && head2->arr2[0] != -1);
+
+        //player2 shots player1
+        do {
+            if(head1->arr1[0] != -1 && head2->arr2[0] != -1) {
+                print_shotable(2);
+                printf("player1:%d  --  player2:%d\n", point1, point2);
+                printf("player2 chose your target:\n");
+                scanf("%d %d", &temp_row, &temp_column);
+                //               a = 0;
+                //
+                //               if (temp_column == -2) {
+                //                   turn = 0;
+                //
+                //                   if(rocket2 > 0 || point2 < 100) {
+                //                       printf("\nyou can not use rocket\n");
+                //                       a = 0;
+                //                       break;
+                //                   }
+                //
+                //                   else{
+                //                       char rocket;
+                //                       scanf("%c %d", &rocket, &temp);
+                //
+                //                       if(rocket == 'v' && point2 >= 100 && rocket2 == 0){
+                //                           int i = 0;
+                //                           while(turn == 0 && i < 10){
+                //                               if(board1[i][temp - 1] != 'E' && board1[i][temp - 1] != 'C' && board1[i][temp - 1] != 'T') {
+                //                                   a = is_shotable(temp_row - 1, temp_column - 1, player2);
+                //                                   turn = shot_it(&head1, &head2, i, temp - 1, 2);
+                //                               }
+                //                               i++;
+                //                           }
+                //                       }
+                //                       if(rocket == 'h' && point2 >= 100 && rocket2 == 0){
+                //                           int i = 0;
+                //                           while(turn == 0 && i < 10){
+                //                               if(board1[temp - 1][i] != 'E' && board1[temp - 1][i] != 'C' && board1[temp - 1][i] != 'T') {
+                //                                   a = is_shotable(temp_row - 1, temp_column - 1, player2);
+                //                                   turn = shot_it(&head1, &head2, temp - 1, i, 2);
+                //                               }
+                //                               i++;
+                //                           }
+                //                       }
+                //                       if(point2 >= 100 && rocket2 == 0)
+                //                       {
+                //                           rocket2++;
+                //                           point2 -= 100;
+                //                       }
+                //                   }
+                //               }
+                //               else{
+                a = is_shotable(temp_row - 1, temp_column - 1, 2);
+
+                if (a)
+                    turn = shot_it(&head1, &head2, temp_row - 1, temp_column - 1, 2);
+
+                else
+                    printf("\ntarget is not acceptable\n");
+                //               }
+            }
+        }while((a == 0 || turn) && head1->arr1[0] != -1 && head2->arr2[0] != -1);
+    }
+
+    printf("\n\nplayer1:%d  --  player2:%d", point1, point2);
+    printf("\nthe winner is player%d\n", point1 > point2 ? 1 : 2);
+    printf("the player1 board is as bellow\n");
+    print(1);
+    printf("the player2 board is as bellow\n");
+    print(2);
+}
 
 int main(void){
     //basic settings
@@ -826,7 +970,7 @@ int main(void){
     arr_size[2] = 3;
     arr_size[3] = 2;
     arr_size[5] = 1;
-    int player1 = 1, player2 = 2, a, choice = 0;
+    int player1 = 1, player2 = 2, choice = 0;
 //basic settings
 
 //    printf("please choose one of the choices\n1. Play with a friend\n2. Play with a bot\n3. Load game4. Load last game\n5. Settings\n6. Score board\n7. Exit\n");
@@ -971,30 +1115,28 @@ int main(void){
 //        if(choice == 4)
 //            get_inputs(head1, head2, 2);
 //
-//    }
+//        int carr[4] = {-5, -5, -5, -5};
+//        add_end2(head2, new_ship2(carr));
+//        add_end1(head1, new_ship1(carr));
 //
+//        mutual_play(&head1, &head2);
+//    }
 //    if(choice == 2){
 //
 //    }
-//
 //    if(choice == 3){
-//
 //    }
-//
 //    if(choice == 4){
-//
 //    }
-//
 //    if(choice == 5){
-//
 //    }
-//
 //    if(choice == 6){
 //
 //    }
 
 
-
+get_inputs(head1, head2, 3);
+print(1);
 
 //// FOR TEST
 //int barr[4] = {1, 1, 3, 1};
@@ -1027,148 +1169,15 @@ int main(void){
 //    barr[2] = 1;
 //    barr[3] = 9;
 //    add_end2(head2, new_ship2(barr));
+//get_inputs(head1, head2, 3);
+  //  print(1);
+//    get_inputs(head1, head2, 1);
+//    get_inputs(head1, head2, 2);
 //    int carr[4] = {-5, -5, -5, -5};
 //    add_end2(head2, new_ship2(carr));
 //    add_end1(head1, new_ship1(carr));
-//get_inputs(head1, head2, 3);
-  //  print(1);
-    get_inputs(head1, head2, 1);
-    get_inputs(head1, head2, 2);
 ////FOR TEST
-    printf("\n lets begin the game. player1 will start the game. every turn you have to choose a correct location to attack. if you   shot any ship you will get points and be able to shot the other player again. you have to enter the row and the column of your location in this way:row column. if you want to use a rocket enter:-2 -2.then you can decide whether to attack your enemy in a vertical or horizontal way. enter:v column or h row. you can use rocket once(it would cost 100 point).\n");
 
-    while(head1->arr1[0] != -1 && head2->arr2[0] != -1){
-        int temp_row, temp_column, temp, turn;
-
-        //player1 shots player2
-        do {
-            if(head1->arr1[0] != -1 && head2->arr2[0] != -1) {
-                print_shotable(1);
-                printf("player1:%d  --  player2:%d\n", point1, point2);
-                printf("player1 chose your target:\n");
-                scanf("%d %d", &temp_row, &temp_column);
-//                a = 0;
-//
-//                if (temp_column == -2) {
-//                    turn = 0;
-//
-//                    if(rocket1 > 0 || point1 < 100) {
-//                        printf("\nyou can not use rocket\n");
-//                        a = 0;
-//                        break;
-//                    }
-//
-//                    else{
-//                        char rocket;
-//                        scanf("%c %d", &rocket, &temp);
-//
-//                        if(rocket == 'v' && point1 >= 100 && rocket1 == 0){
-//                            int i = 0;
-//                            while(turn == 0 && i < 10){
-//                                if(board2[i][temp - 1] != 'E' && board2[i][temp - 1] != 'C' && board2[i][temp - 1] != 'T') {
-//                                    a = is_shotable(temp - 1, i, 1);
-//                                    turn = shot_it(&head1, &head2, i, temp - 1, 1);
-//                                }
-//                                i++;
-//                            }
-//                        }
-//                        if(rocket == 'h' && point1 >= 100 && rocket1 == 0){
-//                            int i = 0;
-//                            while(turn == 0 && i < 10){
-//                                if(board2[temp - 1][i] != 'E' && board2[temp - 1][i] != 'C' && board2[temp - 1][i] != 'T') {
-//                                    a = is_shotable(temp - 1, i, 1);
-//                                    turn = shot_it(&head1, &head2, temp - 1, i, 1);
-//                                }
-//                                i++;
-//                            }
-//                        }
-//                        if(point1 >= 100 && rocket1 == 0)
-//                        {
-//                            point1 -= 100;
-//                            rocket1++;
-//                        }
-//                    }
-//                }
- //               else {
-                    a = is_shotable(temp_row - 1, temp_column - 1, 1);
-
-                    if (a)
-                        turn = shot_it(&head1, &head2, temp_row - 1, temp_column - 1, 1);
-
-                    else
-                        printf("\ntarget is not acceptable\n");
- //               }
-            }
-        }while((a == 0 || turn) && head1->arr1[0] != -1 && head2->arr2[0] != -1);
-
-        //player2 shots player1
-        do {
-            if(head1->arr1[0] != -1 && head2->arr2[0] != -1) {
-                print_shotable(2);
-                printf("player1:%d  --  player2:%d\n", point1, point2);
-                printf("player2 chose your target:\n");
-                scanf("%d %d", &temp_row, &temp_column);
- //               a = 0;
- //
- //               if (temp_column == -2) {
- //                   turn = 0;
- //
- //                   if(rocket2 > 0 || point2 < 100) {
- //                       printf("\nyou can not use rocket\n");
- //                       a = 0;
- //                       break;
- //                   }
- //
- //                   else{
- //                       char rocket;
- //                       scanf("%c %d", &rocket, &temp);
- //
- //                       if(rocket == 'v' && point2 >= 100 && rocket2 == 0){
- //                           int i = 0;
- //                           while(turn == 0 && i < 10){
- //                               if(board1[i][temp - 1] != 'E' && board1[i][temp - 1] != 'C' && board1[i][temp - 1] != 'T') {
- //                                   a = is_shotable(temp_row - 1, temp_column - 1, player2);
- //                                   turn = shot_it(&head1, &head2, i, temp - 1, 2);
- //                               }
- //                               i++;
- //                           }
- //                       }
- //                       if(rocket == 'h' && point2 >= 100 && rocket2 == 0){
- //                           int i = 0;
- //                           while(turn == 0 && i < 10){
- //                               if(board1[temp - 1][i] != 'E' && board1[temp - 1][i] != 'C' && board1[temp - 1][i] != 'T') {
- //                                   a = is_shotable(temp_row - 1, temp_column - 1, player2);
- //                                   turn = shot_it(&head1, &head2, temp - 1, i, 2);
- //                               }
- //                               i++;
- //                           }
- //                       }
- //                       if(point2 >= 100 && rocket2 == 0)
- //                       {
- //                           rocket2++;
- //                           point2 -= 100;
- //                       }
- //                   }
- //               }
- //               else{
-                    a = is_shotable(temp_row - 1, temp_column - 1, player2);
-
-                    if (a)
-                        turn = shot_it(&head1, &head2, temp_row - 1, temp_column - 1, 2);
-
-                    else
-                        printf("\ntarget is not acceptable\n");
- //               }
-            }
-        }while((a == 0 || turn) && head1->arr1[0] != -1 && head2->arr2[0] != -1);
-    }
-
-    printf("\n\nplayer1:%d  --  player2:%d", point1, point2);
-    printf("\nthe winner is player%d\n", point1 > point2 ? 1 : 2);
-    printf("the player1 board is as bellow\n");
-    print(1);
-    printf("the player2 board is as bellow\n");
-    print(2);
     return 0;
 }
 //player1->mehran???
