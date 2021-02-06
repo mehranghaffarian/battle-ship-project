@@ -758,7 +758,7 @@ int shot_it(ships1** head1, ships2** head2, int row, int column, int player){
            printf("\nOops?! NO ship\n");
         }
     }
-    if(player == 2){
+    if(player == 2 || player == 3){
         if(board1[row][column] == 'S'){
             status = 1;
             point2++;
@@ -791,6 +791,7 @@ int shot_it(ships1** head1, ships2** head2, int row, int column, int player){
                                     fill_around(i, j, 1);
                                 }
                             }
+                            if(player == 2)
                             printf("\nNICE SHOT!! COMPLETE EXPLOSION\n");
                         }
                     }
@@ -800,6 +801,7 @@ int shot_it(ships1** head1, ships2** head2, int row, int column, int player){
         else {
             status = 0;
             board1[row][column] = 'T';
+            if(player == 2)
             printf("\nOops?! NO ship\n");
         }
     }
@@ -968,6 +970,161 @@ void mutual_play(ships1** head11, ships2** head22){
     fprintf(number, "%d", num + 2);
     fclose(number);
 }
+void bot_play(ships1** head11, ships2** head22){
+    ships1* head1 = (*head11);
+    ships2* head2 = (*head22);
+    int carr[4] = {-5, -5, -5, -5};
+    add_end2(head2, new_ship2(carr));
+    add_end1(head1, new_ship1(carr));
+    int a;
+    srand(time(0));
+
+    printf("\n\n\n\n\n\n\n\n\n\n\n\n lets begin the game. player1 will start the game. every turn you have to choose a correct location to attack. if you   shot any ship you will get points and be able to shot the other player again. you have to enter the row and the column of your location in this way:row column. if you want to use a rocket enter:-2 -2.then you can decide whether to attack your enemy in a vertical or horizontal way. enter:v column or h row. you can use rocket once(it would cost 100 point).\n");
+
+    while(head1 != NULL && head2 != NULL){
+        int temp_row, temp_column, temp, turn;
+
+        //player1 shots player2
+        do {
+            if(head1 != NULL && head2 != NULL) {
+                print_shotable(1);
+                printf("%s:%d  --  %s:%d\n", name1, point1, name2, point2);
+                printf("%s chose your target:\n", name1);
+                scanf("%d %d", &temp_row, &temp_column);
+
+                a = is_shotable(temp_row - 1, temp_column - 1, 1);
+
+                if (a)
+                    turn = shot_it(&head1, &head2, temp_row - 1, temp_column - 1, 1);
+
+                else
+                    printf("\ntarget is not acceptable\n");
+            }
+        }while((a == 0 || turn) && head1 != NULL && head2 != NULL);
+
+        //bot shots player1
+        do {
+            if(head1 != NULL && head2 != NULL) {
+                int count = 0;
+
+                for(int i = 0;i < map_size;i++){
+                    for(int j = 0;j < map_size;j++)
+                        if(board1[i][j] == 'E')
+                            count++;
+                }
+
+                if(count == 0) {
+                    do {
+                        temp_column = rand() % map_size;
+                        temp_row = rand() % map_size;
+                        a = is_shotable(temp_row, temp_column, 2);
+                    }while (!a);
+                }
+                if(count == 1){
+                    int row, column;
+
+                    for(int i = 0;i < map_size;i++) {
+                        for (int j = 0; j < map_size; j++)
+                            if(board1[i][j] == 'E'){
+                                row = i;
+                                column = j;
+                            }
+                    }
+                    if(row - 1 > -1){
+                        if(board1[row - 1][column] != 'C' && board1[row - 1][column] != 'T') {
+                            temp_column = column;
+                            temp_row = row - 1;
+                        }
+                    }
+                    else if(column - 1 > -1){
+                        if(board1[row][column - 1] != 'C' && board1[row][column - 1] != 'T'){
+                            temp_column = column - 1;
+                            temp_row = row;
+                        }
+                    }
+                    else if(column + 1 < map_size){
+                        if(board1[row][column + 1] != 'C' && board1[row][column + 1] != 'T'){
+                            temp_column = column + 1;
+                            temp_row = row;
+                        }
+                    }
+                    else if(row + 1 < map_size){
+                        if(board1[row + 1][column] != 'C' && board1[row + 1][column] != 'T') {
+                            temp_column = column;
+                            temp_row = row + 1;
+                        }
+                    }
+                }
+//                if(count > 1){
+//                    int row, column;
+//
+//                    for(int i = 0;i < map_size;i++) {
+//                        for (int j = 0; j < map_size; j++)
+//                            if(board1[i][j] == 'E'){
+//                                row = i;
+//                                column = j;
+//                            }
+//                    }
+//                    if(row - 1 > -1){
+//                        if(board1[row - 1][column] == 'E') {
+//                            temp_column = column;
+//                            temp_row = row - 1;
+//                        }
+//                    }
+//                    else if(column - 1 > -1){
+//                        if(board1[row][column - 1] != 'C' && board1[row][column - 1] != 'T'){
+//                            temp_column = column - 1;
+//                            temp_row = row;
+//                        }
+//                    }
+//                    else if(column + 1 < map_size){
+//                        if(board1[row][column + 1] != 'C' && board1[row][column + 1] != 'T'){
+//                            temp_column = column + 1;
+//                            temp_row = row;
+//                        }
+//                    }
+//                    else if(row + 1 < map_size){
+//                        if(board1[row + 1][column] != 'C' && board1[row + 1][column] != 'T') {
+//                            temp_column = column;
+//                            temp_row = row + 1;
+//                        }
+//                    }
+//                }
+
+                turn = shot_it(&head1, &head2, temp_row, temp_column, 3);
+                print_shotable(2);
+                printf("\nthe bot shot is shown above\n");
+            }
+        }while(turn && head1 != NULL && head2 != NULL);
+    }
+
+    printf("\n\n%s:%d  --  %s:%d", name1, point1, name2, point2);
+    printf("\nthe winner is ");
+
+    if(head1 == NULL)
+        printf("%s\n", name2);
+    else
+        printf("%s\n", name1);
+
+    printf("the %s board is as bellow\n", name1);
+    print(1);
+    printf("the %s board is as bellow\n", name2);
+    print(2);
+
+    FILE* users = fopen("users.txt", "a+");
+    fprintf(users, "%s %d\n", name1, point1);
+    fclose(users);
+
+    int num;
+    FILE* number = fopen("number.txt", "r+");
+    fscanf(number, "%d", &num);
+    fclose(number);
+
+    number = fopen("number.txt", "w+");
+    fprintf(number, "%d", num + 1);
+    fclose(number);
+
+}
 
 int main(void){
     //basic settings
@@ -983,10 +1140,10 @@ int main(void){
     arr_size[3] = 2;
     arr_size[5] = 1;
 //basic settings
-get_inputs(head1, head2, 4);
-print(2);
+//get_inputs(head1, head2, 4);
+//print(2);
     int choice = 0;
-/*
+
     while(choice != 7) {
     printf("\nplease choose one of the choices\n1. Play with a friend\n2. Play with a bot\n3. Load game\n4. Load last game\n5. Settings\n6. Score board\n7. Exit\n");
     scanf("%d", &choice);
@@ -1220,16 +1377,9 @@ print(2);
             scanf("%d", &choice);
 
             if (choice == 1) {
-//            check = 1;
-//
-//            while(check) {
                 get_inputs(head1, head2, 3);
                 print(1);
-//                printf("\nif you want to change your map enter 1 if not enter 0:");
-//                scanf("%d", &check);
-//            }
             }
-
             if (choice == 2)
                 get_inputs(head1, head2, 1);
 
@@ -1238,9 +1388,17 @@ print(2);
             name2[2] = 't';
             name2[3] = '\0';
 
+            printf("\nplease make decision to locate the bot ships:\n1. automatically\n2. manually\n");
+            scanf("%d", &choice);
+
+            if(choice == 1)
             get_inputs(head1, head2, 4);
 
-//        bot_play(&head1, &head2);
+            if(choice == 2)
+            get_inputs(head1, head2, 2);
+
+        bot_play(&head1, &head2);
+        choice = 10;
         }
         if (choice == 3) {
 //        load_games();
@@ -1295,8 +1453,18 @@ print(2);
                 printf("\nDONE\n");
             }
             if (choicee == 2) {
-                printf("\nplease enter the new map size:");
-                scanf("%d", &map_size);
+                int check = 1, temp;
+
+                while(check) {
+                    printf("\nplease enter the new map size:");
+                    scanf("%d", &temp);
+
+                    if(temp * temp > ships_sum)
+                        check = 0;
+                    else
+                        printf("\nyour input is not acceptable.");
+                }
+                map_size = temp;
                 printf("\nDONE\n");
             }
         }
@@ -1333,7 +1501,7 @@ print(2);
             printf("\n");
         }
     }
-*/
+
 //    print(1);
 //get_inputs(head1, head2, 3);
 //    get_inputs(head1, head2, 4);
