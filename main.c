@@ -3,6 +3,7 @@
 # include <windows.h>
 # include <time.h>
 # include <string.h>
+# include<ctype.h>
 
 int point1, point2, rocket1, rocket2, max_size, ships_sum = 21, arr_size[15], map_size = 10, shot_point[15];
 char name1[50], name2[50];
@@ -169,7 +170,7 @@ void fill_board2(int arr[]){
 int is_really_locatable(int array[], int player){
     int is_locatable = 1;
 
-    if(player == 1) {
+    if(player == 1 || player == 3) {
         if (array[0] >= 10 || array[1] >= 10 || array[0] <= -1 || array[1] <= -1)
             is_locatable = 0;
 
@@ -826,8 +827,8 @@ void mutual_play(ships1** head11, ships2** head22){
         do {
             if(head1 != NULL && head2 != NULL) {
                 print_shotable(1);
-                printf("player1:%d  --  player2:%d\n", point1, point2);
-                printf("player1 chose your target:\n");
+                printf("%s:%d  --  %s:%d\n", name1, point1, name2, point2);
+                printf("%s chose your target:\n", name1);
                 scanf("%d %d", &temp_row, &temp_column);
 //                a = 0;
 //
@@ -887,8 +888,8 @@ void mutual_play(ships1** head11, ships2** head22){
         do {
             if(head1 != NULL && head2 != NULL) {
                 print_shotable(2);
-                printf("player1:%d  --  player2:%d\n", point1, point2);
-                printf("player2 chose your target:\n");
+                printf("%s:%d  --  %s:%d\n", name1, point1, name2, point2);
+                printf("%s chose your target:\n", name2);
                 scanf("%d %d", &temp_row, &temp_column);
                 //               a = 0;
                 //
@@ -945,12 +946,26 @@ void mutual_play(ships1** head11, ships2** head22){
         }while((a == 0 || turn) && head1 != NULL && head2 != NULL);
     }
 
-    printf("\n\nplayer1:%d  --  player2:%d", point1, point2);
-    printf("\nthe winner is player%d\n", point1 > point2 ? 1 : 2);
-    printf("the player1 board is as bellow\n");
+    printf("\n\n%s:%d  --  %s:%d", name1, point1, name2, point2);
+    printf("\nthe winner is %s\n", point1 > point2 ? name1 : name2);
+    printf("the %s board is as bellow\n", name1);
     print(1);
-    printf("the player2 board is as bellow\n");
+    printf("the %s board is as bellow\n", name2);
     print(2);
+
+    FILE* users = fopen("users.txt", "a+");
+    fprintf(users, "%s %d\n", name1, point1);
+    fprintf(users, "%s %d\n", name2, point2);
+    fclose(users);
+
+    int num;
+    FILE* number = fopen("number.txt", "r+");
+    fscanf(number, "%d", &num);
+    fclose(number);
+
+    number = fopen("number.txt", "w+");
+    fprintf(number, "%d", num);
+    fclose(number);
 }
 
 int main(void){
@@ -970,15 +985,17 @@ int main(void){
     arr_size[5] = 1;
     int player1 = 1, player2 = 2, choice = 0;
 //basic settings
+//get_inputs(head1, head2, 3);
+//print(1);
 
-    printf("\nplease choose one of the choices\n1. Play with a friend\n2. Play with a bot\n3. Load game4. Load last game\n5. Settings\n6. Score board\n7. Exit\n");
+    printf("\nplease choose one of the choices\n1. Play with a friend\n2. Play with a bot\n3. Load game\n4. Load last game\n5. Settings\n6. Score board\n7. Exit\n");
     scanf("%d", &choice);
 
     if(choice == 1){
         int i = 0, score, num, check = 0;
         char name[50];
 
-        printf("\nFirst player:\n1. chose from available users\n2. new user\n3. put ships automatically\n4. put ships manually");
+        printf("\nFirst player, choose your name:\n1. chose from available users\n2. new user\n");
         scanf("%d", &choice);
 
         if(choice == 1){
@@ -987,9 +1004,8 @@ int main(void){
             fscanf(number, "%d", &num);
 
             while (i != num) {
-                printf("\n%d. ", i + 1);
                 fscanf(users, "%s %d\n", name, &score);
-                printf("%d. %s %d", i + 1, name, score);
+                printf("\n%d. %s %d", i + 1, name, score);
                 i++;
             }
             printf("\nchoose an index:");
@@ -1009,7 +1025,8 @@ int main(void){
             check = 1;
             char name_temp[50] = "\0";
             printf("\nplease enter the new name:");
-            scanf("%s", name_temp);
+            fflush(stdin);
+            gets(name_temp);
             FILE *users = fopen("users.txt", "r+");
             FILE *number = fopen("number.txt", "r+");
             fscanf(number, "%d", &num);
@@ -1029,7 +1046,7 @@ int main(void){
                 }
                 if (check == 1) {
                     printf("\nwe have a user with that name. enter another name:");
-                    scanf("%s", name_temp);
+                    gets(name_temp);
                 }
             }
             fclose(users);
@@ -1038,30 +1055,39 @@ int main(void){
             strcpy(name1, name_temp);
             point1 = score;
         }
-        if(choice == 3)
-            get_inputs(head1, head2, 3);
+        printf("\n%s choose an item:\n1. put ships automatically\n2. put ships manually\n",name1);
+        scanf("%d", &choice);
 
-        if(choice == 4)
+        if(choice == 1) {
+//            check = 1;
+//
+//            while(check) {
+                get_inputs(head1, head2, 3);
+                print(1);
+//                printf("\nif you want to change your map enter 1 if not enter 0:");
+//                scanf("%d", &check);
+//            }
+        }
+
+        if(choice == 2)
             get_inputs(head1, head2, 1);
 
-        printf("\nSecond player:\n1. choose from available users\n2. new user\n3. put ships automatically\n4. put ships manually");
+        printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nSecond player:\n1. choose from available users\n2. new user\n");
         scanf("%d", &choice);
 
         if(choice == 1){
+            i = 0;
             FILE* users = fopen("users.txt", "r+");
             FILE* number = fopen("number.txt", "r+");
             fscanf(number, "%d", &num);
 
             while(i != num){
-                printf("%d. ", i + 1);
                 fscanf(users, "%s %d\n", name, &score);
-                printf("%d. %s %d", i + 1, name, score);
+                printf("\n%d. %s %d", i + 1, name, score);
+                i++;
             }
-            printf("choose from above");
+            printf("\nchoose an index:");
             scanf("%d", &i);
-
-            for (int j = 0; j < i; j++)
-                fscanf(users, "%s %d\n", name, &score);
 
             rewind(users);
 
@@ -1107,23 +1133,36 @@ int main(void){
             strcpy(name2, name_temp);
             point2 = score;
         }
-        if(choice == 3)
-            get_inputs(head1, head2, 4);
 
-        if(choice == 4)
+        printf("\n1. put ships automatically\n2. put ships manually\n");
+        scanf("%d", &choice);
+
+        if(choice == 1){
+           // check = 1;
+
+           // while(check) {
+                get_inputs(head1, head2, 4);
+                print(2);
+//                printf("\nif you want to change 1 if not enter 0:");
+//                scanf("%d", &check);
+//            }
+        }
+
+        if(choice == 2)
             get_inputs(head1, head2, 2);
 
-        int carr[4] = {-5, -5, -5, -5};
-        add_end2(head2, new_ship2(carr));
-        add_end1(head1, new_ship1(carr));
-
         mutual_play(&head1, &head2);
+
+        char wait;
+        printf("\nenter any charactor to finish:");
+        scanf("%c", &wait);
+        choice = 7;
     }
     if(choice == 2){
         int i = 0, score, num, check = 0;
         char name[50];
 
-        printf("\nFirst player:\n1. chose from available users\n2. new user\n3. put ships automatically\n4. put ships manually");
+        printf("\nFirst player, choose your name:\n1. chose from available users\n2. new user\n");
         scanf("%d", &choice);
 
         if(choice == 1){
@@ -1132,9 +1171,8 @@ int main(void){
             fscanf(number, "%d", &num);
 
             while (i != num) {
-                printf("\n%d. ", i + 1);
                 fscanf(users, "%s %d\n", name, &score);
-                printf("%d. %s %d", i + 1, name, score);
+                printf("\n%d. %s %d", i + 1, name, score);
                 i++;
             }
             printf("\nchoose an index:");
@@ -1154,7 +1192,7 @@ int main(void){
             check = 1;
             char name_temp[50] = "\0";
             printf("\nplease enter the new name:");
-            scanf("%s", name_temp);
+            gets(name_temp);
             FILE *users = fopen("users.txt", "r+");
             FILE *number = fopen("number.txt", "r+");
             fscanf(number, "%d", &num);
@@ -1174,7 +1212,7 @@ int main(void){
                 }
                 if (check == 1) {
                     printf("\nwe have a user with that name. enter another name:");
-                    scanf("%s", name_temp);
+                    gets(name_temp);
                 }
             }
             fclose(users);
@@ -1183,10 +1221,21 @@ int main(void){
             strcpy(name1, name_temp);
             point1 = score;
         }
-        if(choice == 3)
-            get_inputs(head1, head2, 3);
+        printf("\n%s choose one choice:\n1. put ships automatically\n2. put ships manually\n", name1);
+        scanf("%d", &choice);
 
-        if(choice == 4)
+        if(choice == 1) {
+//            check = 1;
+//
+//            while(check) {
+            get_inputs(head1, head2, 3);
+            print(1);
+//                printf("\nif you want to change your map enter 1 if not enter 0:");
+//                scanf("%d", &check);
+//            }
+        }
+
+        if(choice == 2)
             get_inputs(head1, head2, 1);
 
         name2[0] = 'b';
@@ -1267,10 +1316,10 @@ int main(void){
             printf("\n%d. %s %d", i + 1, name_data[i], score_data[i]);
     }
 
-    return 0;
-
-get_inputs(head1, head2, 3);
-print(1);
+//    print(1);
+//get_inputs(head1, head2, 3);
+//    get_inputs(head1, head2, 4);
+//print(2);
 
 //// FOR TEST
 //int barr[4] = {1, 1, 3, 1};
@@ -1311,6 +1360,7 @@ print(1);
 //    add_end2(head2, new_ship2(carr));
 //    add_end1(head1, new_ship1(carr));
 ////FOR TEST
+    return 0;
 }
 //player1->mehran???
 // be careful about map size errors
