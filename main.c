@@ -20,6 +20,11 @@ typedef struct ships_data2{
     struct ships_data2* next;
 }ships2;
 
+typedef struct data{
+    char board1[10][10], board2[10][10], name1[50], name2[50];
+    int score1, score2, turn;
+}game;
+
 char board1[50][50], board2[50][50];//board1 : the board where player1 puts his/her ships in//board2 : the board where player2 puts his/her ships in
 
 ships1* new_ship1(int arr[4]){
@@ -867,9 +872,10 @@ void mutual_play(ships1** head11, ships2** head22, int save){
                 printf("%s:%d  --  %s:%d\n", name1, point1, name2, point2);
                 printf("%s chose your target:\n", name1);
                 scanf("%d %d", &temp_row, &temp_column);
+                save = 0;
                 if(temp_column == -1 && temp_row == -1) {
                     save_it(head11, head22, 1);
-                    save = -1;
+                    save = -4;
                 }
 //                a = 0;
 //
@@ -922,7 +928,6 @@ void mutual_play(ships1** head11, ships2** head22, int save){
                 if(a == 0 && temp_column != -1 && temp_row != -1)
                     printf("\ntarget is not acceptable\n");
                 //               }
-                save = 0;
             }
         }while((a == 0 || turn) && (save == 2 || save == 0) && head1 != NULL && head2 != NULL);
 
@@ -933,9 +938,10 @@ void mutual_play(ships1** head11, ships2** head22, int save){
                 printf("%s:%d  --  %s:%d\n", name1, point1, name2, point2);
                 printf("%s chose your target:\n", name2);
                 scanf("%d %d", &temp_row, &temp_column);
+                save = 0;
                 if(temp_column == -1 && temp_row == -1) {
                     save_it(head11, head22, 1);
-                    save = -1;
+                    save = -5;
                 }
                 //               a = 0;
                 //
@@ -988,12 +994,47 @@ void mutual_play(ships1** head11, ships2** head22, int save){
                 if(a == 0 && temp_column != -1 && temp_row != -1)
                     printf("\ntarget is not acceptable\n");
                 //               }
-                save = 0;
             }
         }while((a == 0 || turn) && (save == 2 || save == 0) && head1 != NULL && head2 != NULL);
     }
-    if(save != -1)
+    if(save == -4 || save == -5)
     {
+        FILE* games = fopen("games.bin", "ab+");
+
+        game curr;
+        strcpy(curr.name1, name1);
+        strcpy(curr.name2, name2);
+
+        for(int i = 0;i < 10;i++){
+            for(int j = 0;j < 10;j++)
+            {
+                curr.board1[i][j] = board1[i][j];
+                curr.board2[i][j] = board2[i][j];
+            }
+        }
+        curr.score1 = point1;
+        curr.score2 = point2;
+
+        if(save == -4)
+            curr.turn = 1;
+        else
+            curr.turn = 2;
+
+        fwrite(&curr, sizeof(curr), 1, games);
+        fclose(games);
+
+        int num;
+        FILE* number = fopen("games_number.bin", "rb+");
+        fread(&num, 4, 1, number);
+        fclose(number);
+        number = fopen("games_number.bin", "wb+");
+        num += 2;
+        fwrite(&num, 4, 1, number);
+        fclose(number);
+
+        printf("\nthe game is saved properly\n");
+    }
+    else{
         printf("\n\n%s:%d  --  %s:%d", name1, point1, name2, point2);
         printf("\nthe winner is ");
 
@@ -1022,39 +1063,41 @@ void mutual_play(ships1** head11, ships2** head22, int save){
         fprintf(number, "%d", num + 2);
         fclose(number);
     }
-    else
-        printf("\nthe game is saved properly\n");
-
-    //deleting the current information for another game if the user wants
-    for(int i = 0;i < map_size;i++) {
-        for (int j = 0; j < map_size; j++)
-            board1[i][j] = '\0';
-    }
-    for(int i = 0;i < map_size;i++) {
-        for (int j = 0; j < map_size; j++)
-            board2[i][j] = '\0';
-    }
-    int temp_arr[4];
-
-    for(int i = 0;i < 26;i++)
-        if(head1 != NULL) {
-            temp_arr[0] = head1->arr1[0];
-            temp_arr[1] = head1->arr1[1];
-            temp_arr[2] = head1->arr1[2];
-            temp_arr[3] = head1->arr1[3];
-            remove_ship1(&head1, temp_arr);
+        //deleting the current information for another game if the user wants
+        for (int i = 0; i < map_size; i++) {
+            for (int j = 0; j < map_size; j++)
+                board1[i][j] = '\0';
         }
-    for(int i = 0;i < 26;i++)
-        if(head2 != NULL) {
-            temp_arr[0] = head2->arr2[0];
-            temp_arr[1] = head2->arr2[1];
-            temp_arr[2] = head2->arr2[2];
-            temp_arr[3] = head2->arr2[3];
-            remove_ship2(&head2, temp_arr);
+        for (int i = 0; i < map_size; i++) {
+            for (int j = 0; j < map_size; j++)
+                board2[i][j] = '\0';
         }
+        int temp_arr[4];
+
+        for (int i = 0; i < 26; i++)
+            if (head1 != NULL) {
+                temp_arr[0] = head1->arr1[0];
+                temp_arr[1] = head1->arr1[1];
+                temp_arr[2] = head1->arr1[2];
+                temp_arr[3] = head1->arr1[3];
+                remove_ship1(&head1, temp_arr);
+            }
+        for (int i = 0; i < 26; i++)
+            if (head2 != NULL) {
+                temp_arr[0] = head2->arr2[0];
+                temp_arr[1] = head2->arr2[1];
+                temp_arr[2] = head2->arr2[2];
+                temp_arr[3] = head2->arr2[3];
+                remove_ship2(&head2, temp_arr);
+            }
+        //preparing head1 and head2 for another game
+    ships1* head3 = (ships1*)calloc(1, sizeof(ships1));
+    ships2* head4 = (ships2*)calloc(1, sizeof(ships2));
     int arr[4] = {-5, -5, -5, -5};
-    head1 = new_ship1(arr);
-    head2 = new_ship2(arr);
+    head3 = new_ship1(arr);
+    head4 = new_ship2(arr);
+    (*head11) = head3;
+    (*head22) = head4;
 }
 void bot_play(ships1** head11, ships2** head22, int save){
     ships1* head1 = (*head11);
@@ -1072,11 +1115,12 @@ void bot_play(ships1** head11, ships2** head22, int save){
 
         //player1 shots player2
         do {
-            if(head1 != NULL && head2 != NULL && (save == 2 || save == 0)) {
+            if(head1 != NULL && head2 != NULL && (save == 0 || save == -3)) {
                 print_shotable(1);
                 printf("%s:%d  --  %s:%d\n", name1, point1, name2, point2);
                 printf("%s chose your target:\n", name1);
                 scanf("%d %d", &temp_row, &temp_column);
+                save = 0;
                 if(temp_column == -1 && temp_row == -1) {
                     save_it(head11, head22, 1);
                     save = -1;
@@ -1091,11 +1135,11 @@ void bot_play(ships1** head11, ships2** head22, int save){
                     printf("\ntarget is not acceptable\n");
                 save = 0;
             }
-        }while((a == 0 || turn) && (save == 2 || save == 0)&& head1 != NULL && head2 != NULL);
+        }while((a == 0 || turn) && (save == -3 || save == 0) && head1 != NULL && head2 != NULL);
 
         //bot shots player1
         do {
-            if(head1 != NULL && head2 != NULL && (save == 2 || save == 0)) {
+            if(head1 != NULL && head2 != NULL && save == 0) {
                 int count = 0;
 
                 for(int i = 0;i < map_size;i++){
@@ -1211,12 +1255,42 @@ void bot_play(ships1** head11, ships2** head22, int save){
                 turn = shot_it(&head1, &head2, temp_row, temp_column, 3);
                 print_shotable(2);
                 printf("\nthe bot shot is shown above\n");
-                save = 0;
             }
-        }while(turn && (save == 2 || save == 0) && head1 != NULL && head2 != NULL);
+        }while(turn && save == 0 && head1 != NULL && head2 != NULL);
     }
+    if(save == -3){
+        FILE* games = fopen("games.bin", "ab+");
 
-    if(save != -1)
+        game curr;
+        strcpy(curr.name1, name1);
+        strcpy(curr.name2, name2);
+
+        for(int i = 0;i < 10;i++){
+            for(int j = 0;j < 10;j++)
+            {
+                curr.board1[i][j] = board1[i][j];
+                curr.board2[i][j] = board2[i][j];
+            }
+        }
+        curr.score1 = point1;
+        curr.score2 = point2;
+        curr.turn = -3;//to clarify that it is a game with the bot
+
+        fwrite(&curr, sizeof(curr), 1, games);
+        fclose(games);
+
+        int num;
+        FILE* number = fopen("games_number.bin", "rb+");
+        fread(&num, 4, 1, number);
+        fclose(number);
+        number = fopen("games_number.bin", "wb+");
+        num += 2;
+        fwrite(&num, 4, 1, number);
+        fclose(number);
+
+        printf("\nthe game is saved properly\n");
+    }
+    else
     {
         printf("\n\n%s:%d  --  %s:%d", name1, point1, name2, point2);
         printf("\nthe winner is ");
@@ -1246,9 +1320,6 @@ void bot_play(ships1** head11, ships2** head22, int save){
         fprintf(number, "%d", num + 1);
         fclose(number);
     }
-    else
-        printf("\nthe game is saved properly\n");
-
     //deleting the current information for another game if the user wants
     for(int i = 0;i < map_size;i++) {
         for (int j = 0; j < map_size; j++)
@@ -1276,9 +1347,17 @@ void bot_play(ships1** head11, ships2** head22, int save){
             temp_arr[3] = head2->arr2[3];
             remove_ship2(&head2, temp_arr);
         }
+    //preparing head1 and head2 for another game
+    ships1* head3 = (ships1*)calloc(1, sizeof(ships1));
+    ships2* head4 = (ships2*)calloc(1, sizeof(ships2));
     int arr[4] = {-5, -5, -5, -5};
-    head1 = new_ship1(arr);
-    head2 = new_ship2(arr);
+    head3 = new_ship1(arr);
+    head4 = new_ship2(arr);
+    (*head11) = head3;
+    (*head22) = head4;
+}
+void get_saved_inputs(ships1* head1, ships2* head2, int data[50][4], char temp_board1[10][10], int player){
+
 }
 
 int main(void){
@@ -1301,7 +1380,7 @@ int main(void){
     int choice = 0;
 
     while(choice != 7) {
-        printf("\nplease choose one of the choices\n1. Play with a friend\n2. Play with a bot\n3. Load game\n4. Load last game\n5. Settings\n6. Score board\n7. Exit\n");
+        printf("\nplease choose one of the choices\n1. Play with a friend\n2. Play with a bot\n3. Load games\n4. Load last game\n5. Settings\n6. Score board\n7. Exit\n");
         scanf("%d", &choice);
 
         if (choice == 1) {
@@ -1556,13 +1635,62 @@ int main(void){
             bot_play(&head1, &head2, 0);
             choice = 10;
         }
-        if (choice == 3) {
-//        load_games();
+        if (choice == 3){
+            int num;
+            FILE* number = fopen("games_number.bin", "rb+");
+            fread(&num, 4, 1, number);
+            fclose(number);
+
+            FILE* games = fopen("games.bin", "rb+");
+            game temp;
+
+            for(int i = 0;i < num;i++){
+                fread(&temp, sizeof(game), 1, games);
+                printf("\n%d. %s --  %s", i + 1, temp.name1, temp.name2);
+            }
+            printf("\nplease choose one game:");
+            scanf("%d", &choice);
+
+            rewind(games);
+
+            for(int i = 0;i < choice;i++)
+                fread(&temp, sizeof(temp), 1, games);
+
+            point1 = temp.score1;
+            point2 = temp.score2;
+            strcpy(name1, temp.name1);
+            strcpy(name2, temp.name2);
+            int save = temp.turn;
+
+            for(int i = 0;i < 10;i++){
+                for(int j = 0;j < 10;j++){
+                    board1[i][j] = temp.board1[i][j];
+                    board2[i][j] = temp.board2[i][j];
+                }
+            }
+            int ships_data1[50][4];
+            for(int i = 0;i < 49;i++)
+                for(int j = 0;j < 4;j++)
+                    ships_data1[i][j] = -10;//to avoid accidental result
+
+            get_saved_inputs(head1, head2, ships_data1, temp.board1, 1);
+
+            int ships_data2[50][4];
+            for(int i = 0;i < 49;i++)
+                for(int j = 0;j < 4;j++)
+                    ships_data2[i][j] = -10;//to avoid accidental result
+
+            get_saved_inputs(head1, head2, ships_data2, temp.board2, 2);
+
+            if(save == 1 || save == 2)
+                mutual_play(&head1, &head2, save);
+            else
+                bot_play(&head1, &head2, save);
+
+            choice == 10;
         }
-        if (choice == 4) {
-//            int sum = sizeof()
-//            FILE* games = fopen("games.txt", "r+");
-//            fseek(games, , SEEK_END)
+        if (choice == 4){
+//        load_games();
         }
         if (choice == 5) {
             int choicee;
