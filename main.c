@@ -722,40 +722,40 @@ int shot_it(ships1** head1, ships2** head2, int row, int column, int player){
             //if any surrounding place has been exploded we have to judge whether it was complete explosion or a simple explosion
             ships2* curr = *head2;
 
-                while(curr != NULL){
-                    int is_colmplete_explosion = 1;
+            while(curr != NULL){
+                int is_colmplete_explosion = 1;
 
-                    if(((curr->arr2[0] <= row && row <= curr->arr2[2]) || (curr->arr2[2] <= row && row <= curr->arr2[0]))  &&  ((curr->arr2[1] <= column && curr->arr2[3] >= column) || (curr->arr2[3] <= column && curr->arr2[1] >= column))){
-                        int row1 = curr->arr2[0] < curr->arr2[2] ? curr->arr2[0] : curr->arr2[2], row2 = curr->arr2[0] > curr->arr2[2] ? curr->arr2[0] : curr->arr2[2];
-                        int column1 = curr->arr2[1] < curr->arr2[3] ? curr->arr2[1] : curr->arr2[3], column2 = curr->arr2[1] > curr->arr2[3] ? curr->arr2[1] : curr->arr2[3];
+                if(((curr->arr2[0] <= row && row <= curr->arr2[2]) || (curr->arr2[2] <= row && row <= curr->arr2[0]))  &&  ((curr->arr2[1] <= column && curr->arr2[3] >= column) || (curr->arr2[3] <= column && curr->arr2[1] >= column))){
+                    int row1 = curr->arr2[0] < curr->arr2[2] ? curr->arr2[0] : curr->arr2[2], row2 = curr->arr2[0] > curr->arr2[2] ? curr->arr2[0] : curr->arr2[2];
+                    int column1 = curr->arr2[1] < curr->arr2[3] ? curr->arr2[1] : curr->arr2[3], column2 = curr->arr2[1] > curr->arr2[3] ? curr->arr2[1] : curr->arr2[3];
+
+                    for(int i = row1;i <= row2;i++){
+                        for(int j = column1;j <= column2;j++){
+                            if(board2[i][j] != 'E')
+                                is_colmplete_explosion = 0;
+                        }
+                    }
+                    if(is_colmplete_explosion == 1)
+                    {
+                        point1 += shot_point[find_length(curr->arr2)];
+                        remove_ship2(head2, curr->arr2);
 
                         for(int i = row1;i <= row2;i++){
                             for(int j = column1;j <= column2;j++){
-                                if(board2[i][j] != 'E')
-                                    is_colmplete_explosion = 0;
+                                board2[i][j] = 'C';
+                                fill_around(i, j, 2);
                             }
                         }
-                        if(is_colmplete_explosion == 1)
-                        {
-                            point1 += shot_point[find_length(curr->arr2)];
-                            remove_ship2(head2, curr->arr2);
-
-                            for(int i = row1;i <= row2;i++){
-                                for(int j = column1;j <= column2;j++){
-                                    board2[i][j] = 'C';
-                                    fill_around(i, j, 2);
-                                }
-                            }
-                            printf("\nNICE SHOT!! COMPLETE EXPLOSION\n");
-                        }
+                        printf("\nNICE SHOT!! COMPLETE EXPLOSION\n");
                     }
-                    curr = curr->next;
                 }
+                curr = curr->next;
+            }
         }
         else {
             status = 0;
             board2[row][column] = 'T';
-           printf("\nOops?! NO ship\n");
+            printf("\nOops?! NO ship\n");
         }
     }
     if(player == 2 || player == 3){
@@ -765,49 +765,89 @@ int shot_it(ships1** head1, ships2** head2, int row, int column, int player){
             board1[row][column] = 'E';
 
             //if any surrounding place has been exploded we have to judge whether it was complete explosion or a simple explosion
-           ships1* curr = *head1;
+            ships1* curr = *head1;
 
-                while(curr != NULL){
-                    int is_colmplete_explosion = 1;
+            while(curr != NULL){
+                int is_colmplete_explosion = 1;
 
-                    if(((curr->arr1[0] <= row && row <= curr->arr1[2]) || (curr->arr1[2] <= row && row <= curr->arr1[0]))  &&  ((curr->arr1[1] <= column && curr->arr1[3] >= column) || (curr->arr1[3] <= column && curr->arr1[1] >= column))){
-                        int row1 = curr->arr1[0] < curr->arr1[2] ? curr->arr1[0] : curr->arr1[2], row2 = curr->arr1[0] > curr->arr1[2] ? curr->arr1[0] : curr->arr1[2];
-                        int column1 = curr->arr1[1] < curr->arr1[3] ? curr->arr1[1] : curr->arr1[3], column2 = curr->arr1[1] > curr->arr1[3] ? curr->arr1[1] : curr->arr1[3];
+                if(((curr->arr1[0] <= row && row <= curr->arr1[2]) || (curr->arr1[2] <= row && row <= curr->arr1[0]))  &&  ((curr->arr1[1] <= column && curr->arr1[3] >= column) || (curr->arr1[3] <= column && curr->arr1[1] >= column))){
+                    int row1 = curr->arr1[0] < curr->arr1[2] ? curr->arr1[0] : curr->arr1[2], row2 = curr->arr1[0] > curr->arr1[2] ? curr->arr1[0] : curr->arr1[2];
+                    int column1 = curr->arr1[1] < curr->arr1[3] ? curr->arr1[1] : curr->arr1[3], column2 = curr->arr1[1] > curr->arr1[3] ? curr->arr1[1] : curr->arr1[3];
+
+                    for(int i = row1;i <= row2;i++){
+                        for(int j = column1;j <= column2;j++){
+                            if(board1[i][j] != 'E')
+                                is_colmplete_explosion = 0;
+                        }
+                    }
+                    if(is_colmplete_explosion == 1)
+                    {
+                        point2 += shot_point[find_length(curr->arr1)];
+                        remove_ship1(head1, curr->arr1);
 
                         for(int i = row1;i <= row2;i++){
                             for(int j = column1;j <= column2;j++){
-                                if(board1[i][j] != 'E')
-                                    is_colmplete_explosion = 0;
+                                board1[i][j] = 'C';
+                                fill_around(i, j, 1);
                             }
                         }
-                        if(is_colmplete_explosion == 1)
-                        {
-                            point2 += shot_point[find_length(curr->arr1)];
-                            remove_ship1(head1, curr->arr1);
-
-                            for(int i = row1;i <= row2;i++){
-                                for(int j = column1;j <= column2;j++){
-                                    board1[i][j] = 'C';
-                                    fill_around(i, j, 1);
-                                }
-                            }
-                            if(player == 2)
+                        if(player == 2)
                             printf("\nNICE SHOT!! COMPLETE EXPLOSION\n");
-                        }
                     }
-                    curr = curr->next;
+                }
+                curr = curr->next;
             }
         }
         else {
             status = 0;
             board1[row][column] = 'T';
             if(player == 2)
-            printf("\nOops?! NO ship\n");
+                printf("\nOops?! NO ship\n");
         }
     }
     return status;
 }
-void mutual_play(ships1** head11, ships2** head22){
+void save_it(ships1** head11, ships2** head22, int turn){
+    FILE* games = fopen("games.txt", "a+");
+    fprintf(games, "%s", "board1:");
+
+    for(int i = 0;i < map_size;i++){
+        for(int j = 0;j < map_size;j++){
+            if(board1[i][j] == '\0')
+                fprintf(games, " %d", 0);
+            if(board1[i][j] == 'S')
+                fprintf(games, " %d", 1);
+            if(board1[i][j] == 'E')
+                fprintf(games, " %d", 2);
+            if(board1[i][j] == 'C')
+                fprintf(games, " %d", 3);
+        }
+    }
+    fprintf(games, "\n%s", "board2:");
+    for(int i = 0;i < map_size;i++){
+        for(int j = 0;j < map_size;j++){
+            if(board2[i][j] == '\0')
+                fprintf(games, " %d", 0);
+            if(board2[i][j] == 'S')
+                fprintf(games, " %d", 1);
+            if(board2[i][j] == 'E')
+                fprintf(games, " %d", 2);
+            if(board2[i][j] == 'C')
+                fprintf(games, " %d", 3);
+        }
+    }
+    fprintf(games, "\nname1:%s", name1);
+    fprintf(games, "\nname2:%s", name2);
+    fprintf(games, "\nscore1:%d", point1);
+    fprintf(games, "\nscore2:%d", point2);
+    fprintf(games, "turn:%d", turn);
+    fclose(games);
+
+    FILE* games_names = fopen("games_names.txt", "a+");
+    fprintf(games_names, "%s  --  %s", name1, name2);
+    fclose(games_names);
+}
+void mutual_play(ships1** head11, ships2** head22, int save){
     ships1* head1 = (*head11);
     ships2* head2 = (*head22);
     int carr[4] = {-5, -5, -5, -5};
@@ -815,18 +855,22 @@ void mutual_play(ships1** head11, ships2** head22){
     add_end1(head1, new_ship1(carr));
     int a;
 
-    printf("\n\n\n\n\n\n\n\n\n\n\n\n lets begin the game. player1 will start the game. every turn you have to choose a correct location to attack. if you   shot any ship you will get points and be able to shot the other player again. you have to enter the row and the column of your location in this way:row column. if you want to use a rocket enter:-2 -2.then you can decide whether to attack your enemy in a vertical or horizontal way. enter:v column or h row. you can use rocket once(it would cost 100 point).\n");
+    printf("\n\n\n\n\n\n\n\n\n\n\n\n lets begin the game. player1 will start the game. every turn you have to choose a correct location to attack. if you   shot any ship you will get points and be able to shot the other player again. you have to enter the row and the column of your location in this way:row column. if you want to use a rocket enter:-2 -2.then you can decide whether to attack your enemy in a vertical or horizontal way. enter:v column or h row. you can use rocket once(it would cost 100 point). if you want to save the game enter:-1 -1\n");
 
-    while(head1 != NULL && head2 != NULL){
+    while(head1 != NULL && head2 != NULL && save != -1){
         int temp_row, temp_column, temp, turn;
 
         //player1 shots player2
         do {
-            if(head1 != NULL && head2 != NULL) {
+            if(head1 != NULL && head2 != NULL && (save == 1 || save == 0)) {
                 print_shotable(1);
                 printf("%s:%d  --  %s:%d\n", name1, point1, name2, point2);
                 printf("%s chose your target:\n", name1);
                 scanf("%d %d", &temp_row, &temp_column);
+                if(temp_column == -1 && temp_row == -1) {
+                    save_it(head11, head22, 1);
+                    save = -1;
+                }
 //                a = 0;
 //
 //                if (temp_column == -2) {
@@ -875,19 +919,24 @@ void mutual_play(ships1** head11, ships2** head22){
                 if (a)
                     turn = shot_it(&head1, &head2, temp_row - 1, temp_column - 1, 1);
 
-                else
+                if(a == 0 && temp_column != -1 && temp_row != -1)
                     printf("\ntarget is not acceptable\n");
                 //               }
+                save = 0;
             }
-        }while((a == 0 || turn) && head1 != NULL && head2 != NULL);
+        }while((a == 0 || turn) && (save == 2 || save == 0) && head1 != NULL && head2 != NULL);
 
         //player2 shots player1
         do {
-            if(head1 != NULL && head2 != NULL) {
+            if(head1 != NULL && head2 != NULL && (save == 2 || save == 0)) {
                 print_shotable(2);
                 printf("%s:%d  --  %s:%d\n", name1, point1, name2, point2);
                 printf("%s chose your target:\n", name2);
                 scanf("%d %d", &temp_row, &temp_column);
+                if(temp_column == -1 && temp_row == -1) {
+                    save_it(head11, head22, 1);
+                    save = -1;
+                }
                 //               a = 0;
                 //
                 //               if (temp_column == -2) {
@@ -936,50 +985,55 @@ void mutual_play(ships1** head11, ships2** head22){
                 if (a)
                     turn = shot_it(&head1, &head2, temp_row - 1, temp_column - 1, 2);
 
-                else
+                if(a == 0 && temp_column != -1 && temp_row != -1)
                     printf("\ntarget is not acceptable\n");
                 //               }
+                save = 0;
             }
-        }while((a == 0 || turn) && head1 != NULL && head2 != NULL);
+        }while((a == 0 || turn) && (save == 2 || save == 0) && head1 != NULL && head2 != NULL);
     }
+    if(save != -1)
+    {
+        printf("\n\n%s:%d  --  %s:%d", name1, point1, name2, point2);
+        printf("\nthe winner is ");
 
-    printf("\n\n%s:%d  --  %s:%d", name1, point1, name2, point2);
-    printf("\nthe winner is ");
+        if (head1 == NULL)
+            printf("%s\n", name2);
+        else
+            printf("%s\n", name1);
 
-    if(head1 == NULL)
-        printf("%s\n", name2);
+        printf("the %s board is as bellow\n", name1);
+        print(1);
+        printf("the %s board is as bellow\n", name2);
+        print(2);
+        printf("\nthe information is shown above\n\n*_* THE GAME IS OVER *_*\n");
+
+        FILE *users = fopen("users.txt", "a+");
+        fprintf(users, "%s %d\n", name1, point1);
+        fprintf(users, "%s %d\n", name2, point2);
+        fclose(users);
+
+        int num;
+        FILE *number = fopen("number.txt", "r+");
+        fscanf(number, "%d", &num);
+        fclose(number);
+
+        number = fopen("number.txt", "w+");
+        fprintf(number, "%d", num + 2);
+        fclose(number);
+    }
     else
-        printf("%s\n", name1);
-
-    printf("the %s board is as bellow\n", name1);
-    print(1);
-    printf("the %s board is as bellow\n", name2);
-    print(2);
-    printf("\nthe information is shown above\n\n*_* THE GAME IS OVER *_*\n");
-
-    FILE* users = fopen("users.txt", "a+");
-    fprintf(users, "%s %d\n", name1, point1);
-    fprintf(users, "%s %d\n", name2, point2);
-    fclose(users);
-
-    int num;
-    FILE* number = fopen("number.txt", "r+");
-    fscanf(number, "%d", &num);
-    fclose(number);
-
-    number = fopen("number.txt", "w+");
-    fprintf(number, "%d", num + 2);
-    fclose(number);
+        printf("\nthe game is saved properly\n");
 
     //deleting the current information for another game if the user wants
     for(int i = 0;i < map_size;i++) {
         for (int j = 0; j < map_size; j++)
             board1[i][j] = '\0';
     }
-        for(int i = 0;i < map_size;i++) {
-            for (int j = 0; j < map_size; j++)
-                board2[i][j] = '\0';
-        }
+    for(int i = 0;i < map_size;i++) {
+        for (int j = 0; j < map_size; j++)
+            board2[i][j] = '\0';
+    }
     int temp_arr[4];
 
     for(int i = 0;i < 26;i++)
@@ -1002,7 +1056,7 @@ void mutual_play(ships1** head11, ships2** head22){
     head1 = new_ship1(arr);
     head2 = new_ship2(arr);
 }
-void bot_play(ships1** head11, ships2** head22){
+void bot_play(ships1** head11, ships2** head22, int save){
     ships1* head1 = (*head11);
     ships2* head2 = (*head22);
     int carr[4] = {-5, -5, -5, -5};
@@ -1011,32 +1065,37 @@ void bot_play(ships1** head11, ships2** head22){
     int a;
     srand(time(0));
 
-    printf("\n\n\n\n\n\n\n\n\n\n\n\n lets begin the game. player1 will start the game. every turn you have to choose a correct location to attack. if you   shot any ship you will get points and be able to shot the other player again. you have to enter the row and the column of your location in this way:row column. if you want to use a rocket enter:-2 -2.then you can decide whether to attack your enemy in a vertical or horizontal way. enter:v column or h row. you can use rocket once(it would cost 100 point).\n");
+    printf("\n\n\n\n\n\n\n\n\n\n\n\n lets begin the game. player1 will start the game. every turn you have to choose a correct location to attack. if you   shot any ship you will get points and be able to shot the other player again. you have to enter the row and the column of your location in this way:row column. if you want to use a rocket enter:-2 -2.then you can decide whether to attack your enemy in a vertical or horizontal way. enter:v column or h row. you can use rocket once(it would cost 100 point). if you want to save the game enter:-1 -1\n");
 
-    while(head1 != NULL && head2 != NULL){
+    while(head1 != NULL && head2 != NULL && save != -1){
         int temp_row, temp_column, temp, turn;
 
         //player1 shots player2
         do {
-            if(head1 != NULL && head2 != NULL) {
+            if(head1 != NULL && head2 != NULL && (save == 2 || save == 0)) {
                 print_shotable(1);
                 printf("%s:%d  --  %s:%d\n", name1, point1, name2, point2);
                 printf("%s chose your target:\n", name1);
                 scanf("%d %d", &temp_row, &temp_column);
+                if(temp_column == -1 && temp_row == -1) {
+                    save_it(head11, head22, 1);
+                    save = -1;
+                }
 
                 a = is_shotable(temp_row - 1, temp_column - 1, 1);
 
                 if (a)
                     turn = shot_it(&head1, &head2, temp_row - 1, temp_column - 1, 1);
 
-                else
+                if(a == 0 && temp_column != -1 && temp_row != -1)
                     printf("\ntarget is not acceptable\n");
+                save = 0;
             }
-        }while((a == 0 || turn) && head1 != NULL && head2 != NULL);
+        }while((a == 0 || turn) && (save == 2 || save == 0)&& head1 != NULL && head2 != NULL);
 
         //bot shots player1
         do {
-            if(head1 != NULL && head2 != NULL) {
+            if(head1 != NULL && head2 != NULL && (save == 2 || save == 0)) {
                 int count = 0;
 
                 for(int i = 0;i < map_size;i++){
@@ -1128,13 +1187,13 @@ void bot_play(ships1** head11, ships2** head22){
                         i = 1;
                         b = 1;
                         while(column + i < map_size && b) {
-                        if (column + i < map_size && board1[row][column + i] != 'E' && board1[row][column + i] != 'T') {
-                            temp_column = column + i;
-                            temp_row = row;
-                            b = 0;
-                        } else
-                            i++;
-                    }
+                            if (column + i < map_size && board1[row][column + i] != 'E' && board1[row][column + i] != 'T') {
+                                temp_column = column + i;
+                                temp_row = row;
+                                b = 0;
+                            } else
+                                i++;
+                        }
                     }
                     if(row + 1 < map_size) {
                         i = 1;
@@ -1152,37 +1211,43 @@ void bot_play(ships1** head11, ships2** head22){
                 turn = shot_it(&head1, &head2, temp_row, temp_column, 3);
                 print_shotable(2);
                 printf("\nthe bot shot is shown above\n");
+                save = 0;
             }
-        }while(turn && head1 != NULL && head2 != NULL);
+        }while(turn && (save == 2 || save == 0) && head1 != NULL && head2 != NULL);
     }
 
-    printf("\n\n%s:%d  --  %s:%d", name1, point1, name2, point2);
-    printf("\nthe winner is ");
+    if(save != -1)
+    {
+        printf("\n\n%s:%d  --  %s:%d", name1, point1, name2, point2);
+        printf("\nthe winner is ");
 
-    if(head1 == NULL)
-        printf("%s\n", name2);
+        if (head1 == NULL)
+            printf("%s\n", name2);
+        else
+            printf("%s\n", name1);
+
+        printf("the %s board is as bellow\n", name1);
+        print(1);
+        printf("the %s board is as bellow\n", name2);
+        print(2);
+        printf("\nthe information is shown above\n\n*_* THE GAME IS OVER *_*\n");
+
+
+        FILE *users = fopen("users.txt", "a+");
+        fprintf(users, "%s %d\n", name1, point1);
+        fclose(users);
+
+        int num;
+        FILE *number = fopen("number.txt", "r+");
+        fscanf(number, "%d", &num);
+        fclose(number);
+
+        number = fopen("number.txt", "w+");
+        fprintf(number, "%d", num + 1);
+        fclose(number);
+    }
     else
-        printf("%s\n", name1);
-
-    printf("the %s board is as bellow\n", name1);
-    print(1);
-    printf("the %s board is as bellow\n", name2);
-    print(2);
-    printf("\nthe information is shown above\n\n*_* THE GAME IS OVER *_*\n");
-
-
-    FILE* users = fopen("users.txt", "a+");
-    fprintf(users, "%s %d\n", name1, point1);
-    fclose(users);
-
-    int num;
-    FILE* number = fopen("number.txt", "r+");
-    fscanf(number, "%d", &num);
-    fclose(number);
-
-    number = fopen("number.txt", "w+");
-    fprintf(number, "%d", num + 1);
-    fclose(number);
+        printf("\nthe game is saved properly\n");
 
     //deleting the current information for another game if the user wants
     for(int i = 0;i < map_size;i++) {
@@ -1236,8 +1301,8 @@ int main(void){
     int choice = 0;
 
     while(choice != 7) {
-    printf("\nplease choose one of the choices\n1. Play with a friend\n2. Play with a bot\n3. Load game\n4. Load last game\n5. Settings\n6. Score board\n7. Exit\n");
-    scanf("%d", &choice);
+        printf("\nplease choose one of the choices\n1. Play with a friend\n2. Play with a bot\n3. Load game\n4. Load last game\n5. Settings\n6. Score board\n7. Exit\n");
+        scanf("%d", &choice);
 
         if (choice == 1) {
             int i = 0, score, num, check = 0;
@@ -1398,7 +1463,7 @@ int main(void){
             if (choice == 2)
                 get_inputs(head1, head2, 2);
 
-            mutual_play(&head1, &head2);
+            mutual_play(&head1, &head2, 0);
             choice = 10;
         }
         if (choice == 2) {
@@ -1483,19 +1548,21 @@ int main(void){
             scanf("%d", &choice);
 
             if(choice == 1)
-            get_inputs(head1, head2, 4);
+                get_inputs(head1, head2, 4);
 
             if(choice == 2)
-            get_inputs(head1, head2, 2);
+                get_inputs(head1, head2, 2);
 
-        bot_play(&head1, &head2);
-        choice = 10;
+            bot_play(&head1, &head2, 0);
+            choice = 10;
         }
         if (choice == 3) {
 //        load_games();
         }
         if (choice == 4) {
-//        load_last_game();
+//            int sum = sizeof()
+//            FILE* games = fopen("games.txt", "r+");
+//            fseek(games, , SEEK_END)
         }
         if (choice == 5) {
             int choicee;
@@ -1531,14 +1598,14 @@ int main(void){
 
                 max_size = temp;
 
-                    for(int i = 0;i < 26;i++)
-                        if(arr_size[i] != 0)
+                for(int i = 0;i < 26;i++)
+                    if(arr_size[i] != 0)
                         shot_point[i] = (5 * temp) / i;
 
-                        ships_sum = 0;
-                        for(int i = 0;i < 26;i++)
-                            if(arr_size[i] != 0)
-                                ships_sum += i * arr_size[i];
+                ships_sum = 0;
+                for(int i = 0;i < 26;i++)
+                    if(arr_size[i] != 0)
+                        ships_sum += i * arr_size[i];
 
 
                 printf("\nDONE\n");
@@ -1593,44 +1660,8 @@ int main(void){
         }
     }
 
-//    print(1);
-//get_inputs(head1, head2, 3);
-//    get_inputs(head1, head2, 4);
-//print(2);
-
 //// FOR TEST
-//int barr[4] = {1, 1, 3, 1};
-//    board1[1][1] = 'S';
-//    board1[2][1] = 'S';
-//    board1[3][1] = 'S';
-//    board2[3][1] = 'S';
-//    board2[1][1] = 'S';
-//    board2[2][1] = 'S';
-//    head1->arr1[0] = barr[0];
-//    head1->arr1[1] = barr[1];
-//    head1->arr1[2] = barr[2];
-//    head1->arr1[3] = barr[3];
-//    head2->arr2[0] = barr[0];
-//    head2->arr2[1] = barr[1];
-//    head2->arr2[2] = barr[2];
-//    head2->arr2[3] = barr[3];
-//    barr[0] = 9;
-//    barr[1] = 0;
-//    barr[2] = 9;
-//    barr[3] = 0;
-//    add_end1(head1, new_ship1(barr));
 //    add_end2(head2, new_ship2(barr));
-//    board1[9][0] = 'S';
-//    board2[9][0] = 'S';
-//    board2[0][9] = 'S';
-//    board2[1][9] = 'S';
-//    barr[0] = 0;
-//    barr[1] = 9;
-//    barr[2] = 1;
-//    barr[3] = 9;
-//    add_end2(head2, new_ship2(barr));
-//get_inputs(head1, head2, 3);
-  //  print(1);
 //    get_inputs(head1, head2, 1);
 //    get_inputs(head1, head2, 2);
 //    int carr[4] = {-5, -5, -5, -5};
@@ -1643,4 +1674,3 @@ int main(void){
 //player chooses the name(saved or new)
 /////loading last game is obligation
 //rocket is orbitrary->-2
-/////saving is obligation->-1
