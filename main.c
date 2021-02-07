@@ -1201,54 +1201,60 @@ void bot_play(ships1** head11, ships2** head22, int save){
                             }
                     }
                     int i, b;
-                    if(row - 1 > -1){
+                    if(row - 1 > -1 && board1[row - 1][column] == 'E'){
                         i = 1;
                         b = 1;
                         while(row - i > -1 && b) {
-                            if (row - i > -1 && board1[row - i][column] != 'E' && board1[row - i][column] != 'T') {
-                                temp_column = column;
-                                temp_row = row - i;
-                                b = 0;
-                            }
-                            else
-                                i++;
+                             if(board1[row - i][column] == 'E'){
+                                    i++;
+                                    if(row - i > -1 && board1[row - i][column] == '\0'){
+                                        temp_column = column;
+                                        temp_row = row - i;
+                                        b = 0;
+                                    }
+                             }
                         }
                     }
-                    if(column - 1 > -1){
+                    if(column - 1 > -1 && board1[row][column - 1] == 'E'){
                         i = 1;
                         b = 1;
                         while(column - i > -1 && b) {
-                            if (column - i > -1 && board1[row][column - i] != 'E' && board1[row][column - i] != 'T') {
-                                temp_column = column - i;
-                                temp_row = row;
-                                b = 0;
-                            }
-                            else
+                            if (board1[row][column - 1] == 'E') {
                                 i++;
+                                if(column - 1 > -1 && board1[row][column - 1] == '\0'){
+                                    temp_column = column - i;
+                                    temp_row = row;
+                                    b = 0;
+                                }
+                            }
                         }
                     }
-                    if(column + 1 < map_size) {
+                    if(column + 1 < map_size && board1[row][column + 1] == 'E') {
                         i = 1;
                         b = 1;
                         while(column + i < map_size && b) {
-                            if (column + i < map_size && board1[row][column + i] != 'E' && board1[row][column + i] != 'T') {
-                                temp_column = column + i;
-                                temp_row = row;
-                                b = 0;
-                            } else
+                            if (board1[row][column + i] == 'E') {
                                 i++;
+                                if (column + i < map_size && board1[row][column + i] == '\0') {
+                                    temp_column = column + i;
+                                    temp_row = row;
+                                    b = 0;
+                                }
+                            }
                         }
                     }
-                    if(row + 1 < map_size) {
+                    if(row + 1 < map_size && board1[row + 1][column] == 'E') {
                         i = 1;
                         b = 1;
                         while (row + i < map_size && b) {
-                            if (row + i < map_size && board1[row + i][column] != 'E' && board1[row + i][column] != 'T') {
-                                temp_column = column;
-                                temp_row = row + i;
-                                b = 0;
-                            } else
+                            if (board1[row + i][column] == 'E'){
                                 i++;
+                                if(row + i < map_size && board1[row + i][column] == '\0') {
+                                    temp_column = column;
+                                    temp_row = row + i;
+                                    b = 0;
+                                }
+                            }
                         }
                     }
                 }
@@ -1357,7 +1363,66 @@ void bot_play(ships1** head11, ships2** head22, int save){
     (*head22) = head4;
 }
 void get_saved_inputs(ships1* head1, ships2* head2, int data[50][4], char temp_board1[10][10], int player){
+    if(player == 1){
+        int counter = 0,  arr[4], is_locatable, temp_array[2], arr_size1[26] = {0};//arr_size[size of ship][number of this ship]
 
+        for(int i = 0;i < 26;i++)
+            arr_size1[i] = arr_size[i];
+
+        while (counter < ships_sum) {
+            is_locatable = 1;
+
+
+
+            for(int f = 0;f < 4;f++)
+                arr[f] -= 1;//because of the fact that arrays start from 0
+
+            int x1 = arr[0] < arr[2] ? arr[0] : arr[2], x2 = arr[2] > arr[0] ? arr[2] : arr[0];
+            int y1 = arr[1] < arr[3] ? arr[1] : arr[3], y2 = arr[1] < arr[3] ? arr[3] : arr[1];
+
+            if(arr[0] != arr[2] && arr[1] != arr[3])
+                is_locatable = 0;
+
+            if(arr[0] == arr[2]){
+                for(int i = y1;i <= y2;i++) {
+                    temp_array[0] = arr[0];
+                    temp_array[1] = i;
+                    if (is_really_locatable(temp_array, player) == 0)
+                        is_locatable = 0;
+                }
+            }
+            if(arr[1] == arr[3]){
+                for(int i = x1;i <= x2;i++) {
+                    temp_array[1] = arr[1];
+                    temp_array[0] = i;
+                    if (is_really_locatable(temp_array, player) == 0)
+                        is_locatable = 0;
+                }
+            }
+
+            if(is_locatable == 1 && arr_size1[find_length(arr)] != 0 && find_length(arr) <= max_size) {
+                if (counter + find_length(arr) <= ships_sum) {
+                    if (counter == 0) {
+                        for(int i = 0;i < 4;i++)
+                            head1->arr1[i] = arr[i];
+                    }
+
+                    else
+                        add_end1(head1, new_ship1(arr));
+
+                    fill_board1(arr);
+
+                    counter += find_length(arr);
+                    print(player);
+                    arr_size1[find_length(arr)]--;
+                }
+                else
+                    is_locatable = 0;
+            }
+            else
+                is_locatable = 0;
+        }
+    }
 }
 
 int main(void){
@@ -1745,7 +1810,7 @@ int main(void){
                     printf("\nplease enter the new map size:");
                     scanf("%d", &temp);
 
-                    if(temp * temp > ships_sum)
+                    if(temp * temp > ships_sum * 2)
                         check = 0;
                     else
                         printf("\nyour input is not acceptable.");
