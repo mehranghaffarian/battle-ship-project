@@ -398,12 +398,12 @@ void get_inputs(ships1* head1, ships2* head2, int player){
         }
     }
     if(player == 2){
-        int counter = 0,  arr[4], is_locatable, temp_array[2], arr_size2[26] = {0};//arr_size[size of ship][number of this ship]
+        int counter = 0,  arr[4], is_locatable, temp_array[2], arr_size2[26];//arr_size[size of ship][number of this ship]
 
         for(int i = 0;i < 26;i++)
             arr_size2[i] = arr_size[i];
 
-        printf("\nplayer%d please enter the row and column of the ships(ships end and first). if it is a ship with length of 1 please enter its start row and column twice\n",
+        printf("\n\n\n\n\n\n\n\n\n\n\n\nplayer%d please enter the row and column of the ships(ships end and first). if it is a ship with length of 1 please enter its start row and column twice\n",
                player);
 
         while (counter < ships_sum) {
@@ -501,7 +501,7 @@ void get_inputs(ships1* head1, ships2* head2, int player){
                 for(int i = y1;i <= y2;i++) {
                     temp_array[0] = arr[0];
                     temp_array[1] = i;
-                    if (is_really_locatable(temp_array, player) == 0)
+                    if (is_really_locatable(temp_array, 1) == 0)
                         is_locatable = 0;
                 }
             }
@@ -509,7 +509,7 @@ void get_inputs(ships1* head1, ships2* head2, int player){
                 for(int i = x1;i <= x2;i++) {
                     temp_array[1] = arr[1];
                     temp_array[0] = i;
-                    if (is_really_locatable(temp_array, player) == 0)
+                    if (is_really_locatable(temp_array, 1) == 0)
                         is_locatable = 0;
                 }
             }
@@ -567,7 +567,7 @@ void get_inputs(ships1* head1, ships2* head2, int player){
                 for(int i = y1;i <= y2;i++) {
                     temp_array[0] = arr[0];
                     temp_array[1] = i;
-                    if (is_really_locatable(temp_array, player) == 0)
+                    if (is_really_locatable(temp_array, 2) == 0)
                         is_locatable = 0;
                 }
             }
@@ -575,7 +575,7 @@ void get_inputs(ships1* head1, ships2* head2, int player){
                 for(int i = x1;i <= x2;i++) {
                     temp_array[1] = arr[1];
                     temp_array[0] = i;
-                    if (is_really_locatable(temp_array, player) == 0)
+                    if (is_really_locatable(temp_array, 2) == 0)
                         is_locatable = 0;
                 }
             }
@@ -955,6 +955,7 @@ void mutual_play(ships1** head11, ships2** head22){
     print(1);
     printf("the %s board is as bellow\n", name2);
     print(2);
+    printf("\nthe information is shown above\n\n*_* THE GAME IS OVER *_*\n");
 
     FILE* users = fopen("users.txt", "a+");
     fprintf(users, "%s %d\n", name1, point1);
@@ -969,6 +970,37 @@ void mutual_play(ships1** head11, ships2** head22){
     number = fopen("number.txt", "w+");
     fprintf(number, "%d", num + 2);
     fclose(number);
+
+    //deleting the current information for another game if the user wants
+    for(int i = 0;i < map_size;i++) {
+        for (int j = 0; j < map_size; j++)
+            board1[i][j] = '\0';
+    }
+        for(int i = 0;i < map_size;i++) {
+            for (int j = 0; j < map_size; j++)
+                board2[i][j] = '\0';
+        }
+    int temp_arr[4];
+
+    for(int i = 0;i < 26;i++)
+        if(head1 != NULL) {
+            temp_arr[0] = head1->arr1[0];
+            temp_arr[1] = head1->arr1[1];
+            temp_arr[2] = head1->arr1[2];
+            temp_arr[3] = head1->arr1[3];
+            remove_ship1(&head1, temp_arr);
+        }
+    for(int i = 0;i < 26;i++)
+        if(head2 != NULL) {
+            temp_arr[0] = head2->arr2[0];
+            temp_arr[1] = head2->arr2[1];
+            temp_arr[2] = head2->arr2[2];
+            temp_arr[3] = head2->arr2[3];
+            remove_ship2(&head2, temp_arr);
+        }
+    int arr[4] = {-5, -5, -5, -5};
+    head1 = new_ship1(arr);
+    head2 = new_ship2(arr);
 }
 void bot_play(ships1** head11, ships2** head22){
     ships1* head1 = (*head11);
@@ -1031,66 +1063,92 @@ void bot_play(ships1** head11, ships2** head22){
                             }
                     }
                     if(row - 1 > -1){
-                        if(board1[row - 1][column] != 'C' && board1[row - 1][column] != 'T') {
+                        if(board1[row - 1][column] != 'T') {
                             temp_column = column;
                             temp_row = row - 1;
                         }
                     }
-                    else if(column - 1 > -1){
-                        if(board1[row][column - 1] != 'C' && board1[row][column - 1] != 'T'){
+                    if(column - 1 > -1){
+                        if(board1[row][column - 1] != 'T'){
                             temp_column = column - 1;
                             temp_row = row;
                         }
                     }
-                    else if(column + 1 < map_size){
-                        if(board1[row][column + 1] != 'C' && board1[row][column + 1] != 'T'){
+                    if(column + 1 < map_size){
+                        if(board1[row][column + 1] != 'T'){
                             temp_column = column + 1;
                             temp_row = row;
                         }
                     }
-                    else if(row + 1 < map_size){
-                        if(board1[row + 1][column] != 'C' && board1[row + 1][column] != 'T') {
+                    if(row + 1 < map_size){
+                        if(board1[row + 1][column] != 'T') {
                             temp_column = column;
                             temp_row = row + 1;
                         }
                     }
                 }
-//                if(count > 1){
-//                    int row, column;
-//
-//                    for(int i = 0;i < map_size;i++) {
-//                        for (int j = 0; j < map_size; j++)
-//                            if(board1[i][j] == 'E'){
-//                                row = i;
-//                                column = j;
-//                            }
-//                    }
-//                    if(row - 1 > -1){
-//                        if(board1[row - 1][column] == 'E') {
-//                            temp_column = column;
-//                            temp_row = row - 1;
-//                        }
-//                    }
-//                    else if(column - 1 > -1){
-//                        if(board1[row][column - 1] != 'C' && board1[row][column - 1] != 'T'){
-//                            temp_column = column - 1;
-//                            temp_row = row;
-//                        }
-//                    }
-//                    else if(column + 1 < map_size){
-//                        if(board1[row][column + 1] != 'C' && board1[row][column + 1] != 'T'){
-//                            temp_column = column + 1;
-//                            temp_row = row;
-//                        }
-//                    }
-//                    else if(row + 1 < map_size){
-//                        if(board1[row + 1][column] != 'C' && board1[row + 1][column] != 'T') {
-//                            temp_column = column;
-//                            temp_row = row + 1;
-//                        }
-//                    }
-//                }
+                if(count > 1){
+                    int row, column;
 
+                    for(int i = 0;i < map_size;i++) {
+                        for (int j = 0; j < map_size; j++)
+                            if(board1[i][j] == 'E'){
+                                row = i;
+                                column = j;
+                            }
+                    }
+                    int i, b;
+                    if(row - 1 > -1){
+                        i = 1;
+                        b = 1;
+                        while(row - i > -1 && b) {
+                            if (row - i > -1 && board1[row - i][column] != 'E' && board1[row - i][column] != 'T') {
+                                temp_column = column;
+                                temp_row = row - i;
+                                b = 0;
+                            }
+                            else
+                                i++;
+                        }
+                    }
+                    if(column - 1 > -1){
+                        i = 1;
+                        b = 1;
+                        while(column - i > -1 && b) {
+                            if (column - i > -1 && board1[row][column - i] != 'E' && board1[row][column - i] != 'T') {
+                                temp_column = column - i;
+                                temp_row = row;
+                                b = 0;
+                            }
+                            else
+                                i++;
+                        }
+                    }
+                    if(column + 1 < map_size) {
+                        i = 1;
+                        b = 1;
+                        while(column + i < map_size && b) {
+                        if (column + i < map_size && board1[row][column + i] != 'E' && board1[row][column + i] != 'T') {
+                            temp_column = column + i;
+                            temp_row = row;
+                            b = 0;
+                        } else
+                            i++;
+                    }
+                    }
+                    if(row + 1 < map_size) {
+                        i = 1;
+                        b = 1;
+                        while (row + i < map_size && b) {
+                            if (row + i < map_size && board1[row + i][column] != 'E' && board1[row + i][column] != 'T') {
+                                temp_column = column;
+                                temp_row = row + i;
+                                b = 0;
+                            } else
+                                i++;
+                        }
+                    }
+                }
                 turn = shot_it(&head1, &head2, temp_row, temp_column, 3);
                 print_shotable(2);
                 printf("\nthe bot shot is shown above\n");
@@ -1110,6 +1168,8 @@ void bot_play(ships1** head11, ships2** head22){
     print(1);
     printf("the %s board is as bellow\n", name2);
     print(2);
+    printf("\nthe information is shown above\n\n*_* THE GAME IS OVER *_*\n");
+
 
     FILE* users = fopen("users.txt", "a+");
     fprintf(users, "%s %d\n", name1, point1);
@@ -1124,9 +1184,40 @@ void bot_play(ships1** head11, ships2** head22){
     fprintf(number, "%d", num + 1);
     fclose(number);
 
+    //deleting the current information for another game if the user wants
+    for(int i = 0;i < map_size;i++) {
+        for (int j = 0; j < map_size; j++)
+            board1[i][j] = '\0';
+    }
+    for(int i = 0;i < map_size;i++) {
+        for (int j = 0; j < map_size; j++)
+            board2[i][j] = '\0';
+    }
+    int temp_arr[4];
+
+    for(int i = 0;i < 26;i++)
+        if(head1 != NULL) {
+            temp_arr[0] = head1->arr1[0];
+            temp_arr[1] = head1->arr1[1];
+            temp_arr[2] = head1->arr1[2];
+            temp_arr[3] = head1->arr1[3];
+            remove_ship1(&head1, temp_arr);
+        }
+    for(int i = 0;i < 26;i++)
+        if(head2 != NULL) {
+            temp_arr[0] = head2->arr2[0];
+            temp_arr[1] = head2->arr2[1];
+            temp_arr[2] = head2->arr2[2];
+            temp_arr[3] = head2->arr2[3];
+            remove_ship2(&head2, temp_arr);
+        }
+    int arr[4] = {-5, -5, -5, -5};
+    head1 = new_ship1(arr);
+    head2 = new_ship2(arr);
 }
 
 int main(void){
+    setbuf(stdout, 0);
     //basic settings
     int arr[4] = {-5, -5, -5, -5};
     ships1* head1 = new_ship1(arr);
@@ -1388,7 +1479,7 @@ int main(void){
             name2[2] = 't';
             name2[3] = '\0';
 
-            printf("\nplease make decision to locate the bot ships:\n1. automatically\n2. manually\n");
+            printf("\nplease make decision to locate the bot ships:\n1. automatically\n2. manually(another person can set it for you)\n");
             scanf("%d", &choice);
 
             if(choice == 1)
@@ -1550,7 +1641,6 @@ int main(void){
 }
 // be careful about map size errors
 //player chooses the name(saved or new)
-//////bot is obligation but its map is not(has++)
 /////loading last game is obligation
 //rocket is orbitrary->-2
 /////saving is obligation->-1
