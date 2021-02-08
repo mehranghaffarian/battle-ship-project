@@ -803,12 +803,14 @@ int shot_it(ships1** head1, ships2** head2, int row, int column, int player){
                 curr = curr->next;
             }
         }
-        else{
+        else if(board1[row][column] != 'S'){
             status = 0;
             board1[row][column] = 'T';
             if(player == 2)
                 printf("\nOops?! NO ship\n");
         }
+        else
+            status = 0;
     }
     return status;
 }
@@ -829,12 +831,7 @@ void save_it(ships1** head11, ships2** head22, int turn){
     curr.score1 = point1;
     curr.score2 = point2;
 
-    if(turn == 1)
-        curr.turn = 1;
-    if(turn == 2)
-        curr.turn = 2;
-    if(turn == 3)
-        curr.turn = 3;
+    curr.turn = turn;
 
     ships1* head1 = (*head11);
     ships2* head2 = (*head22);
@@ -915,7 +912,7 @@ void mutual_play(ships1** head11, ships2** head22, int save){
                 save = 0;
                 if(temp_column == -1 && temp_row == -1) {
                     save_it(head11, head22, 1);
-                    save = -4;
+                    save = -1;
                 }
 //                a = 0;
 //
@@ -969,7 +966,7 @@ void mutual_play(ships1** head11, ships2** head22, int save){
                     printf("\ntarget is not acceptable\n");
                 //               }
             }
-        }while((a == 0 || turn) && (save == 2 || save == 0) && head1 != NULL && head2 != NULL);
+        }while((a == 0 || turn) && (save == 1 || save == 0) && head1 != NULL && head2 != NULL);
 
         //player2 shots player1
         do {
@@ -981,7 +978,7 @@ void mutual_play(ships1** head11, ships2** head22, int save){
                 save = 0;
                 if(temp_column == -1 && temp_row == -1) {
                     save_it(head11, head22, 2);
-                    save = -5;
+                    save = -1;
                 }
                 //               a = 0;
                 //
@@ -1037,7 +1034,7 @@ void mutual_play(ships1** head11, ships2** head22, int save){
             }
         }while((a == 0 || turn) && (save == 2 || save == 0) && head1 != NULL && head2 != NULL);
     }
-    if(save != -4 && save != -5){
+    if(save != -1){
         printf("\n\n%s:%d  --  %s:%d", name1, point1, name2, point2);
         printf("\nthe winner is ");
 
@@ -1113,14 +1110,14 @@ void bot_play(ships1** head11, ships2** head22, int save){
     int a;
     srand(time(0));
 
-    printf("\n\n\n\n\n\n\n\n\n\n\n\n lets begin the game. player1 will start the game. every turn you have to choose a correct location to attack. if you   shot any ship you will get points and be able to shot the other player again. you have to enter the row and the column of your location in this way:row column. if you want to use a rocket enter:-2 -2.then you can decide whether to attack your enemy in a vertical or horizontal way. enter:v column or h row. you can use rocket once(it would cost 100 point). if you want to save the game enter:-1 -1\n");
+    printf("\n\n\n\n\n\n\n\n\n\n\n\n lets begin the game. player1 will start the game. every turn you have to choose a correct location to attack. if you   shot any ship you will get points and be able to shot the other player again. you have to enter the row and the column of your location in this way:row column. if you want to use a rocket enter:-2 -2.then you can decide whether to attack your enemy in a vertical or horizontal way. enter:v column or h row. you can use rocket once(it would cost 100 point). if you got any problem enter your target twice. if you want to save the game enter:-1 -1\n");
 
     while(head1 != NULL && head2 != NULL && save != -1){
         int temp_row, temp_column, temp, turn;
 
         //player1 shots player2
         do {
-            if(head1 != NULL && head2 != NULL && (save == 0 || save == 1)) {
+            if(head1 != NULL && head2 != NULL && (save == 0 || save == 3)) {
                 print_shotable(1);
                 printf("%s:%d  --  %s:%d\n", name1, point1, name2, point2);
                 printf("%s chose your target:\n", name1);
@@ -1140,7 +1137,7 @@ void bot_play(ships1** head11, ships2** head22, int save){
                     printf("\ntarget is not acceptable\n");
                 save = 0;
             }
-        }while((a == 0 || turn) && (save == 1 || save == 0) && head1 != NULL && head2 != NULL);
+        }while((a == 0 || turn) && (save == 3 || save == 0) && head1 != NULL && head2 != NULL);
 
         //bot shots player1
         do {
@@ -1149,17 +1146,19 @@ void bot_play(ships1** head11, ships2** head22, int save){
                 int row = map_size, column = map_size;
 
                 for(int i = 0;i < map_size;i++) {
-                    for (int j = 0; j < map_size; j++)
-                        if(board1[i][j] == 'E' && (i <= row && j <= column)){
+                    for (int j = 0; j < map_size; j++) {
+                        if (board1[i][j] == 'E' && (i <= row && j <= column)) {
                             row = i;
                             column = j;
-                            count++;
                         }
+                        if(board1[i][j] == 'E')
+                            count++;
+                    }
                 }
                 if(count == 0) {
                     do {
                         temp_column = rand() % map_size;
-                        temp_row = (temp_column * 57) % map_size;
+                        temp_row = rand() % map_size;
                         a = is_shotable(temp_row, temp_column, 2);
                     }while(!a);
                 }
@@ -1168,83 +1167,64 @@ void bot_play(ships1** head11, ships2** head22, int save){
                             temp_column = column;
                             temp_row = row - 1;
                     }
+                    else if(column + 1 < map_size && board1[row][column + 1] != 'T' && is_shotable(row, column + 1, 2)){
+                        temp_column = column + 1;
+                        temp_row = row;
+                    }
+                    else if(row + 1 < map_size && board1[row + 1][column] != 'T' && is_shotable(row + 1, column, 2)){
+                        temp_column = column;
+                        temp_row = row + 1;
+                    }
                     else if(column - 1 > -1 && board1[row][column - 1] != 'T' && is_shotable(row, column - 1, 2)){
                             temp_column = column - 1;
                             temp_row = row;
                     }
-                    else if(column + 1 < map_size && board1[row][column + 1] != 'T' && is_shotable(row, column + 1, 2)){
-                            temp_column = column + 1;
-                            temp_row = row;
-                    }
-                    else if(row + 1 < map_size && board1[row + 1][column] != 'T' && is_shotable(row + 1, column, 2)){
-                            temp_column = column;
-                            temp_row = row + 1;
-                    }
                 }
                 else if(count > 1){
-                    int i, b;
+                    int i = 1, b = 1;
+
                     if(column + 1 < map_size && board1[row][column + 1] == 'E') {
-                        i = 1;
-                        b = 1;
-                        if(column - 1 > -1 && board1[row][column - 1] != 'T' && board1[row][column - 1] != 'E') {
-                            if (is_shotable(row, column - 1, 2)) {
-                                temp_column = column - 1;
-                                temp_row = row;
-                                b = 0;
-                            }
+                        if (column - 1 > -1 && is_shotable(row, column - 1, 2)) {
+                            temp_row = row;
+                            temp_column = column - 1;
+                            b = 0;
                         }
-                        while(column + i < map_size && b) {
-                            if (board1[row][column + i] == 'E') {
+                        while (b && column + i < map_size){
+                            if(column + i < map_size && board1[row][column + i] == 'E'){
                                 i++;
-                                if (column + i < map_size && board1[row][column + i] != 'T' && board1[row][column + i] != 'E') {
-                                    if (is_shotable(row, column + i, 2)) {
-                                        temp_column = column + i;
-                                        temp_row = row;
-                                        b = 0;
-                                    }
-                                }
-                                else if(column + i < map_size && board1[row][column + i] != 'E')
+                                if(column + i < map_size && is_shotable(row, column + i, 2)){
+                                    temp_row = row;
+                                    temp_column = column + i;
                                     b = 0;
+                                }
                             }
                             else
                                 b = 0;
                         }
                     }
-                    else if(row + 1 < map_size && board1[row + 1][column] == 'E') {
-                        i = 1;
-                        b = 1;
-                        if(row - 1 > -1 && board1[row - 1][column] != 'T' && board1[row - 1][column] != 'E'){
-                            if(is_shotable(row - 1, column, 2)) {
-                                temp_row = row - 1;
-                                temp_column = column;
-                                b = 0;
-                            }
+                    else if(row + 1 < map_size && board1[row + 1][column] == 'E'){
+                        if(row - 1 > -1 && is_shotable(row - 1, column, 2)){
+                            temp_column = column;
+                            temp_row = row - 1;
+                            b = 0;
                         }
-                        while (row + i < map_size && b) {
-                            if (board1[row + i][column] == 'E'){
+                        while(b && row + i < map_size){
+                            if(row + i < map_size && board1[row + i][column] == 'E'){
                                 i++;
-                                if(row + i < map_size && board1[row + i][column] != 'T' &&  board1[row + i][column] != 'E') {
-                                    if (is_shotable(row + i, column, 2)) {
-                                        temp_column = column;
-                                        temp_row = row + i;
-                                        b = 0;
-                                    }
-                                }
-                                else if(row + i < map_size && board1[row + i][column] != 'E')
+                                if(row + i < map_size && is_shotable(row + i, column, 2)){
+                                    temp_column = column;
+                                    temp_row = row + i;
                                     b = 0;
+                                }
                             }
                             else
                                 b = 0;
                         }
                     }
                 }
-                if(is_shotable(temp_row, temp_column, 2)) {
                     turn = shot_it(&head1, &head2, temp_row, temp_column, 3);
                     print_shotable(2);
                     printf("\nthe bot shot is shown above\n");
-                }
-                else
-                    turn = 0;
             }
         }while(turn && save == 0 && head1 != NULL && head2 != NULL);
     }
@@ -1447,6 +1427,7 @@ int main(void){
 
                 fclose(users);
                 fclose(number);
+                choice = 10;
             }
             if (choice == 2) {
                 check = 1;
@@ -1531,6 +1512,7 @@ int main(void){
 
                 fclose(users);
                 fclose(number);
+                choice = 10;
             }
             if (choice == 2) {
                 check = 1;
@@ -1544,6 +1526,7 @@ int main(void){
                 while (check == 1) {
                     rewind(users);
                     i = 0;
+                    check = 0;
 
                     while (i != num) {
                         fscanf(users, "%s %d\n", name, &score);
@@ -1552,11 +1535,11 @@ int main(void){
                         else
                             check = 0;
 
+                        if (check == 1) {
+                            printf("\nwe have a user with that name. enter another name:");
+                            gets(name_temp);
+                        }
                         i++;
-                    }
-                    if (check == 1) {
-                        printf("\nwe have a user with that name. enter another name:");
-                        gets(name_temp);
                     }
                 }
                 fclose(users);
@@ -1564,6 +1547,7 @@ int main(void){
 
                 strcpy(name1, name_temp);
                 point1 = score;
+                choice = 10;
             }
             printf("\n%s choose one choice:\n1. put ships automatically\n2. put ships manually\n", name1);
             scanf("%d", &choice);
@@ -1766,36 +1750,73 @@ int main(void){
             }
         }
         if (choice == 6) {
-            char name_data[500][50], temp_name[50];
-            int score_data[500] = {0}, temp;
-            int num, i = 0;
+            printf("\nplease decide:\n1. removing a person from scoreboard\n2. show scoreboard\n");
+            scanf("%d", &choice);
+            if(choice == 1){
+                char name_data[500][50], temp_name[50];
+                int score_data[500] = {0}, temp;
+                int num, i = 0, line;
 
-            FILE *users = fopen("users.txt", "r+");
-            FILE *number = fopen("number.txt", "r+");
-            fscanf(number, "%d", &num);
+                FILE *users = fopen("users.txt", "r+");
+                FILE *number = fopen("number.txt", "r+");
+                fscanf(number, "%d", &num);
 
-            while (i != num) {
-                fscanf(users, "%s %d\n", name_data[i], &score_data[i]);
-                i++;
+                while (i != num) {
+                    fscanf(users, "%s %d\n", name_data[i], &score_data[i]);
+                    printf("\n%d. %s %d", i + 1, name_data[i], score_data[i]);
+                    i++;
+                }
+                fclose(users);
+                fclose(number);
+
+                printf("\nplease enter the index of the person you want to remove:");
+                scanf("%d", &line);
+
+                users = fopen("users.txt", "w+");
+
+                for(int k = 0;k < num;k++)
+                    if(k != line - 1)
+                        fprintf(users, "%s %d\n", name_data[k], score_data[k]);
+
+                fclose(users);
+                users = fopen("number.txt", "w+");
+                fprintf(users, "%d", num - 1);
+                fclose(users);
+                printf("\nDONE\n");
             }
-            fclose(users);
-            fclose(number);
+            if(choice == 2) {
+                char name_data[500][50], temp_name[50];
+                int score_data[500] = {0}, temp;
+                int num, i = 0;
 
-            for(int j = 0;j < num;j++) {
-                for (i = 0; i < num - 1; i++) {
-                    if (score_data[i] < score_data[i + 1]) {
-                        temp = score_data[i + 1];
-                        score_data[i + 1] = score_data[i];
-                        score_data[i] = temp;
-                        strcpy(temp_name, name_data[i]);
-                        strcpy(name_data[i], name_data[i + 1]);
-                        strcpy(name_data[i + 1], temp_name);
+                FILE *users = fopen("users.txt", "r+");
+                FILE *number = fopen("number.txt", "r+");
+                fscanf(number, "%d", &num);
+
+                while (i != num) {
+                    fscanf(users, "%s %d\n", name_data[i], &score_data[i]);
+                    i++;
+                }
+                fclose(users);
+                fclose(number);
+
+                for (int j = 0; j < num; j++) {
+                    for (i = 0; i < num - 1; i++) {
+                        if (score_data[i] < score_data[i + 1]) {
+                            temp = score_data[i + 1];
+                            score_data[i + 1] = score_data[i];
+                            score_data[i] = temp;
+                            strcpy(temp_name, name_data[i]);
+                            strcpy(name_data[i], name_data[i + 1]);
+                            strcpy(name_data[i + 1], temp_name);
+                        }
                     }
                 }
+                for (i = 0; i < num; i++)
+                    printf("\n%d. %s %d", i + 1, name_data[i], score_data[i]);
+                printf("\n");
             }
-            for (i = 0; i < num; i++)
-                printf("\n%d. %s %d", i + 1, name_data[i], score_data[i]);
-            printf("\n");
+            choice = 10;
         }
     }
 
@@ -1844,4 +1865,5 @@ int main(void){
 //                            else if (board1[row][column - 1] != 'E')
 //                                b = 0;
 //                        }
-//                    }
+//
+//
