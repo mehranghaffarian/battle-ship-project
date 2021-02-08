@@ -757,7 +757,7 @@ int shot_it(ships1** head1, ships2** head2, int row, int column, int player){
                 curr = curr->next;
             }
         }
-        else {
+        else{
             status = 0;
             board2[row][column] = 'T';
             printf("\nOops?! NO ship\n");
@@ -803,7 +803,7 @@ int shot_it(ships1** head1, ships2** head2, int row, int column, int player){
                 curr = curr->next;
             }
         }
-        else {
+        else{
             status = 0;
             board1[row][column] = 'T';
             if(player == 2)
@@ -813,44 +813,42 @@ int shot_it(ships1** head1, ships2** head2, int row, int column, int player){
     return status;
 }
 void save_it(ships1** head11, ships2** head22, int turn){
-    FILE* games = fopen("games.txt", "a+");
-    fprintf(games, "%s", "board1:");
+    FILE* games = fopen("games.bin", "ab+");
 
-    for(int i = 0;i < map_size;i++){
-        for(int j = 0;j < map_size;j++){
-            if(board1[i][j] == '\0')
-                fprintf(games, " %d", 0);
-            if(board1[i][j] == 'S')
-                fprintf(games, " %d", 1);
-            if(board1[i][j] == 'E')
-                fprintf(games, " %d", 2);
-            if(board1[i][j] == 'C')
-                fprintf(games, " %d", 3);
+    game curr;
+    strcpy(curr.name1, name1);
+    strcpy(curr.name2, name2);
+
+    for(int i = 0;i < 10;i++){
+        for(int j = 0;j < 10;j++)
+        {
+            curr.board1[i][j] = board1[i][j];
+            curr.board2[i][j] = board2[i][j];
         }
     }
-    fprintf(games, "\n%s", "board2:");
-    for(int i = 0;i < map_size;i++){
-        for(int j = 0;j < map_size;j++){
-            if(board2[i][j] == '\0')
-                fprintf(games, " %d", 0);
-            if(board2[i][j] == 'S')
-                fprintf(games, " %d", 1);
-            if(board2[i][j] == 'E')
-                fprintf(games, " %d", 2);
-            if(board2[i][j] == 'C')
-                fprintf(games, " %d", 3);
-        }
-    }
-    fprintf(games, "\nname1:%s", name1);
-    fprintf(games, "\nname2:%s", name2);
-    fprintf(games, "\nscore1:%d", point1);
-    fprintf(games, "\nscore2:%d", point2);
-    fprintf(games, "turn:%d", turn);
+    curr.score1 = point1;
+    curr.score2 = point2;
+
+    if(turn == 1)
+        curr.turn = 1;
+    if(turn == 2)
+        curr.turn = 2;
+    if(turn == 3)
+        curr.turn = 3;
+
+    fwrite(&curr, sizeof(curr), 1, games);
     fclose(games);
 
-    FILE* games_names = fopen("games_names.txt", "a+");
-    fprintf(games_names, "%s  --  %s", name1, name2);
-    fclose(games_names);
+    int num;
+    FILE* number = fopen("games_number.bin", "rb+");
+    fread(&num, 4, 1, number);
+    fclose(number);
+    number = fopen("games_number.bin", "wb+");
+    num += 2;
+    fwrite(&num, 4, 1, number);
+    fclose(number);
+
+    printf("\nthe game is saved properly\n");
 }
 void mutual_play(ships1** head11, ships2** head22, int save){
     ships1* head1 = (*head11);
@@ -940,7 +938,7 @@ void mutual_play(ships1** head11, ships2** head22, int save){
                 scanf("%d %d", &temp_row, &temp_column);
                 save = 0;
                 if(temp_column == -1 && temp_row == -1) {
-                    save_it(head11, head22, 1);
+                    save_it(head11, head22, 2);
                     save = -5;
                 }
                 //               a = 0;
@@ -997,44 +995,7 @@ void mutual_play(ships1** head11, ships2** head22, int save){
             }
         }while((a == 0 || turn) && (save == 2 || save == 0) && head1 != NULL && head2 != NULL);
     }
-    if(save == -4 || save == -5)
-    {
-        FILE* games = fopen("games.bin", "ab+");
-
-        game curr;
-        strcpy(curr.name1, name1);
-        strcpy(curr.name2, name2);
-
-        for(int i = 0;i < 10;i++){
-            for(int j = 0;j < 10;j++)
-            {
-                curr.board1[i][j] = board1[i][j];
-                curr.board2[i][j] = board2[i][j];
-            }
-        }
-        curr.score1 = point1;
-        curr.score2 = point2;
-
-        if(save == -4)
-            curr.turn = 1;
-        else
-            curr.turn = 2;
-
-        fwrite(&curr, sizeof(curr), 1, games);
-        fclose(games);
-
-        int num;
-        FILE* number = fopen("games_number.bin", "rb+");
-        fread(&num, 4, 1, number);
-        fclose(number);
-        number = fopen("games_number.bin", "wb+");
-        num += 2;
-        fwrite(&num, 4, 1, number);
-        fclose(number);
-
-        printf("\nthe game is saved properly\n");
-    }
-    else{
+    if(save != -4 && save != -5){
         printf("\n\n%s:%d  --  %s:%d", name1, point1, name2, point2);
         printf("\nthe winner is ");
 
@@ -1115,14 +1076,14 @@ void bot_play(ships1** head11, ships2** head22, int save){
 
         //player1 shots player2
         do {
-            if(head1 != NULL && head2 != NULL && (save == 0 || save == -3)) {
+            if(head1 != NULL && head2 != NULL && (save == 0 || save == 1)) {
                 print_shotable(1);
                 printf("%s:%d  --  %s:%d\n", name1, point1, name2, point2);
                 printf("%s chose your target:\n", name1);
                 scanf("%d %d", &temp_row, &temp_column);
                 save = 0;
                 if(temp_column == -1 && temp_row == -1) {
-                    save_it(head11, head22, 1);
+                    save_it(head11, head22, 3);
                     save = -1;
                 }
 
@@ -1135,36 +1096,30 @@ void bot_play(ships1** head11, ships2** head22, int save){
                     printf("\ntarget is not acceptable\n");
                 save = 0;
             }
-        }while((a == 0 || turn) && (save == -3 || save == 0) && head1 != NULL && head2 != NULL);
+        }while((a == 0 || turn) && (save == 1 || save == 0) && head1 != NULL && head2 != NULL);
 
         //bot shots player1
         do {
             if(head1 != NULL && head2 != NULL && save == 0) {
                 int count = 0;
+                int row = map_size, column = map_size;
 
-                for(int i = 0;i < map_size;i++){
-                    for(int j = 0;j < map_size;j++)
-                        if(board1[i][j] == 'E')
+                for(int i = 0;i < map_size;i++) {
+                    for (int j = 0; j < map_size; j++)
+                        if(board1[i][j] == 'E' && (i <= row || j <= column)){
+                            row = i;
+                            column = j;
                             count++;
+                        }
                 }
-
                 if(count == 0) {
                     do {
                         temp_column = rand() % map_size;
                         temp_row = rand() % map_size;
                         a = is_shotable(temp_row, temp_column, 2);
-                    }while (!a);
+                    }while(!a);
                 }
                 if(count == 1){
-                    int row, column;
-
-                    for(int i = 0;i < map_size;i++) {
-                        for (int j = 0; j < map_size; j++)
-                            if(board1[i][j] == 'E'){
-                                row = i;
-                                column = j;
-                            }
-                    }
                     if(row - 1 > -1){
                         if(board1[row - 1][column] != 'T') {
                             temp_column = column;
@@ -1191,70 +1146,77 @@ void bot_play(ships1** head11, ships2** head22, int save){
                     }
                 }
                 if(count > 1){
-                    int row, column;
-
-                    for(int i = 0;i < map_size;i++) {
-                        for (int j = 0; j < map_size; j++)
-                            if(board1[i][j] == 'E'){
-                                row = i;
-                                column = j;
-                            }
-                    }
                     int i, b;
-                    if(row - 1 > -1 && board1[row - 1][column] == 'E'){
-                        i = 1;
-                        b = 1;
-                        while(row - i > -1 && b) {
-                             if(board1[row - i][column] == 'E'){
-                                    i++;
-                                    if(row - i > -1 && board1[row - i][column] == '\0'){
-                                        temp_column = column;
-                                        temp_row = row - i;
-                                        b = 0;
-                                    }
-                             }
-                        }
-                    }
-                    if(column - 1 > -1 && board1[row][column - 1] == 'E'){
-                        i = 1;
-                        b = 1;
-                        while(column - i > -1 && b) {
-                            if (board1[row][column - 1] == 'E') {
-                                i++;
-                                if(column - 1 > -1 && board1[row][column - 1] == '\0'){
-                                    temp_column = column - i;
-                                    temp_row = row;
-                                    b = 0;
-                                }
-                            }
-                        }
-                    }
+//                    if(row - 1 > -1 && board1[row - 1][column] == 'E'){
+//                        i = 1;
+//                        b = 1;
+//                        while(row - i > -1 && b) {
+//                             if(board1[row - i][column] == 'E'){
+//                                    i++;
+//                                    if(row - i > -1 && board1[row - i][column] == '\0'){
+//                                        temp_column = column;
+//                                        temp_row = row - i;
+//                                        b = 0;
+//                                    }
+//                             }
+//                             else if(board1[row - i][column] == 'E')
+//                                 b = 0;
+//                        }
+//                    }
+//                    if(column - 1 > -1 && board1[row][column - 1] == 'E'){
+//                        i = 1;
+//                        b = 1;
+//                        while(column - i > -1 && b) {
+//                            if (board1[row][column - 1] == 'E') {
+//                                i++;
+//                                if(column - 1 > -1 && board1[row][column - 1] == '\0'){
+//                                    temp_column = column - i;
+//                                    temp_row = row;
+//                                    b = 0;
+//                                }
+//                            }
+//                            else if (board1[row][column - 1] != 'E')
+//                                b = 0;
+//                        }
+//                    }
                     if(column + 1 < map_size && board1[row][column + 1] == 'E') {
                         i = 1;
                         b = 1;
+                        if(column - 1 > -1 && board1[row][column - 1] != 'T'){
+                            temp_column--;
+                            b = 0;
+                        }
                         while(column + i < map_size && b) {
                             if (board1[row][column + i] == 'E') {
                                 i++;
-                                if (column + i < map_size && board1[row][column + i] == '\0') {
+                                if (column + i < map_size && board1[row][column + i] != 'T' && board1[row][column + i] != 'E') {
                                     temp_column = column + i;
                                     temp_row = row;
                                     b = 0;
                                 }
                             }
+                            else if(board1[row][column + i] != 'E')
+                                b = 0;
                         }
                     }
                     if(row + 1 < map_size && board1[row + 1][column] == 'E') {
                         i = 1;
                         b = 1;
+                        if(row - 1 > -1 && board1[row + 1][column] != 'T'){
+                            temp_row--;
+                            b = 0;
+                        }
                         while (row + i < map_size && b) {
                             if (board1[row + i][column] == 'E'){
                                 i++;
-                                if(row + i < map_size && board1[row + i][column] == '\0') {
+                                if(row + i < map_size && board1[row + i][column] != 'T' &&  board1[row + i][column] != 'E') {
                                     temp_column = column;
                                     temp_row = row + i;
                                     b = 0;
                                 }
                             }
+                            else if(board1[row + i][column] != 'E')
+                                b = 0;
                         }
                     }
                 }
@@ -1264,39 +1226,7 @@ void bot_play(ships1** head11, ships2** head22, int save){
             }
         }while(turn && save == 0 && head1 != NULL && head2 != NULL);
     }
-    if(save == -3){
-        FILE* games = fopen("games.bin", "ab+");
-
-        game curr;
-        strcpy(curr.name1, name1);
-        strcpy(curr.name2, name2);
-
-        for(int i = 0;i < 10;i++){
-            for(int j = 0;j < 10;j++)
-            {
-                curr.board1[i][j] = board1[i][j];
-                curr.board2[i][j] = board2[i][j];
-            }
-        }
-        curr.score1 = point1;
-        curr.score2 = point2;
-        curr.turn = -3;//to clarify that it is a game with the bot
-
-        fwrite(&curr, sizeof(curr), 1, games);
-        fclose(games);
-
-        int num;
-        FILE* number = fopen("games_number.bin", "rb+");
-        fread(&num, 4, 1, number);
-        fclose(number);
-        number = fopen("games_number.bin", "wb+");
-        num += 2;
-        fwrite(&num, 4, 1, number);
-        fclose(number);
-
-        printf("\nthe game is saved properly\n");
-    }
-    else
+    if(save != -1)
     {
         printf("\n\n%s:%d  --  %s:%d", name1, point1, name2, point2);
         printf("\nthe winner is ");
@@ -1688,7 +1618,7 @@ int main(void){
             name2[2] = 't';
             name2[3] = '\0';
 
-            printf("\nplease make decision to locate the bot ships:\n1. automatically\n2. manually(another person can set it for you)\n");
+            printf("\n\n\n\n\n\n\n\n\n\n\nplease make decision to locate the bot ships:\n1. automatically\n2. manually(another person can set it for you)\n");
             scanf("%d", &choice);
 
             if(choice == 1)
@@ -1700,7 +1630,7 @@ int main(void){
             bot_play(&head1, &head2, 0);
             choice = 10;
         }
-        if (choice == 3){
+        if (choice == 3) {
             int num;
             FILE* number = fopen("games_number.bin", "rb+");
             fread(&num, 4, 1, number);
@@ -1716,9 +1646,7 @@ int main(void){
             printf("\nplease choose one game:");
             scanf("%d", &choice);
 
-            rewind(games);
-
-            for(int i = 0;i < choice;i++)
+                fseek(games, (choice - 1) * sizeof(temp), SEEK_SET);
                 fread(&temp, sizeof(temp), 1, games);
 
             point1 = temp.score1;
@@ -1754,8 +1682,8 @@ int main(void){
 
             choice == 10;
         }
-        if (choice == 4){
-//        load_games();
+        if (choice == 4) {
+//        load_last_game();
         }
         if (choice == 5) {
             int choicee;
