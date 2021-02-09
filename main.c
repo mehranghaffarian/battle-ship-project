@@ -331,6 +331,31 @@ void print(int player){
 //        scanf("%c",&wait);
     }
 }
+int check_around(int row, int column, int player){
+    int ships_around = 0;
+
+    if(player == 1){
+        if(row - 2 > -1 && board1[row - 2][column] == 'S')
+            ships_around = 1;
+        if(column + 2 < map_size && board1[row][column + 2] == 'S')
+            ships_around = 1;
+        if(row + 2 < map_size && board1[row + 2][column] == 'S')
+            ships_around  = 1;
+        if(column - 2 > -1 && board1[row][column - 2] == 'S')
+            ships_around = 1;
+    }
+    else{
+        if(row - 2 > -1 && board2[row - 2][column] == 'S')
+            ships_around = 1;
+        if(column + 2 < map_size && board2[row][column + 2] == 'S')
+            ships_around = 1;
+        if(row + 2 < map_size && board2[row + 2][column] == 'S')
+            ships_around  = 1;
+        if(column - 2 > -1 && board2[row][column - 2] == 'S')
+            ships_around = 1;
+    }
+    return ships_around;
+}
 void get_inputs(ships1* head1, ships2* head2, int player){
     if(player == 1) {
         int counter = 0,  arr[4], is_locatable, temp_array[2], arr_size1[26] = {0};//arr_size[size of ship][number of this ship]
@@ -475,26 +500,59 @@ void get_inputs(ships1* head1, ships2* head2, int player){
     srand(time(0));
 
     if(player == 3) {//auto for player1
-        int counter = 0,  arr[4], is_locatable, temp_array[2], arr_size1[26] = {0};//arr_size[size of ship][number of this ship]
+        int counter = 0, sum, arr[4], check, is_locatable, temp_array[2], k, arr_size1[26] = {0}, locatable[map_size][map_size];//arr_size[size of ship][number of this ship]
 
         for(int i = 0;i < 26;i++)
             arr_size1[i] = arr_size[i];
 
         while (counter < ships_sum){
+            print(1);
             is_locatable = 1;
 
-            arr[2] = rand() % map_size;
-            arr[2] = arr[2] < 0 ? arr[2] + map_size : arr[2];
-            arr[3] = rand() % map_size;
-            arr[3] = arr[3] < 0 ? arr[3] + map_size : arr[3];
+            if(counter  > ships_sum / 4 * 3)
+            { //to avoid impossible design
+                sum = 1;
+                k = 0;
 
-            if(counter % 2){
-                arr[0] = arr[2];
-                arr[1] = (arr[2] * arr[3]) % map_size;
+                for(int i = 0;i < map_size;i++) {
+                    for(int j = 0;j < map_size;j++)
+                    locatable[i][j] = 0;
+                }
+
+                for(int i = 0;i < map_size;i++) {
+                    for (int j = 0; j < map_size; j++) {
+                        temp_array[0] = i;
+                        temp_array[1] = j;
+                            locatable[i][j] = is_really_locatable(temp_array, 1);
+
+                            if(is_really_locatable(temp_array, 1))
+                            k++;
+                    }
+                }
+
+                    arr[2] = rand() % map_size;
+                    arr[3] = rand() % map_size;
+
+                    if(counter % 2){
+                        arr[0] = arr[2];
+                        arr[1] = (arr[2] * arr[3]) % map_size;
+                    }
+                    else{
+                        arr[1] = arr[3];
+                        arr[0] = (arr[2] * arr[3]) % map_size;
+                    }
             }
-            else{
-                arr[1] = arr[3];
-                arr[0] = (arr[2] * arr[3]) % map_size;
+            else {
+                arr[2] = rand() % map_size;
+                arr[3] = rand() % map_size;
+
+                if (counter % 2) {
+                    arr[0] = arr[2];
+                    arr[1] = (arr[2] * arr[3]) % map_size;
+                } else {
+                    arr[1] = arr[3];
+                    arr[0] = (arr[2] * arr[3]) % map_size;
+                }
             }
             int x1 = arr[0] < arr[2] ? arr[0] : arr[2], x2 = arr[2] > arr[0] ? arr[2] : arr[0];
             int y1 = arr[1] < arr[3] ? arr[1] : arr[3], y2 = arr[1] < arr[3] ? arr[3] : arr[1];
@@ -502,26 +560,6 @@ void get_inputs(ships1* head1, ships2* head2, int player){
             if(arr[0] != arr[2] && arr[1] != arr[3])
                 is_locatable = 0;
 
-//            if(counter  < ships_sum / 2)
-//            { //to avoid impossible design
-//                int sum = 0;
-//
-//                if ((arr[0] - 2 > -1 && board1[arr[0] - 2][arr[1]] != 'S') ||
-//                    (arr[1] + 2 < map_size && board1[arr[0]][arr[1] + 2] != 'S') ||
-//                    (arr[0] + 2 < map_size && board1[arr[0] + 2][arr[1]] != 'S') ||
-//                    (arr[1] - 2 > -1 && board1[arr[0]][arr[1] - 2] != 'S'))
-//                    sum++;
-//
-//                //to avoid impossible design
-//                if ((arr[2] - 2 > -1 && board1[arr[2] - 2][arr[3]] != 'S') ||
-//                    (arr[3] + 2 < map_size && board1[arr[2]][arr[3] + 2] != 'S') ||
-//                    (arr[2] + 2 < map_size && board1[arr[2] + 2][arr[3]] != 'S') ||
-//                    (arr[3] - 2 > -1 && board1[arr[2]][arr[3] - 2] != 'S'))
-//                    sum++;
-//
-//                if(sum == 2)
-//                    is_locatable = 0;
-//            }
             if(arr[0] == arr[2]){
                 for(int i = y1;i <= y2;i++) {
                     temp_array[0] = arr[0];
@@ -568,6 +606,7 @@ void get_inputs(ships1* head1, ships2* head2, int player){
             arr_size2[i] = arr_size[i];
 
         while (counter < ships_sum) {
+            print(2);
             is_locatable = 1;
 
             arr[3] = rand() % map_size;
@@ -626,6 +665,30 @@ void get_inputs(ships1* head1, ships2* head2, int player){
             else
                 is_locatable = 0;
         }
+    }
+    if(player == 5){
+        FILE* bot = fopen("get input example for bot.txt", "r+");
+
+        int counter = 0, arr[4];
+
+        while(counter != 21){
+            fscanf(bot, "%d %d %d %d", &arr[0], &arr[1], &arr[2], &arr[3]);
+
+            for(int i = 0;i < 4;i++)
+                arr[i]--;
+
+            if (counter == 0) {
+                for (int i = 0; i < 4; i++)
+                    head2->arr2[i] = arr[i];
+            }
+            else
+                add_end2(head2, new_ship2(arr));
+
+            fill_board2(arr);
+
+            counter += find_length(arr);
+        }
+        fclose(bot);
     }
 }
 int is_shotable(int temp_row, int temp_column, int player){
@@ -915,7 +978,7 @@ void mutual_play(ships1** head11, ships2** head22, int save){
     ships2* head2 = (*head22);
     int a;
 
-    printf("\n\n\n\n\n\n\n\n\n\n\n\n lets begin the game. player1 will start the game. every turn you have to choose a correct location to attack. if you   shot any ship you will get points and be able to shot the other player again. you have to enter the row and the column of your location in this way:row column. if you want to use a rocket enter:-2 -2.then you can decide whether to attack your enemy in a vertical or horizontal way. enter:v column or h row. you can use rocket once(it would cost 100 point). if you want to save the game enter:-1 -1\n");
+    printf("\n\n\n\n\n\n\n\n\n\n\n\n lets begin the game. player1 will start the game. every turn you have to choose a correct location to attack. if you shot any ship you will get points and be able to shot the other player again. you have to enter the row and the column of your location in this way:row column. if you want to use a rocket enter:-2 -2.then you can decide whether to attack your enemy in a vertical or horizontal way. enter:v column or h row. you can use rocket once(it would cost 100 point). if you want to save the game enter:-1 -1\nsimple shot:row column\nsave:-1 -1\nrocket:-2 -2  -> then:h row  or:v column\n");
 
     while(head1 != NULL && head2 != NULL && save != -1){
         int temp_row, temp_column, temp, turn;
@@ -1091,16 +1154,14 @@ void mutual_play(ships1** head11, ships2** head22, int save){
     }
         //deleting the current information for another game if the user wants
         for (int i = 0; i < map_size; i++) {
-            for (int j = 0; j < map_size; j++)
+            for (int j = 0; j < map_size; j++) {
                 board1[i][j] = '\0';
-        }
-        for (int i = 0; i < map_size; i++) {
-            for (int j = 0; j < map_size; j++)
                 board2[i][j] = '\0';
+            }
         }
         int temp_arr[4];
 
-        for (int i = 0; i < 26; i++)
+        for (int i = 0; i < 26; i++) {
             if (head1 != NULL) {
                 temp_arr[0] = head1->arr1[0];
                 temp_arr[1] = head1->arr1[1];
@@ -1108,7 +1169,6 @@ void mutual_play(ships1** head11, ships2** head22, int save){
                 temp_arr[3] = head1->arr1[3];
                 remove_ship1(&head1, temp_arr);
             }
-        for (int i = 0; i < 26; i++)
             if (head2 != NULL) {
                 temp_arr[0] = head2->arr2[0];
                 temp_arr[1] = head2->arr2[1];
@@ -1116,6 +1176,7 @@ void mutual_play(ships1** head11, ships2** head22, int save){
                 temp_arr[3] = head2->arr2[3];
                 remove_ship2(&head2, temp_arr);
             }
+        }
         //preparing head1 and head2 for another game
     int arr[4] = {-5, -5, -5, -5};
     ships1* head3 = new_ship1(arr);
@@ -1129,7 +1190,7 @@ void bot_play(ships1** head11, ships2** head22, int save){
     int a;
     srand(time(0));
 
-    printf("\n\n\n\n\n\n\n\n\n\n\n\n lets begin the game. player1 will start the game. every turn you have to choose a correct location to attack. if you   shot any ship you will get points and be able to shot the other player again. you have to enter the row and the column of your location in this way:row column. if you want to use a rocket enter:-2 -2.then you can decide whether to attack your enemy in a vertical or horizontal way. enter:v column or h row. you can use rocket once(it would cost 100 point). if you got any problem enter your target column again and a junk number. if you want to save the game enter:-1 -1\n");
+    printf("\n\n\n\n\n\n\n\n\n\n\n\n lets begin the game. player1 will start the game. every turn you have to choose a correct location to attack. if you   shot any ship you will get points and be able to shot the other player again. you have to enter the row and the column of your location in this way:row column. if you want to use a rocket enter:-2 -2.then you can decide whether to attack your enemy in a vertical or horizontal way. enter:v column or h row. you can use rocket once(it would cost 100 point). if you got any problem enter your target column again and a junk number. if you want to save the game enter:-1 -1\nsimple shot:row column\nsave:-1 -1\nrocket:-2 -2  -> then:h row  or:v column\n");
 
     while(head1 != NULL && head2 != NULL && save != -1){
         int temp_row, temp_column, temp, turn;
@@ -1327,39 +1388,35 @@ void bot_play(ships1** head11, ships2** head22, int save){
     }
     //deleting the current information for another game if the user wants
     for(int i = 0;i < map_size;i++) {
-        for (int j = 0; j < map_size; j++)
+        for (int j = 0; j < map_size; j++) {
             board1[i][j] = '\0';
-    }
-    for(int i = 0;i < map_size;i++) {
-        for (int j = 0; j < map_size; j++)
             board2[i][j] = '\0';
+        }
     }
     int temp_arr[4];
 
-    for(int i = 0;i < 26;i++)
-        if(head1 != NULL) {
+    for(int i = 0;i < 26;i++) {
+        if (head1 != NULL) {
             temp_arr[0] = head1->arr1[0];
             temp_arr[1] = head1->arr1[1];
             temp_arr[2] = head1->arr1[2];
             temp_arr[3] = head1->arr1[3];
             remove_ship1(&head1, temp_arr);
         }
-    for(int i = 0;i < 26;i++)
-        if(head2 != NULL) {
+        if (head2 != NULL) {
             temp_arr[0] = head2->arr2[0];
             temp_arr[1] = head2->arr2[1];
             temp_arr[2] = head2->arr2[2];
             temp_arr[3] = head2->arr2[3];
             remove_ship2(&head2, temp_arr);
         }
+    }
     //preparing head1 and head2 for another game
-    ships1* head3 = (ships1*)calloc(1, sizeof(ships1));
-    ships2* head4 = (ships2*)calloc(1, sizeof(ships2));
     int arr[4] = {-5, -5, -5, -5};
-    head3 = new_ship1(arr);
-    head4 = new_ship2(arr);
-    (*head11) = head3;
-    (*head22) = head4;
+    ships1* head3 = new_ship1(arr);
+    ships2* head4 = new_ship2(arr);
+    head11 = &head3;
+    head22 = &head4;
 }
 
 int main(void){
@@ -1383,8 +1440,8 @@ int main(void){
     arr_size[3] = 2;
     arr_size[5] = 1;
 //basic settings
-//get_inputs(head1, head2, 4);
-//print(2);
+//get_inputs(head1, head2, 3);
+//print(1);
     int choice = 0;
 
     while(choice != 7) {
@@ -1392,27 +1449,28 @@ int main(void){
         scanf("%d", &choice);
 
         if (choice == 1) {
-            int i = 0, score, num, check = 0;
-            char name[50];
+            int i = 0, score, num, check = 0, k = 0;
 
             printf("\nFirst player, choose your name:\n1. chose from available users\n2. new user\n");
             scanf("%d", &choice);
 
             if (choice == 1) {
+                char name[50] = "\0";
+
                 FILE *users = fopen("users.txt", "r+");
                 FILE *number = fopen("number.txt", "r+");
                 fscanf(number, "%d", &num);
 
-                while (i != num) {
+                while (k != num) {
                     fscanf(users, "%s %d\n", name, &score);
-                    printf("\n%d. %s %d", i + 1, name, score);
-                    i++;
+                    printf("\n%d. %s %d", k + 1, name, score);
+                    k++;
                 }
                 printf("\nchoose an index:");
-                scanf("%d", &i);
+                scanf("%d", &k);
                 rewind(users);
 
-                for (int j = 0; j < i; j++)
+                for (int j = 0; j < k; j++)
                     fscanf(users, "%s %d\n", name, &score);
 
                 strcpy(name1, name);
@@ -1422,30 +1480,35 @@ int main(void){
                 fclose(number);
             }
             if (choice == 2) {
-                check = 1;
-                char name_temp[50] = "\0";
+                check = 0;
+                char name_temp[50] = "\0", name[50] = "\0";
+
                 printf("\nplease enter the new name:");
                 scanf("%s", name_temp);
+
                 FILE *users = fopen("users.txt", "r+");
                 FILE *number = fopen("number.txt", "r+");
                 fscanf(number, "%d", &num);
 
-                while (check == 1) {
+                while (check == 0) {
                     rewind(users);
                     i = 0;
 
                     while (i != num) {
                         fscanf(users, "%s %d\n", name, &score);
-                        if (strncmp(name_temp, name, strlen(name_temp)) == 0)
+                        if (strcmp(name_temp, name) == 0)
                             check = 1;
-                        else
-                            check = 0;
 
                         i++;
                     }
+                    if(check == 0)
+                        check = 5;
+
                     if (check == 1) {
                         printf("\nwe have a user with that name. enter another name:");
-                        gets(name_temp);
+                        fflush(stdin);
+                        scanf("%s", &name_temp);
+                        check = 0;
                     }
                 }
                 fclose(users);
@@ -1458,14 +1521,8 @@ int main(void){
             scanf("%d", &choice);
 
             if (choice == 1) {
-//            check = 1;
-//
-//            while(check) {
                 get_inputs(head1, head2, 3);
                 print(1);
-//                printf("\nif you want to change your map enter 1 if not enter 0:");
-//                scanf("%d", &check);
-//            }
             }
 
             if (choice == 2)
@@ -1474,8 +1531,10 @@ int main(void){
             printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nSecond player:\n1. choose from available users\n2. new user\n");
             scanf("%d", &choice);
 
-            if (choice == 1) {
-                i = 0;
+            if (choice == 1){
+
+                char name[50] = "\0";
+
                 FILE *users = fopen("users.txt", "r+");
                 FILE *number = fopen("number.txt", "r+");
                 fscanf(number, "%d", &num);
@@ -1485,8 +1544,16 @@ int main(void){
                     printf("\n%d. %s %d", i + 1, name, score);
                     i++;
                 }
-                printf("\nchoose an index:");
-                scanf("%d", &i);
+                i = k;
+
+                while(k == i)
+                {
+                    printf("\nchoose an index:");
+                    scanf("%d", &i);
+
+                    if(k == i)
+                        printf("\nplayer one has choosen that name. choose another index.\n");
+                }
 
                 rewind(users);
 
@@ -1498,33 +1565,38 @@ int main(void){
 
                 fclose(users);
                 fclose(number);
-                choice = 10;
             }
             if (choice == 2) {
-                check = 1;
-                char name_temp[50] = "\0";
+                check = 0;
+                char name_temp[50] = "\0", name[50] = "\0";
+
                 printf("\nplease enter the new name:");
-                gets(name_temp);
+                fflush(stdin);
+                scanf("%s", &name_temp);
+
                 FILE *users = fopen("users.txt", "r+");
                 FILE *number = fopen("number.txt", "r+");
                 fscanf(number, "%d", &num);
 
-                while (check == 1) {
+                while (check == 0) {
                     rewind(users);
                     i = 0;
 
                     while (i != num) {
                         fscanf(users, "%s %d\n", name, &score);
-                        if (strncmp(name_temp, name, strlen(name_temp)) == 0 || strncmp(name1, name_temp, strlen(name_temp)) == 0)
+                        if (strcmp(name_temp, name) == 0 || strcmp(name1, name_temp) == 0)
                             check = 1;
-                        else
-                            check = 0;
 
                         i++;
                     }
+                    if(check == 0)
+                        check = 5;
+
                     if (check == 1) {
                         printf("\nwe have a user with that name. enter another name:");
-                        gets(name_temp);
+                        fflush(stdin);
+                        scanf("%s", &name_temp);
+                        check = 0;
                     }
                 }
                 fclose(users);
@@ -1538,14 +1610,8 @@ int main(void){
             scanf("%d", &choice);
 
             if (choice == 1) {
-                // check = 1;
-
-                // while(check) {
                 get_inputs(head1, head2, 4);
                 print(2);
-//                printf("\nif you want to change 1 if not enter 0:");
-//                scanf("%d", &check);
-//            }
             }
 
             if (choice == 2)
@@ -1556,12 +1622,13 @@ int main(void){
         }
         if (choice == 2) {
             int i = 0, score, num, check = 0;
-            char name[50];
 
             printf("\nFirst player, choose your name:\n1. chose from available users\n2. new user\n");
             scanf("%d", &choice);
 
             if (choice == 1) {
+                char name[50] = "\0";
+
                 FILE *users = fopen("users.txt", "r+");
                 FILE *number = fopen("number.txt", "r+");
                 fscanf(number, "%d", &num);
@@ -1586,31 +1653,36 @@ int main(void){
                 choice = 10;
             }
             if (choice == 2) {
-                check = 1;
-                char name_temp[50] = "\0";
+                check = 0;
+                char name_temp[50] = "\0", name[50] = "\0";
+
                 printf("\nplease enter the new name:");
-                gets(name_temp);
+                fflush(stdin);
+                scanf("%s", &name_temp);
+
                 FILE *users = fopen("users.txt", "r+");
                 FILE *number = fopen("number.txt", "r+");
                 fscanf(number, "%d", &num);
 
-                while (check == 1) {
+                while (check == 0) {
                     rewind(users);
                     i = 0;
-                    check = 0;
 
                     while (i != num) {
                         fscanf(users, "%s %d\n", name, &score);
-                        if (strncmp(name_temp, name, strlen(name_temp)) == 0)
+                        if (strcmp(name_temp, name) == 0)
                             check = 1;
-                        else
-                            check = 0;
 
-                        if (check == 1) {
-                            printf("\nwe have a user with that name. enter another name:");
-                            gets(name_temp);
-                        }
                         i++;
+                    }
+                    if(check == 0)
+                        check = 5;
+
+                    if (check == 1) {
+                        printf("\nwe have a user with that name. enter another name:");
+                        fflush(stdin);
+                        scanf("%s", &name_temp);
+                        check = 0;
                     }
                 }
                 fclose(users);
@@ -1623,10 +1695,9 @@ int main(void){
             printf("\n%s choose one choice:\n1. put ships automatically\n2. put ships manually\n", name1);
             scanf("%d", &choice);
 
-            if (choice == 1) {
+            if (choice == 1)
                 get_inputs(head1, head2, 3);
-                print(1);
-            }
+
             if (choice == 2)
                 get_inputs(head1, head2, 1);
 
@@ -1635,7 +1706,7 @@ int main(void){
             name2[2] = 't';
             name2[3] = '\0';
 
-            printf("\n\n\n\n\n\n\n\n\n\n\nplease make decision to locate the bot ships:\n1. automatically\n2. manually(another person can set it for you)\n");
+            printf("\n\n\n\n\n\n\n\n\n\n\nplease make decision to locate the bot ships:\n1. automatically\n2. manually(another person can set it for you)\n3. based on the constant map\n");
             scanf("%d", &choice);
 
             if(choice == 1)
@@ -1644,6 +1715,9 @@ int main(void){
             if(choice == 2)
                 get_inputs(head1, head2, 2);
 
+            if(choice == 3)
+                get_inputs(head1, head2, 5);
+print(2);
             bot_play(&head1, &head2, 0);
             choice = 10;
         }
@@ -1909,3 +1983,24 @@ int main(void){
 // be careful about map size errors
 //player chooses the name(saved or new)
 //rocket is orbitrary->-2
+/*
+ *
+ * //            if(count_loops > limit){
+//                limit += 2000;
+//                max_length_needed = 0;
+//                for(int k = 0;k < 26;k++){
+//                    if(arr_size1[k] != 0)
+//                        max_length_needed = k;
+//                }
+//                for(int i = 0;i < map_size;i++){
+//                    for(int j = 0;j < map_size;j++){
+//
+//                    }
+//                }
+//            }
+//            else
+//            {
+ *
+ *
+ *
+ * */
