@@ -80,7 +80,7 @@ void remove_ship1(ships1** head1, int arr[]){
             (*head1) = (*head1)->next;
             free(hold);
         }
-        if((*head1)->next == NULL)
+        else if((*head1)->next == NULL)
             (*head1) = NULL;
     }
     else{
@@ -101,7 +101,7 @@ void remove_ship2(ships2** head2, int arr[]){
             (*head2) = (*head2)->next;
             free(hold);
         }
-        if((*head2)->next == NULL)
+        else if((*head2)->next == NULL)
             (*head2) = NULL;
     }
     else{
@@ -203,7 +203,7 @@ int is_really_locatable(int array[], int player){
             is_locatable = 0;
 
         if(array[1] - 1 >= 0 ) {
-            if (  board1[array[0]][array[1] - 1] == 'S')
+            if (board1[array[0]][array[1] - 1] == 'S')
                 is_locatable = 0;
         }
 
@@ -251,7 +251,7 @@ int is_really_locatable(int array[], int player){
             is_locatable = 0;
 
         if(array[1] - 1 >= 0 ) {
-            if (  board1[array[0]][array[1] - 1] == 'S')
+            if (  board2[array[0]][array[1] - 1] == 'S')
                 is_locatable = 0;
         }
 
@@ -408,7 +408,7 @@ void get_inputs(ships1* head1, ships2* head2, int player){
         for(int i = 0;i < 26;i++)
             arr_size2[i] = arr_size[i];
 
-        printf("\n\n\n\n\n\n\n\n\n\n\n\nplayer%d please enter the row and column of the ships(ships end and first). if it is a ship with length of 1 please enter its start row and column twice\n",
+        printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nplayer%d please enter the row and column of the ships(ships end and first). if it is a ship with length of 1 please enter its start row and column twice\n",
                player);
 
         while (counter < ships_sum) {
@@ -502,6 +502,26 @@ void get_inputs(ships1* head1, ships2* head2, int player){
             if(arr[0] != arr[2] && arr[1] != arr[3])
                 is_locatable = 0;
 
+//            if(counter  < ships_sum / 2)
+//            { //to avoid impossible design
+//                int sum = 0;
+//
+//                if ((arr[0] - 2 > -1 && board1[arr[0] - 2][arr[1]] != 'S') ||
+//                    (arr[1] + 2 < map_size && board1[arr[0]][arr[1] + 2] != 'S') ||
+//                    (arr[0] + 2 < map_size && board1[arr[0] + 2][arr[1]] != 'S') ||
+//                    (arr[1] - 2 > -1 && board1[arr[0]][arr[1] - 2] != 'S'))
+//                    sum++;
+//
+//                //to avoid impossible design
+//                if ((arr[2] - 2 > -1 && board1[arr[2] - 2][arr[3]] != 'S') ||
+//                    (arr[3] + 2 < map_size && board1[arr[2]][arr[3] + 2] != 'S') ||
+//                    (arr[2] + 2 < map_size && board1[arr[2] + 2][arr[3]] != 'S') ||
+//                    (arr[3] - 2 > -1 && board1[arr[2]][arr[3] - 2] != 'S'))
+//                    sum++;
+//
+//                if(sum == 2)
+//                    is_locatable = 0;
+//            }
             if(arr[0] == arr[2]){
                 for(int i = y1;i <= y2;i++) {
                     temp_array[0] = arr[0];
@@ -839,7 +859,7 @@ void save_it(ships1** head11, ships2** head22, int turn){
     ships1* curr1 = head1;
     ships2* curr2 = head2;
 
-    for(int i = 0;i < 11;i++){
+    for(int i = 0;i < 10;i++){
         if(curr1 != NULL)
         {
             curr.arr1[i][0] = curr1->arr1[0];
@@ -870,6 +890,7 @@ void save_it(ships1** head11, ships2** head22, int turn){
         }
         if(curr1 != NULL)
         curr1 = curr1->next;
+
         if(curr2 != NULL)
         curr2 = curr2->next;
     }
@@ -881,7 +902,7 @@ void save_it(ships1** head11, ships2** head22, int turn){
     fread(&num, 4, 1, number);
     fclose(number);
     number = fopen("games_number.bin", "wb+");
-    num += 1;
+    num++;
     fwrite(&num, 4, 1, number);
     fclose(number);
 
@@ -890,11 +911,6 @@ void save_it(ships1** head11, ships2** head22, int turn){
 void mutual_play(ships1** head11, ships2** head22, int save){
     ships1* head1 = (*head11);
     ships2* head2 = (*head22);
-    if(save == 0){
-        int carr[4] = {-5, -5, -5, -5};
-        add_end2(head2, new_ship2(carr));
-        add_end1(head1, new_ship1(carr));
-    }
     int a;
 
     printf("\n\n\n\n\n\n\n\n\n\n\n\n lets begin the game. player1 will start the game. every turn you have to choose a correct location to attack. if you   shot any ship you will get points and be able to shot the other player again. you have to enter the row and the column of your location in this way:row column. if you want to use a rocket enter:-2 -2.then you can decide whether to attack your enemy in a vertical or horizontal way. enter:v column or h row. you can use rocket once(it would cost 100 point). if you want to save the game enter:-1 -1\n");
@@ -1091,22 +1107,15 @@ void mutual_play(ships1** head11, ships2** head22, int save){
                 remove_ship2(&head2, temp_arr);
             }
         //preparing head1 and head2 for another game
-    ships1* head3 = (ships1*)calloc(1, sizeof(ships1));
-    ships2* head4 = (ships2*)calloc(1, sizeof(ships2));
     int arr[4] = {-5, -5, -5, -5};
-    head3 = new_ship1(arr);
-    head4 = new_ship2(arr);
+    ships1* head3 = new_ship1(arr);
+    ships2* head4 = new_ship2(arr);
     head11 = &head3;
     head22 = &head4;
 }
 void bot_play(ships1** head11, ships2** head22, int save){
     ships1* head1 = (*head11);
     ships2* head2 = (*head22);
-    if(save == 0){
-        int carr[4] = {-5, -5, -5, -5};
-        add_end2(head2, new_ship2(carr));
-        add_end1(head1, new_ship1(carr));
-    }
     int a;
     srand(time(0));
 
@@ -1611,14 +1620,11 @@ int main(void){
             ships2* curr2 = head2;
             int temp_arr1[4], temp_arr2[4];
 
-            for(int j = 0;j < 4;j++){
-                temp_arr1[j] = temp.arr1[0][j];
-                temp_arr2[j] = temp.arr2[0][j];
+            for(int j = 0;j < 4;j++) {
+                head1->arr1[j] = temp.arr1[0][j];
+                head2->arr2[j] = temp.arr2[0][j];
             }
-            head1 = new_ship1(temp_arr1);
-            head2 = new_ship2(temp_arr2);
-
-            for(int i = 1;i < 11;i++){
+            for(int i = 1;i < 10;i++){
                 for(int j = 0;j < 4;j++){
                     temp_arr1[j] = temp.arr1[i][j];
                     temp_arr2[j] = temp.arr2[i][j];
@@ -1670,7 +1676,7 @@ int main(void){
             head1 = new_ship1(temp_arr1);
             head2 = new_ship2(temp_arr2);
 
-            for(int i = 1;i < 11;i++){
+            for(int i = 1;i < 10;i++){
                 for(int j = 0;j < 4;j++){
                     temp_arr1[j] = temp.arr1[i][j];
                     temp_arr2[j] = temp.arr2[i][j];
@@ -1832,38 +1838,4 @@ int main(void){
 }
 // be careful about map size errors
 //player chooses the name(saved or new)
-/////loading last game is obligation
 //rocket is orbitrary->-2
-//                    if(row - 1 > -1 && board1[row - 1][column] == 'E'){
-//                        i = 1;
-//                        b = 1;
-//                        while(row - i > -1 && b) {
-//                             if(board1[row - i][column] == 'E'){
-//                                    i++;
-//                                    if(row - i > -1 && board1[row - i][column] == '\0'){
-//                                        temp_column = column;
-//                                        temp_row = row - i;
-//                                        b = 0;
-//                                    }
-//                             }
-//                             else if(board1[row - i][column] == 'E')
-//                                 b = 0;
-//                        }
-//                    }
-//                    else if(column - 1 > -1 && board1[row][column - 1] == 'E'){
-//                        i = 1;
-//                        b = 1;
-//                        while(column - i > -1 && b) {
-//                            if (board1[row][column - 1] == 'E') {
-//                                i++;
-//                                if(column - 1 > -1 && board1[row][column - 1] == '\0'){
-//                                    temp_column = column - i;
-//                                    temp_row = row;
-//                                    b = 0;
-//                                }
-//                            }
-//                            else if (board1[row][column - 1] != 'E')
-//                                b = 0;
-//                        }
-//
-//
