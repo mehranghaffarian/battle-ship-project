@@ -22,7 +22,7 @@ typedef struct ships_data2{
 
 typedef struct data{
     char board1[10][10], board2[10][10], name1[50], name2[50];
-    int score1, score2, turn, arr1[11][4], arr2[11][4];
+    int score1, score2, turn, arr1[11][4], arr2[11][4], rocket1, rocket2, map_size;
 }game;
 
 char board1[50][50], board2[50][50];//board1 : the board where player1 puts his/her ships in//board2 : the board where player2 puts his/her ships in
@@ -850,7 +850,9 @@ void save_it(ships1** head11, ships2** head22, int turn){
     }
     curr.score1 = point1;
     curr.score2 = point2;
-
+    curr.map_size = map_size;
+    curr.rocket1 = rocket1;
+    curr.rocket2 = rocket2;
     curr.turn = turn;
 
     ships1* head1 = (*head11);
@@ -924,63 +926,68 @@ void mutual_play(ships1** head11, ships2** head22, int save){
                 print_shotable(1);
                 printf("%s:%d  --  %s:%d\n", name1, point1, name2, point2);
                 printf("%s chose your target:\n", name1);
+                fflush(stdin);
                 scanf("%d %d", &temp_row, &temp_column);
                 save = 0;
                 if(temp_column == -1 && temp_row == -1) {
                     save_it(head11, head22, 1);
                     save = -1;
                 }
-//                a = 0;
-//
-//                if (temp_column == -2) {
-//                    turn = 0;
-//
-//                    if(rocket1 > 0 || point1 < 100) {
-//                        printf("\nyou can not use rocket\n");
-//                        a = 0;
-//                        break;
-//                    }
-//
-//                    else{
-//                        char rocket;
-//                        scanf("%c %d", &rocket, &temp);
-//
-//                        if(rocket == 'v' && point1 >= 100 && rocket1 == 0){
-//                            int i = 0;
-//                            while(turn == 0 && i < 10){
-//                                if(board2[i][temp - 1] != 'E' && board2[i][temp - 1] != 'C' && board2[i][temp - 1] != 'T') {
-//                                    a = is_shotable(temp - 1, i, 1);
-//                                    turn = shot_it(&head1, &head2, i, temp - 1, 1);
-//                                }
-//                                i++;
-//                            }
-//                        }
-//                        if(rocket == 'h' && point1 >= 100 && rocket1 == 0){
-//                            int i = 0;
-//                            while(turn == 0 && i < 10){
-//                                if(board2[temp - 1][i] != 'E' && board2[temp - 1][i] != 'C' && board2[temp - 1][i] != 'T') {
-//                                    a = is_shotable(temp - 1, i, 1);
-//                                    turn = shot_it(&head1, &head2, temp - 1, i, 1);
-//                                }
-//                                i++;
-//                            }
-//                        }
-//                        if(point1 >= 100 && rocket1 == 0)
-//                        {
-//                            point1 -= 100;
-//                            rocket1++;
-//                        }
-//                    }
-//                }
-                //               else {
+                else if (temp_column == -2 && temp_row == -2) {
+                    if(rocket1 > 0 || point1 < 100) {
+                        printf("\nyou can not use rocket\n");
+                        a = 0;
+                        turn = 1;
+                        point1 += 100;
+                        rocket1--;
+                    }
+                    else{
+                        turn = 0;
+                        char rocket;
+                        int i = 0;
+
+                        printf("%s choose your method to attack your enemy:\n", name1);
+                        fflush(stdin);
+                        scanf("%c %d", &rocket, &temp);
+                        temp--;
+
+                        if(temp < 0 || temp >= map_size || (rocket != 'v' && rocket != 'h')){
+                            i = map_size;
+                            a = 1;
+                            turn = 1;
+                            printf("\nyour inputs are not valid. choose another way.\n");
+                            point1 += 100;
+                            rocket1--;
+                        }
+                        if(rocket == 'v'){
+                            while(turn == 0 && i < map_size){
+                                if(board2[i][temp] != 'E' && board2[i][temp] != 'C' && board2[i][temp] != 'T') {
+                                    turn = shot_it(&head1, &head2, i, temp, 1);
+                                }
+                                i++;
+                            }
+                        }
+                        else if(rocket == 'h'){
+                            while(turn == 0 && i < 10){
+                                if(board2[temp][i] != 'E' && board2[temp][i] != 'C' && board2[temp][i] != 'T') {
+                                    turn = shot_it(&head1, &head2, temp, i, 1);
+                                }
+                                i++;
+                            }
+                        }
+                            point1 -= 100;
+                            rocket1++;
+                    }
+                }
+                else if(temp_column != -2 && temp_row != -1){
                 a = is_shotable(temp_row - 1, temp_column - 1, 1);
 
-                if (a)
+                if(a)
                     turn = shot_it(&head1, &head2, temp_row - 1, temp_column - 1, 1);
 
-                if(a == 0 && temp_column != -1 && temp_row != -1)
+                else
                     printf("\ntarget is not acceptable\n");
-                //               }
+                }
             }
         }while((a == 0 || turn) && (save == 1 || save == 0) && head1 != NULL && head2 != NULL);
 
@@ -990,63 +997,66 @@ void mutual_play(ships1** head11, ships2** head22, int save){
                 print_shotable(2);
                 printf("%s:%d  --  %s:%d\n", name1, point1, name2, point2);
                 printf("%s chose your target:\n", name2);
+                fflush(stdin);
                 scanf("%d %d", &temp_row, &temp_column);
                 save = 0;
                 if(temp_column == -1 && temp_row == -1) {
                     save_it(head11, head22, 2);
                     save = -1;
                 }
-                //               a = 0;
-                //
-                //               if (temp_column == -2) {
-                //                   turn = 0;
-                //
-                //                   if(rocket2 > 0 || point2 < 100) {
-                //                       printf("\nyou can not use rocket\n");
-                //                       a = 0;
-                //                       break;
-                //                   }
-                //
-                //                   else{
-                //                       char rocket;
-                //                       scanf("%c %d", &rocket, &temp);
-                //
-                //                       if(rocket == 'v' && point2 >= 100 && rocket2 == 0){
-                //                           int i = 0;
-                //                           while(turn == 0 && i < 10){
-                //                               if(board1[i][temp - 1] != 'E' && board1[i][temp - 1] != 'C' && board1[i][temp - 1] != 'T') {
-                //                                   a = is_shotable(temp_row - 1, temp_column - 1, player2);
-                //                                   turn = shot_it(&head1, &head2, i, temp - 1, 2);
-                //                               }
-                //                               i++;
-                //                           }
-                //                       }
-                //                       if(rocket == 'h' && point2 >= 100 && rocket2 == 0){
-                //                           int i = 0;
-                //                           while(turn == 0 && i < 10){
-                //                               if(board1[temp - 1][i] != 'E' && board1[temp - 1][i] != 'C' && board1[temp - 1][i] != 'T') {
-                //                                   a = is_shotable(temp_row - 1, temp_column - 1, player2);
-                //                                   turn = shot_it(&head1, &head2, temp - 1, i, 2);
-                //                               }
-                //                               i++;
-                //                           }
-                //                       }
-                //                       if(point2 >= 100 && rocket2 == 0)
-                //                       {
-                //                           rocket2++;
-                //                           point2 -= 100;
-                //                       }
-                //                   }
-                //               }
-                //               else{
-                a = is_shotable(temp_row - 1, temp_column - 1, 2);
+                else if (temp_column == -2 && temp_row == -2) {
+                    if(rocket2 > 0 || point2 < 100) {
+                        printf("\nyou can not use rocket\n");
+                        a = 0;
+                        turn = 1;
+                    }
+                    else{
+                        turn = 0;
+                        char rocket;
+                        int i = 0;
 
-                if (a)
-                    turn = shot_it(&head1, &head2, temp_row - 1, temp_column - 1, 2);
+                        printf("\n%s choose your method to attack your enemy\n", name2);
+                        fflush(stdin);
+                        scanf("%c %d", &rocket, &temp);
+                        temp--;
 
-                if(a == 0 && temp_column != -1 && temp_row != -1)
-                    printf("\ntarget is not acceptable\n");
-                //               }
+                        if(temp < 1 || temp > map_size || (rocket != 'v' && rocket != 'h')){
+                            i = map_size;
+                            a = 1;
+                            turn = 1;
+                            rocket2--;point2 += 100;
+
+                            printf("\nyour inputs are not valid. choose another way.\n");
+                        }
+                        if(rocket == 'v'){
+                            while(turn == 0 && i < map_size){
+                                if(board1[i][temp] != 'E' && board1[i][temp] != 'C' && board1[i][temp] != 'T') {
+                                    turn = shot_it(&head1, &head2, i, temp, 2);
+                                }
+                                i++;
+                            }
+                        }
+                        else if(rocket == 'h'){
+                            while(turn == 0 && i < 10){
+                                if(board1[temp][i] != 'E' && board1[temp][i] != 'C' && board1[temp][i] != 'T') {
+                                    turn = shot_it(&head1, &head2, temp, i, 2);
+                                }
+                                i++;
+                            }
+                        }
+                        point2 -= 100;
+                        rocket2++;
+                    }
+                }
+                else if(temp_column != -2 && temp_row != -1){
+                    a = is_shotable(temp_row - 1, temp_column - 1, 2);
+
+                    if(a)
+                        turn = shot_it(&head1, &head2, temp_row - 1, temp_column - 1, 2);
+
+                    else
+                        printf("\ntarget is not acceptable\n");
+                }
             }
         }while((a == 0 || turn) && (save == 2 || save == 0) && head1 != NULL && head2 != NULL);
     }
@@ -1119,7 +1129,7 @@ void bot_play(ships1** head11, ships2** head22, int save){
     int a;
     srand(time(0));
 
-    printf("\n\n\n\n\n\n\n\n\n\n\n\n lets begin the game. player1 will start the game. every turn you have to choose a correct location to attack. if you   shot any ship you will get points and be able to shot the other player again. you have to enter the row and the column of your location in this way:row column. if you want to use a rocket enter:-2 -2.then you can decide whether to attack your enemy in a vertical or horizontal way. enter:v column or h row. you can use rocket once(it would cost 100 point). if you got any problem enter your target twice. if you want to save the game enter:-1 -1\n");
+    printf("\n\n\n\n\n\n\n\n\n\n\n\n lets begin the game. player1 will start the game. every turn you have to choose a correct location to attack. if you   shot any ship you will get points and be able to shot the other player again. you have to enter the row and the column of your location in this way:row column. if you want to use a rocket enter:-2 -2.then you can decide whether to attack your enemy in a vertical or horizontal way. enter:v column or h row. you can use rocket once(it would cost 100 point). if you got any problem enter your target column again and a junk number. if you want to save the game enter:-1 -1\n");
 
     while(head1 != NULL && head2 != NULL && save != -1){
         int temp_row, temp_column, temp, turn;
@@ -1130,21 +1140,69 @@ void bot_play(ships1** head11, ships2** head22, int save){
                 print_shotable(1);
                 printf("%s:%d  --  %s:%d\n", name1, point1, name2, point2);
                 printf("%s chose your target:\n", name1);
+                fflush(stdin);
                 scanf("%d %d", &temp_row, &temp_column);
+                fflush(stdin);
                 save = 0;
                 if(temp_column == -1 && temp_row == -1) {
                     save_it(head11, head22, 3);
                     save = -1;
                 }
+                else if (temp_column == -2 && temp_row == -2) {
+                    if(rocket1 > 0 || point1 < 100) {
+                        printf("\nyou can not use rocket\n");
+                        a = 0;
+                        turn = 1;
+                        point1 += 100;
+                        rocket1--;
+                    }
+                    else{
+                        turn = 0;
+                        char rocket;
+                        int i = 0;
 
-                a = is_shotable(temp_row - 1, temp_column - 1, 1);
+                        printf("%s choose your method to attack your enemy:\n", name1);
+                        fflush(stdin);
+                        scanf("%c %d", &rocket, &temp);
+                        temp--;
 
-                if (a)
-                    turn = shot_it(&head1, &head2, temp_row - 1, temp_column - 1, 1);
+                        if(temp < 0 || temp >= map_size || (rocket != 'v' && rocket != 'h')){
+                            i = map_size;
+                            a = 1;
+                            turn = 1;
+                            printf("\nyour inputs are not valid. choose another way.\n");
+                            point1 += 100;
+                            rocket1--;
+                        }
+                        if(rocket == 'v'){
+                            while(turn == 0 && i < map_size){
+                                if(board2[i][temp] != 'E' && board2[i][temp] != 'C' && board2[i][temp] != 'T') {
+                                    turn = shot_it(&head1, &head2, i, temp, 1);
+                                }
+                                i++;
+                            }
+                        }
+                        else if(rocket == 'h'){
+                            while(turn == 0 && i < 10){
+                                if(board2[temp][i] != 'E' && board2[temp][i] != 'C' && board2[temp][i] != 'T') {
+                                    turn = shot_it(&head1, &head2, temp, i, 1);
+                                }
+                                i++;
+                            }
+                        }
+                        point1 -= 100;
+                        rocket1++;
+                    }
+                }
+                else if(temp_column != -2 && temp_row != -1){
+                    a = is_shotable(temp_row - 1, temp_column - 1, 1);
 
-                if(a == 0 && temp_column != -1 && temp_row != -1)
-                    printf("\ntarget is not acceptable\n");
-                save = 0;
+                    if(a)
+                        turn = shot_it(&head1, &head2, temp_row - 1, temp_column - 1, 1);
+
+                    else
+                        printf("\ntarget is not acceptable\n");
+                }
             }
         }while((a == 0 || turn) && (save == 3 || save == 0) && head1 != NULL && head2 != NULL);
 
@@ -1306,6 +1364,10 @@ void bot_play(ships1** head11, ships2** head22, int save){
 
 int main(void){
 //    FILE* f = fopen("games.bin", "wb+");
+//    fclose(f);
+//    f = fopen("games_number.bin", "wb+");
+//    int num = 0;
+//    fwrite(&num, 4, 1, f);
 //    fclose(f);
     setbuf(stdout, 0);
     //basic settings
@@ -1606,12 +1668,16 @@ int main(void){
 
             point1 = temp.score1;
             point2 = temp.score2;
+            map_size = temp.map_size;
+            rocket1 = temp.rocket1;
+            rocket2 = temp.rocket2;
             strcpy(name1, temp.name1);
             strcpy(name2, temp.name2);
+
             int save = temp.turn;
 
-            for(int i = 0;i < 10;i++){
-                for(int j = 0;j < 10;j++){
+            for(int i = 0;i < map_size;i++){
+                for(int j = 0;j < map_size;j++){
                     board1[i][j] = temp.board1[i][j];
                     board2[i][j] = temp.board2[i][j];
                 }
@@ -1624,7 +1690,7 @@ int main(void){
                 head1->arr1[j] = temp.arr1[0][j];
                 head2->arr2[j] = temp.arr2[0][j];
             }
-            for(int i = 1;i < 10;i++){
+            for(int i = 1;i < map_size;i++){
                 for(int j = 0;j < 4;j++){
                     temp_arr1[j] = temp.arr1[i][j];
                     temp_arr2[j] = temp.arr2[i][j];
@@ -1655,12 +1721,16 @@ int main(void){
 
             point1 = temp.score1;
             point2 = temp.score2;
+            map_size = temp.map_size;
+            rocket1 = temp.rocket1;
+            rocket2 = temp.rocket2;
             strcpy(name1, temp.name1);
             strcpy(name2, temp.name2);
+
             int save = temp.turn;
 
-            for(int i = 0;i < 10;i++){
-                for(int j = 0;j < 10;j++){
+            for(int i = 0;i < map_size;i++){
+                for(int j = 0;j < map_size;j++){
                     board1[i][j] = temp.board1[i][j];
                     board2[i][j] = temp.board2[i][j];
                 }
@@ -1676,7 +1746,7 @@ int main(void){
             head1 = new_ship1(temp_arr1);
             head2 = new_ship2(temp_arr2);
 
-            for(int i = 1;i < 10;i++){
+            for(int i = 1;i < map_size;i++){
                 for(int j = 0;j < 4;j++){
                     temp_arr1[j] = temp.arr1[i][j];
                     temp_arr2[j] = temp.arr2[i][j];
