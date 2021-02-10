@@ -5,7 +5,7 @@
 # include <string.h>
 # include <ctype.h>
 
-int point1, point2, rocket1, rocket2, max_size = 5, ships_sum = 21, arr_size[26], map_size = 10, shot_point[26];
+int point1, point2, rocket1, rocket2, max_size = 5, ships_sum = 21, arr_size[26], map_size = 10, shot_point[26], count_loops2 = 0;
 char name1[50], name2[50];
 
 typedef struct ships_data1{
@@ -297,10 +297,6 @@ void print(int player){
 
             printf("\n");
         }
-//        system("CLS");
-//        printf("\n enter any key to continue\n");
-//        char wait;
-//        scanf("%c",&wait);
     }
     else {
         printf("  ");
@@ -325,10 +321,6 @@ void print(int player){
 
             printf("\n");
         }
-//        system("CLS");
-//        printf("\n enter any key to continue\n");
-//        char wait;
-//        scanf("%c",&wait);
     }
 }
 int check_around(int row, int column, int player){
@@ -505,32 +497,61 @@ void get_inputs(ships1* head1, ships2* head2, int player){
         for(int i = 0;i < 26;i++)
             arr_size1[i] = arr_size[i];
 
+        count_loops2 = 0;
+        count_loops = 0;
+
         while (counter < ships_sum){
+            count_loops2++;
+            count_loops++;
             is_locatable = 1;
 
-            if(counter  > ships_sum / 4 * 3 && count_loops < 1000)
+            if(count_loops2 > 15000){
+                printf("\nthe automat map is not possible\n");
+
+                counter += ships_sum;
+
+                while(head1->next != NULL){//reseting the inputs to avoid endless loops
+                    ships1* curr = head1;
+
+                    for(;curr->next->next != NULL;curr = curr->next);
+
+                    ships1* hold = curr->next;
+                    curr->next = NULL;
+                    free(hold);
+                }
+
+                for(int i = 0;i < map_size;i++){
+                    for(int j = 0;j < map_size;j++)
+                        board1[i][j] = '\0';
+                }
+
+                for(int i = 0;i < 26;i++)
+                    arr_size1[i] = arr_size[i];
+
+                counter = 0;
+                count_loops = 0;
+            }
+
+            if(counter  > ships_sum / 2)
             { //to avoid impossible design
                 k = 0;
 
                 for(int i = 0;i < map_size;i++) {
                     for(int j = 0;j < map_size;j++)
-                    locatable[i][j] = 0;
+                        locatable[i][j] = 0;
                 }
 
                 for(int i = 0;i < map_size;i++) {
                     for (int j = 0; j < map_size; j++) {
                         temp_array[0] = i;
                         temp_array[1] = j;
-                            locatable[i][j] = is_really_locatable(temp_array, 1);
+                        locatable[i][j] = is_really_locatable(temp_array, 1);
 
-                            if(is_really_locatable(temp_array, 1))
+                        if(is_really_locatable(temp_array, 1))
                             k++;
                     }
                 }
-                check = rand();
-                limit = check;
-                check %= k;
-                check++;
+                check =  1 + rand() % k;
 
                 for(int i = 0;i < map_size;i++){
                     for(int j = 0;j < map_size;j++){
@@ -549,19 +570,19 @@ void get_inputs(ships1* head1, ships2* head2, int player){
                     if(arr_size1[i] != 0 && i > k)
                         k = i;
 
-                    check = limit % 4;
+                check = 1 + count_loops % 4;
 
-                temp_array1[0] = arr[0] - k;
+                temp_array1[0] = arr[0] - k + 1;
                 temp_array1[1] = arr[1];
 
                 temp_array2[0] = arr[0];
-                temp_array2[1] = arr[1] + k;
+                temp_array2[1] = arr[1] + k - 1;
 
-                temp_array3[0] = arr[0] + k;
+                temp_array3[0] = arr[0] + k - 1;
                 temp_array3[1] = arr[1];
 
                 temp_array4[0] = arr[0];
-                temp_array4[1] = arr[1] - k;
+                temp_array4[1] = arr[1] - k + 1;
 
                 if(check == 1){
                     arr[2] = temp_array1[0];
@@ -581,95 +602,22 @@ void get_inputs(ships1* head1, ships2* head2, int player){
                 }
             }
             else {
-                    arr[2] = rand() % map_size;
-                    arr[3] = rand() % map_size;
+                arr[2] = rand() % map_size;
+                arr[3] = rand() % map_size;
 
-                    if (counter % 2) {
-                        arr[0] = arr[2];
-                        arr[1] = (arr[2] * arr[3]) % map_size;
-                    } else {
-                        arr[1] = arr[3];
-                        arr[0] = (arr[2] * arr[3]) % map_size;
-                    }
-
-                    if(count_loops > 1000){
-                        k = 0;
-
-                        for(int i = 0;i < map_size;i++) {
-                            for(int j = 0;j < map_size;j++)
-                                locatable[i][j] = 0;
-                        }
-
-                        for(int i = 0;i < map_size;i++) {
-                            for (int j = 0; j < map_size; j++) {
-                                temp_array[0] = i;
-                                temp_array[1] = j;
-                                locatable[i][j] = is_really_locatable(temp_array, 1);
-
-                                if(is_really_locatable(temp_array, 1))
-                                    k++;
-                            }
-                        }
-                        check = rand();
-                        limit = check;
-                        check %= k;
-                        check++;
-
-                        for(int i = 0;i < map_size;i++){
-                            for(int j = 0;j < map_size;j++){
-                                if(locatable[i][j] == 1)
-                                    check--;
-
-                                if(check == 0){
-                                    arr[0] = i;
-                                    arr[1] = j;
-                                }
-                            }
-                        }
-                        k = 0;
-
-                        for(int i = 0;i < 26;i++)
-                            if(arr_size1[i] != 0 && i > k)
-                                k = i;
-
-                        check = limit % 4;
-
-                        temp_array1[0] = arr[0] - k;
-                        temp_array1[1] = arr[1];
-
-                        temp_array2[0] = arr[0];
-                        temp_array2[1] = arr[1] + k;
-
-                        temp_array3[0] = arr[0] + k;
-                        temp_array3[1] = arr[1];
-
-                        temp_array4[0] = arr[0];
-                        temp_array4[1] = arr[1] - k;
-
-                        if(check == 1){
-                            arr[2] = temp_array1[0];
-                            arr[3] = temp_array1[1];
-                        }
-                        else if(check == 2){
-                            arr[2] = temp_array2[0];
-                            arr[3] = temp_array2[1];
-                        }
-                        else if(check == 3){
-                            arr[2] = temp_array3[0];
-                            arr[3] = temp_array3[1];
-                        }
-                        else if(check == 4){
-                            arr[2] = temp_array4[0];
-                            arr[3] = temp_array4[1];
-                        }
-                    }
-
+                if (counter % 2) {
+                    arr[0] = arr[2];
+                    arr[1] = (arr[2] * arr[3]) % map_size;
+                } else {
+                    arr[1] = arr[3];
+                    arr[0] = (arr[2] * arr[3]) % map_size;
+                }
             }
-            if(count_loops > 10000){
+            if(count_loops > 5000){
                 while(head1->next != NULL){//reseting the inputs to avoid endless loops
                     ships1* curr = head1;
 
-                    for(;curr->next != NULL;curr = curr->next);
+                    for(;curr->next->next != NULL;curr = curr->next);
 
                     ships1* hold = curr->next;
                     curr->next = NULL;
@@ -733,16 +681,48 @@ void get_inputs(ships1* head1, ships2* head2, int player){
                 is_locatable = 0;
         }
     }
-    if(player == 4){//auto for player1
+    if(player == 4) {//auto for player1
         int counter = 0, arr[4], check, limit, count_loops = 0, is_locatable, temp_array[2], temp_array1[2], temp_array2[2], temp_array3[2], temp_array4[2], k, arr_size2[26] = {0}, locatable[map_size][map_size];//arr_size[size of ship][number of this ship]
 
         for(int i = 0;i < 26;i++)
             arr_size2[i] = arr_size[i];
 
+        count_loops2 = 0;
+        count_loops = 0;
+
         while (counter < ships_sum){
+            count_loops2++;
+            count_loops++;
             is_locatable = 1;
 
-            if(counter  > ships_sum / 4 * 3 && count_loops < 1000)
+            if(count_loops2 > 15000){
+                printf("\nthe automat map is not possible\n");
+
+                counter += ships_sum;
+
+                while(head2->next != NULL){//reseting the inputs to avoid endless loops
+                    ships2* curr = head2;
+
+                    for(;curr->next->next != NULL;curr = curr->next);
+
+                    ships2* hold = curr->next;
+                    curr->next = NULL;
+                    free(hold);
+                }
+
+                for(int i = 0;i < map_size;i++){
+                    for(int j = 0;j < map_size;j++)
+                        board2[i][j] = '\0';
+                }
+
+                for(int i = 0;i < 26;i++)
+                    arr_size2[i] = arr_size[i];
+
+                counter = 0;
+                count_loops = 0;
+            }
+
+            if(counter  > ships_sum / 2)
             { //to avoid impossible design
                 k = 0;
 
@@ -761,10 +741,7 @@ void get_inputs(ships1* head1, ships2* head2, int player){
                             k++;
                     }
                 }
-                check = rand();
-                limit = check;
-                check %= k;
-                check++;
+                check =  1 + rand() % k;
 
                 for(int i = 0;i < map_size;i++){
                     for(int j = 0;j < map_size;j++){
@@ -783,19 +760,19 @@ void get_inputs(ships1* head1, ships2* head2, int player){
                     if(arr_size2[i] != 0 && i > k)
                         k = i;
 
-                check = limit % 4;
+                check = 1 + count_loops % 4;
 
-                temp_array1[0] = arr[0] - k;
+                temp_array1[0] = arr[0] - k + 1;
                 temp_array1[1] = arr[1];
 
                 temp_array2[0] = arr[0];
-                temp_array2[1] = arr[1] + k;
+                temp_array2[1] = arr[1] + k - 1;
 
-                temp_array3[0] = arr[0] + k;
+                temp_array3[0] = arr[0] + k - 1;
                 temp_array3[1] = arr[1];
 
                 temp_array4[0] = arr[0];
-                temp_array4[1] = arr[1] - k;
+                temp_array4[1] = arr[1] - k + 1;
 
                 if(check == 1){
                     arr[2] = temp_array1[0];
@@ -825,85 +802,12 @@ void get_inputs(ships1* head1, ships2* head2, int player){
                     arr[1] = arr[3];
                     arr[0] = (arr[2] * arr[3]) % map_size;
                 }
-
-                if(count_loops > 1000){
-                    k = 0;
-
-                    for(int i = 0;i < map_size;i++) {
-                        for(int j = 0;j < map_size;j++)
-                            locatable[i][j] = 0;
-                    }
-
-                    for(int i = 0;i < map_size;i++) {
-                        for (int j = 0; j < map_size; j++) {
-                            temp_array[0] = i;
-                            temp_array[1] = j;
-                            locatable[i][j] = is_really_locatable(temp_array, 2);
-
-                            if(is_really_locatable(temp_array, 2))
-                                k++;
-                        }
-                    }
-                    check = rand();
-                    limit = check;
-                    check %= k;
-                    check++;
-
-                    for(int i = 0;i < map_size;i++){
-                        for(int j = 0;j < map_size;j++){
-                            if(locatable[i][j] == 1)
-                                check--;
-
-                            if(check == 0){
-                                arr[0] = i;
-                                arr[1] = j;
-                            }
-                        }
-                    }
-                    k = 0;
-
-                    for(int i = 0;i < 26;i++)
-                        if(arr_size2[i] != 0 && i > k)
-                            k = i;
-
-                    check = limit % 4;
-
-                    temp_array1[0] = arr[0] - k;
-                    temp_array1[1] = arr[1];
-
-                    temp_array2[0] = arr[0];
-                    temp_array2[1] = arr[1] + k;
-
-                    temp_array3[0] = arr[0] + k;
-                    temp_array3[1] = arr[1];
-
-                    temp_array4[0] = arr[0];
-                    temp_array4[1] = arr[1] - k;
-
-                    if(check == 1){
-                        arr[2] = temp_array1[0];
-                        arr[3] = temp_array1[1];
-                    }
-                    else if(check == 2){
-                        arr[2] = temp_array2[0];
-                        arr[3] = temp_array2[1];
-                    }
-                    else if(check == 3){
-                        arr[2] = temp_array3[0];
-                        arr[3] = temp_array3[1];
-                    }
-                    else if(check == 4){
-                        arr[2] = temp_array4[0];
-                        arr[3] = temp_array4[1];
-                    }
-                }
-
             }
-            if(count_loops > 10000){
+            if(count_loops > 5000){
                 while(head2->next != NULL){//reseting the inputs to avoid endless loops
                     ships2* curr = head2;
 
-                    for(;curr->next != NULL;curr = curr->next);
+                    for(;curr->next->next != NULL;curr = curr->next);
 
                     ships2* hold = curr->next;
                     curr->next = NULL;
@@ -1744,6 +1648,7 @@ int main(void){
 ////basic settings
 //get_inputs(head1, head2, 3);
 //print(1);
+// be careful about map size errors
     int choice = 0;
 
     while(choice != 7) {
@@ -1824,6 +1729,12 @@ int main(void){
 
             if (choice == 1) {
                 get_inputs(head1, head2, 3);
+
+                if(count_loops2 > 20000)
+                {
+                    printf("sorry, please try the manual way.\n");
+                    get_inputs(head1, head2, 1);
+                }
                 print(1);
             }
 
@@ -1997,8 +1908,10 @@ int main(void){
             printf("\n%s choose one choice:\n1. put ships automatically\n2. put ships manually\n", name1);
             scanf("%d", &choice);
 
-            if (choice == 1)
+            if (choice == 1) {
                 get_inputs(head1, head2, 3);
+                print(1);
+            }
 
             if (choice == 2)
                 get_inputs(head1, head2, 1);
@@ -2019,7 +1932,7 @@ int main(void){
 
             if(choice == 3)
                 get_inputs(head1, head2, 5);
-print(2);
+
             bot_play(&head1, &head2, 0);
             choice = 10;
         }
@@ -2272,37 +2185,6 @@ print(2);
         }
     }
 
-//// FOR TEST
-//    add_end2(head2, new_ship2(barr));
-//    get_inputs(head1, head2, 1);
-//    get_inputs(head1, head2, 2);
-//    int carr[4] = {-5, -5, -5, -5};
-//    add_end2(head2, new_ship2(carr));
-//    add_end1(head1, new_ship1(carr));
-////FOR TEST
+
     return 0;
 }
-// be careful about map size errors
-//player chooses the name(saved or new)
-//rocket is orbitrary->-2
-/*
- *
- * //            if(count_loops > limit){
-//                limit += 2000;
-//                max_length_needed = 0;
-//                for(int k = 0;k < 26;k++){
-//                    if(arr_size1[k] != 0)
-//                        max_length_needed = k;
-//                }
-//                for(int i = 0;i < map_size;i++){
-//                    for(int j = 0;j < map_size;j++){
-//
-//                    }
-//                }
-//            }
-//            else
-//            {
- *
- *
- *
- * */
