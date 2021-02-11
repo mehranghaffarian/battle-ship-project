@@ -5,7 +5,7 @@
 # include <string.h>
 # include <ctype.h>
 
-int point1, point2, rocket1, rocket2, max_size = 5, ships_sum = 21, arr_size[30], map_size = 10, shot_point[30], count_loops2 = 0;
+int point1, point2, rocket1, rocket2, radar1, radar2, max_size = 5, ships_sum = 21, arr_size[30], map_size = 10, shot_point[30], count_loops2 = 0;
 char name1[50], name2[50];
 
 typedef struct ships_data1{
@@ -1154,12 +1154,33 @@ void save_it(ships1** head11, ships2** head22, int turn){
 
     printf("\nthe game is saved properly\n");
 }
+void radar(int row , int column, int player){
+    //player1 has used the radar
+    if(player == 1){
+        for(int i = row - 1;i <= row + 1;i++){
+            printf("\n");
+            for(int j = column - 1;j <= column + 1;j++){
+                printf("%c ", board2[i][j]);
+            }
+        }
+        printf("\n");
+    }
+    else{
+        for(int i = row - 1;i <= row + 1;i++){
+            printf("\n");
+            for(int j = column - 1;j <= column + 1;j++){
+                printf("%c ", board1[i][j]);
+            }
+        }
+        printf("\n");
+    }
+}
 void mutual_play(ships1** head11, ships2** head22, int save){
     ships1* head1 = (*head11);
     ships2* head2 = (*head22);
     int a;
 
-    printf("\n\n\n\n\n\n\n\n\n\n\n\n lets begin the game. player1 will start the game. every turn you have to choose a correct location to attack. if you shot any ship you will get points and be able to shot the other player again. you have to enter the row and the column of your location in this way:row column. if you want to use a rocket enter:-2 -2.then you can decide whether to attack your enemy in a vertical or horizontal way. enter:v column or h row. you can use rocket once(it would cost 100 point). if you want to save the game enter:-1 -1\nsimple shot:row column\nsave:-1 -1\nrocket:-2 -2  -> then:h row  or:v column\n");
+    printf("\n\n\n\n\n\n\n\n\n\n\n\n lets begin the game. player1 will start the game. every turn you have to choose a correct location to attack. if you shot any ship you will get points and be able to shot the other player again. you have to enter the row and the column of your location in this way:row column. if you want to use a rocket enter:-2 -2.then you can decide whether to attack your enemy in a vertical or horizontal way. enter:v column or h row. you can use rocket once(it would cost 100 point). if you want to use the radar enter:-3 -3. then you have to enter the central point location of the 3*3 area(it would cost 75 points and can be used only ance). if you want to save the game enter:-1 -1\nsimple shot:row column\nsave:-1 -1\nrocket:-2 -2  -> then:h row  or:v column\nradar:-3 -3 then->row column\n");
 
     while(head1 != NULL && head2 != NULL && save != -1){
         int temp_row, temp_column, temp, turn;
@@ -1170,12 +1191,42 @@ void mutual_play(ships1** head11, ships2** head22, int save){
                 print_shotable(1);
                 printf("%s:%d  --  %s:%d\n", name1, point1, name2, point2);
                 printf("%s chose your target:\n", name1);
-                fflush(stdin);
                 scanf("%d %d", &temp_row, &temp_column);
                 save = 0;
                 if(temp_column == -1 && temp_row == -1) {
                     save_it(head11, head22, 1);
                     save = -1;
+                }
+                else if((temp_column == -3 && temp_row == -3)){
+                    printf("%s enter the central point:\n", name1);
+                    scanf("%d %d", &temp_row, &temp_column);
+
+                    if(radar1 != 0 || point1 < 75){
+                        printf("\nyou can not use radar.\n");
+
+                        turn = 1;
+                    }
+                    else if(temp_row < 2 || temp_row > map_size - 1 || temp_column < 2 || temp_column > map_size - 1){
+                        printf("\nyour inputs are not acceptable\n");
+
+                        turn = 1;
+                    }
+                    else{
+                        int row  = temp_row - 1, column = temp_column - 1;
+
+                        for(int i = row - 1;i <= row + 1;i++){
+                            printf("\n");
+                            for(int j = column - 1;j <= column + 1;j++)
+                                printf("%c", board2[i][j] == '\0' ? '_' : board2[i][j]);
+                        }
+                        printf("\n");
+
+                        a = 1;
+                        turn = 0;
+
+                        radar1++;
+                        point1 -= 75;
+                    }
                 }
                 else if (temp_column == -2 && temp_row == -2) {
                     if(rocket1 > 0 || point1 < 100) {
@@ -1184,9 +1235,11 @@ void mutual_play(ships1** head11, ships2** head22, int save){
                         turn = 1;
                     }
                     else{
-                        turn = 0;
                         char rocket;
                         int i = 0;
+
+                        a = 1;
+                        turn = 0;
 
                         printf("%s choose your method to attack your enemy:\n", name1);
                         fflush(stdin);
@@ -1195,7 +1248,6 @@ void mutual_play(ships1** head11, ships2** head22, int save){
 
                         if(temp < 0 || temp >= map_size || (rocket != 'v' && rocket != 'h')){
                             i = map_size;
-                            a = 1;
                             turn = 1;
                             printf("\nyour inputs are not valid. choose another way.\n");
                             point1 += 100;
@@ -1246,6 +1298,37 @@ void mutual_play(ships1** head11, ships2** head22, int save){
                     save_it(head11, head22, 2);
                     save = -1;
                 }
+                else if((temp_column == -3 && temp_row == -3)){
+                    printf("%s enter the central point:\n", name1);
+                    scanf("%d %d", &temp_row, &temp_column);
+
+                    if(radar2 != 0 || point2 < 75){
+                        printf("\nyou can not use radar.\n");
+
+                        turn = 1;
+                    }
+                    else if(temp_row < 2 || temp_row > map_size - 1 || temp_column < 2 || temp_column > map_size - 1){
+                        printf("\nyour inputs are not acceptable\n");
+
+                        turn = 1;
+                    }
+                    else{
+                        int row  = temp_row - 1, column = temp_column - 1;
+
+                        for(int i = row - 1;i <= row + 1;i++){
+                            printf("\n");
+                            for(int j = column - 1;j <= column + 1;j++)
+                                printf("%c", board1[i][j] == '\0' ? '_' : board1[i][j]);
+                        }
+                        printf("\n");
+
+                        a = 1;
+                        turn = 0;
+
+                        radar2++;
+                        point2 -= 75;
+                    }
+                }
                 else if (temp_column == -2 && temp_row == -2) {
                     if(rocket2 > 0 || point2 < 100) {
                         printf("\nyou can not use rocket\n");
@@ -1253,9 +1336,11 @@ void mutual_play(ships1** head11, ships2** head22, int save){
                         turn = 1;
                     }
                     else{
-                        turn = 0;
                         char rocket;
                         int i = 0;
+
+                        a = 1;
+                        turn = 0;
 
                         printf("\n%s choose your method to attack your enemy\n", name2);
                         fflush(stdin);
@@ -1264,7 +1349,6 @@ void mutual_play(ships1** head11, ships2** head22, int save){
 
                         if(temp < 1 || temp > map_size || (rocket != 'v' && rocket != 'h')){
                             i = map_size;
-                            a = 1;
                             turn = 1;
                             rocket2--;point2 += 100;
 
@@ -1388,16 +1472,50 @@ void bot_play(ships1** head11, ships2** head22, int save){
                     save_it(head11, head22, 3);
                     save = -1;
                 }
+                else if((temp_column == -3 && temp_row == -3)){
+                    printf("%s enter the central point:\n", name1);
+                    scanf("%d %d", &temp_row, &temp_column);
+
+                    if(radar1 != 0 || point1 < 75){
+                        printf("\nyou can not use radar.\n");
+
+                        turn = 1;
+                    }
+                    else if(temp_row < 2 || temp_row > map_size - 1 || temp_column < 2 || temp_column > map_size - 1){
+                        printf("\nyour inputs are not acceptable\n");
+
+                        turn = 1;
+                    }
+                    else{
+                        int row  = temp_row - 1, column = temp_column - 1;
+
+                        for(int i = row - 1;i <= row + 1;i++){
+                            printf("\n");
+                            for(int j = column - 1;j <= column + 1;j++)
+                                printf("%c", board2[i][j] == '\0' ? '_' : board2[i][j]);
+                        }
+                        printf("\n");
+
+                        a = 1;
+                        turn = 0;
+
+                        radar1++;
+                        point1 -= 75;
+                    }
+                }
                 else if (temp_column == -2 && temp_row == -2) {
                     if(rocket1 > 0 || point1 < 100) {
                         printf("\nyou can not use rocket\n");
+
                         a = 0;
                         turn = 1;
                     }
                     else{
-                        turn = 0;
                         char rocket;
                         int i = 0;
+
+                        a = 1;
+                        turn = 0;
 
                         printf("%s choose your method to attack your enemy:\n", name1);
                         fflush(stdin);
@@ -1406,7 +1524,6 @@ void bot_play(ships1** head11, ships2** head22, int save){
 
                         if(temp < 0 || temp >= map_size || (rocket != 'v' && rocket != 'h')){
                             i = map_size;
-                            a = 1;
                             turn = 1;
                             printf("\nyour inputs are not valid. choose another way.\n");
                             point1 += 100;
@@ -1622,7 +1739,6 @@ int main(void){
 //print(1);
 //    get_inputs(head1, head2, 4);
 //    print(2);
-// be careful about map size errors
     int choice = 0;
 
     while(choice != 7) {
@@ -1952,8 +2068,8 @@ int main(void){
                         board2[i][j] = temp.board2[i][j];
                     }
                 }
-                ships1 *curr1 = head1;
-                ships2 *curr2 = head2;
+                ships1* curr1 = head1;
+                ships2* curr2 = head2;
                 int temp_arr1[4], temp_arr2[4];
 
                 for (int j = 0; j < 4; j++) {
@@ -1968,6 +2084,7 @@ int main(void){
                     }
                     if (temp_arr1[0] != -10)
                         add_end1(head1, new_ship1(temp_arr1));
+
                     if (temp_arr2[0] != -10)
                         add_end2(head2, new_ship2(temp_arr2));
                 }
@@ -2146,13 +2263,9 @@ int main(void){
                     printf("\nplease enter the new map size:");
                     scanf("%d", &temp);
 
-                    int count = 0;
-
-                    for(int i = 0;i < 30;i++)
-                            count += arr_size[i];
-
-                    if(temp * temp > count + ships_sum * 2)
+                    if(temp * temp > ships_sum * 2 - temp)
                         check = 0;
+
                     else
                         printf("\nyour input is not acceptable.");
                 }
