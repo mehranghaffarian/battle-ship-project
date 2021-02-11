@@ -21,7 +21,7 @@ typedef struct ships_data2{
 }ships2;
 
 typedef struct data{
-    int score1, score2, turn, arr1[30][4], arr2[30][4], rocket1, rocket2, map_size, shot_point[30];
+    int score1, score2, turn, arr1[30][4], arr2[30][4], rocket1, rocket2, map_size, shot_point[30], radar1, radar2;
     char board1[15][15], board2[15][15], name1[50], name2[50];
 }game;
 
@@ -1097,9 +1097,15 @@ void save_it(ships1** head11, ships2** head22, int turn){
 
     curr.score1 = point1;
     curr.score2 = point2;
+
     curr.map_size = map_size;
+
     curr.rocket1 = rocket1;
     curr.rocket2 = rocket2;
+
+    curr.radar1 = radar1;
+    curr.radar2 = radar2;
+
     curr.turn = turn;
 
     ships1* curr1 = (*head11);
@@ -1153,27 +1159,6 @@ void save_it(ships1** head11, ships2** head22, int turn){
     fclose(number);
 
     printf("\nthe game is saved properly\n");
-}
-void radar(int row , int column, int player){
-    //player1 has used the radar
-    if(player == 1){
-        for(int i = row - 1;i <= row + 1;i++){
-            printf("\n");
-            for(int j = column - 1;j <= column + 1;j++){
-                printf("%c ", board2[i][j]);
-            }
-        }
-        printf("\n");
-    }
-    else{
-        for(int i = row - 1;i <= row + 1;i++){
-            printf("\n");
-            for(int j = column - 1;j <= column + 1;j++){
-                printf("%c ", board1[i][j]);
-            }
-        }
-        printf("\n");
-    }
 }
 void mutual_play(ships1** head11, ships2** head22, int save){
     ships1* head1 = (*head11);
@@ -1390,10 +1375,16 @@ void mutual_play(ships1** head11, ships2** head22, int save){
         printf("\n\n%s:%d  --  %s:%d", name1, point1, name2, point2);
         printf("\nthe winner is ");
 
-        if (head1 == NULL)
+        if (head1 == NULL) {
+            point1 /= 2;
+
             printf("%s\n", name2);
-        else
+        }
+        else {
+            point2 /= 2;
+
             printf("%s\n", name1);
+        }
 
         printf("the %s board is as bellow\n", name1);
         print(1);
@@ -1453,7 +1444,7 @@ void bot_play(ships1** head11, ships2** head22, int save){
     int a;
     srand(time(0));
 
-    printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n lets begin the game. player1 will start the game. every turn you have to choose a correct location to attack. if you   shot any ship you will get points and be able to shot the other player again. you have to enter the row and the column of your location in this way:row column. if you want to use a rocket enter:-2 -2.then you can decide whether to attack your enemy in a vertical or horizontal way. enter:v column or h row. you can use rocket once(it would cost 100 point). if you got any problem enter your target column again and a junk number. if you want to save the game enter:-1 -1\nsimple shot:row column\nsave:-1 -1\nrocket:-2 -2  -> then:h row  or:v column\n");
+    printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n lets begin the game. player1 will start the game. every turn you have to choose a correct location to attack. if you   shot any ship you will get points and be able to shot the other player again. you have to enter the row and the column of your location in this way:row column. if you want to use a rocket enter:-2 -2.then you can decide whether to attack your enemy in a vertical or horizontal way. enter:v column or h row. you can use rocket once(it would cost 100 point). if you got any problem enter your target column again and a junk number. if you want to use the radar enter:-3 -3. then you have to enter the central point location of the 3*3 area(it would cost 75 points and can be used only ance). if you want to save the game enter:-1 -1\nsimple shot:row column\nsave:-1 -1\nrocket:-2 -2  -> then:h row  or:v column\nradar:-3 -3  then->central:row column\n");
 
     while(head1 != NULL && head2 != NULL && save != -1){
         int temp_row, temp_column, temp, turn;
@@ -1655,10 +1646,16 @@ void bot_play(ships1** head11, ships2** head22, int save){
         printf("\n\n%s:%d  --  %s:%d", name1, point1, name2, point2);
         printf("\nthe winner is ");
 
-        if (head1 == NULL)
+        if (head1 == NULL) {
+            point1 /= 2;
+
             printf("%s\n", name2);
-        else
+        }
+        else {
+            point2 /= 2;
+
             printf("%s\n", name1);
+        }
 
         printf("the %s board is as bellow\n", name1);
         print(1);
@@ -2051,9 +2048,15 @@ int main(void){
 
                 point1 = temp.score1;
                 point2 = temp.score2;
+
                 map_size = temp.map_size;
+
+                radar1 = temp.radar1;
+                radar2 = temp.radar2;
+
                 rocket1 = temp.rocket1;
                 rocket2 = temp.rocket2;
+
                 strcpy(name1, temp.name1);
                 strcpy(name2, temp.name2);
 
@@ -2164,7 +2167,12 @@ int main(void){
 
             point1 = temp.score1;
             point2 = temp.score2;
+
             map_size = temp.map_size;
+
+            radar1 = temp.radar1;
+            radar2 = temp.radar2;
+
             rocket1 = temp.rocket1;
             rocket2 = temp.rocket2;
 
