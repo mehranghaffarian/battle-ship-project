@@ -3,7 +3,6 @@
 # include <windows.h>
 # include <time.h>
 # include <string.h>
-# include <ctype.h>
 
 int point1, point2, rocket1, rocket2, radar1, radar2, max_size = 5, ships_sum = 21, arr_size[30], map_size = 10, shot_point[30], count_loops2 = 0;
 char name1[50], name2[50];
@@ -583,7 +582,8 @@ void get_inputs(ships1* head1, ships2* head2, int player){
                 if (counter % 2) {
                     arr[0] = arr[2];
                     arr[1] = (arr[2] * arr[3]) % map_size;
-                } else {
+                }
+                else {
                     arr[1] = arr[3];
                     arr[0] = (arr[2] * arr[3]) % map_size;
                 }
@@ -1372,6 +1372,11 @@ void mutual_play(ships1** head11, ships2** head22, int save){
         }while((a == 0 || turn) && (save == 2 || save == 0) && head1 != NULL && head2 != NULL);
     }
     if(save != -1){
+        printf("\nthe %s board is as bellow\n", name1);
+        print(1);
+        printf("\nthe %s board is as bellow\n", name2);
+        print(2);
+
         printf("\n\n%s:%d  --  %s:%d", name1, point1, name2, point2);
         printf("\nthe winner is ");
 
@@ -1385,11 +1390,6 @@ void mutual_play(ships1** head11, ships2** head22, int save){
 
             printf("%s\n", name1);
         }
-
-        printf("the %s board is as bellow\n", name1);
-        print(1);
-        printf("the %s board is as bellow\n", name2);
-        print(2);
         printf("\nthe information is shown above\n\n*_* THE GAME IS OVER *_*\n");
 
         FILE *users = fopen("users.txt", "a+");
@@ -1643,6 +1643,11 @@ void bot_play(ships1** head11, ships2** head22, int save){
     }
     if(save != -1)
     {
+        printf("\nthe %s board is as bellow\n", name1);
+        print(1);
+        printf("\nthe %s board is as bellow\n", name2);
+        print(2);
+
         printf("\n\n%s:%d  --  %s:%d", name1, point1, name2, point2);
         printf("\nthe winner is ");
 
@@ -1656,13 +1661,7 @@ void bot_play(ships1** head11, ships2** head22, int save){
 
             printf("%s\n", name1);
         }
-
-        printf("the %s board is as bellow\n", name1);
-        print(1);
-        printf("the %s board is as bellow\n", name2);
-        print(2);
         printf("\nthe information is shown above\n\n*_* THE GAME IS OVER *_*\n");
-
 
         FILE *users = fopen("users.txt", "a+");
         fprintf(users, "%s %d\n", name1, point1);
@@ -1731,11 +1730,7 @@ int main(void){
     arr_size[2] = 3;
     arr_size[3] = 2;
     arr_size[5] = 1;
-////basic settings
-//get_inputs(head1, head2, 3);
-//print(1);
-//    get_inputs(head1, head2, 4);
-//    print(2);
+////basic settings 
     int choice = 0;
 
     while(choice != 7) {
