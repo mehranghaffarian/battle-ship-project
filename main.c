@@ -5,7 +5,7 @@
 # include <string.h>
 # include <ctype.h>
 
-int point1, point2, rocket1, rocket2, max_size = 5, ships_sum = 21, arr_size[26], map_size = 10, shot_point[26], count_loops2 = 0;
+int point1, point2, rocket1, rocket2, max_size = 5, ships_sum = 21, arr_size[30], map_size = 10, shot_point[30], count_loops2 = 0;
 char name1[50], name2[50];
 
 typedef struct ships_data1{
@@ -21,11 +21,11 @@ typedef struct ships_data2{
 }ships2;
 
 typedef struct data{
-    char board1[10][10], board2[10][10], name1[50], name2[50];
-    int score1, score2, turn, arr1[11][4], arr2[11][4], rocket1, rocket2, map_size;
+    int score1, score2, turn, arr1[30][4], arr2[30][4], rocket1, rocket2, map_size, shot_point[30];
+    char board1[15][15], board2[15][15], name1[50], name2[50];
 }game;
 
-char board1[50][50], board2[50][50];//board1 : the board where player1 puts his/her ships in//board2 : the board where player2 puts his/her ships in
+char board1[20][20], board2[20][20];//board1 : the board where player1 puts his/her ships in//board2 : the board where player2 puts his/her ships in
 
 ships1* new_ship1(int arr[4]){
     ships1* new = (ships1*)malloc(sizeof(ships1));
@@ -323,36 +323,11 @@ void print(int player){
         }
     }
 }
-int check_around(int row, int column, int player){
-    int ships_around = 0;
-
-    if(player == 1){
-        if(row - 2 > -1 && board1[row - 2][column] == 'S')
-            ships_around = 1;
-        if(column + 2 < map_size && board1[row][column + 2] == 'S')
-            ships_around = 1;
-        if(row + 2 < map_size && board1[row + 2][column] == 'S')
-            ships_around  = 1;
-        if(column - 2 > -1 && board1[row][column - 2] == 'S')
-            ships_around = 1;
-    }
-    else{
-        if(row - 2 > -1 && board2[row - 2][column] == 'S')
-            ships_around = 1;
-        if(column + 2 < map_size && board2[row][column + 2] == 'S')
-            ships_around = 1;
-        if(row + 2 < map_size && board2[row + 2][column] == 'S')
-            ships_around  = 1;
-        if(column - 2 > -1 && board2[row][column - 2] == 'S')
-            ships_around = 1;
-    }
-    return ships_around;
-}
 void get_inputs(ships1* head1, ships2* head2, int player){
     if(player == 1) {
-        int counter = 0,  arr[4], is_locatable, temp_array[2], arr_size1[26] = {0};//arr_size[size of ship][number of this ship]
+        int counter = 0,  arr[4], is_locatable, temp_array[2], arr_size1[30] = {0};//arr_size[size of ship][number of this ship]
 
-        for(int i = 0;i < 26;i++)
+        for(int i = 0;i < 30;i++)
             arr_size1[i] = arr_size[i];
 
         printf("\nplayer%d please enter the row and column of the ships(ships end and first). if it is a ship with length of 1 please enter its start row and column twice\n",
@@ -420,9 +395,9 @@ void get_inputs(ships1* head1, ships2* head2, int player){
         }
     }
     if(player == 2){
-        int counter = 0,  arr[4], is_locatable, temp_array[2], arr_size2[26];//arr_size[size of ship][number of this ship]
+        int counter = 0,  arr[4], is_locatable, temp_array[2], arr_size2[30];//arr_size[size of ship][number of this ship]
 
-        for(int i = 0;i < 26;i++)
+        for(int i = 0;i < 30;i++)
             arr_size2[i] = arr_size[i];
 
         printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nplayer%d please enter the row and column of the ships(ships end and first). if it is a ship with length of 1 please enter its start row and column twice\n",
@@ -492,9 +467,9 @@ void get_inputs(ships1* head1, ships2* head2, int player){
     srand(time(0));
 
     if(player == 3) {//auto for player1
-        int counter = 0, arr[4], check, limit, count_loops = 0, is_locatable, temp_array[2], temp_array1[2], temp_array2[2], temp_array3[2], temp_array4[2], k, arr_size1[26] = {0}, locatable[map_size][map_size];//arr_size[size of ship][number of this ship]
+        int counter = 0, arr[4], check, limit, count_loops = 0, is_locatable, temp_array[2], temp_array1[2], temp_array2[2], temp_array3[2], temp_array4[2], k, arr_size1[30] = {0}, locatable[map_size][map_size];//arr_size[size of ship][number of this ship]
 
-        for(int i = 0;i < 26;i++)
+        for(int i = 0;i < 30;i++)
             arr_size1[i] = arr_size[i];
 
         count_loops2 = 0;
@@ -525,7 +500,7 @@ void get_inputs(ships1* head1, ships2* head2, int player){
                         board1[i][j] = '\0';
                 }
 
-                for(int i = 0;i < 26;i++)
+                for(int i = 0;i < 30;i++)
                     arr_size1[i] = arr_size[i];
 
                 counter = 0;
@@ -566,7 +541,7 @@ void get_inputs(ships1* head1, ships2* head2, int player){
                 }
                 k = 0;
 
-                for(int i = 0;i < 26;i++)
+                for(int i = 0;i < 30;i++)
                     if(arr_size1[i] != 0 && i > k)
                         k = i;
 
@@ -629,7 +604,7 @@ void get_inputs(ships1* head1, ships2* head2, int player){
                         board1[i][j] = '\0';
                 }
 
-                for(int i = 0;i < 26;i++)
+                for(int i = 0;i < 30;i++)
                     arr_size1[i] = arr_size[i];
 
                 counter = 0;
@@ -682,9 +657,9 @@ void get_inputs(ships1* head1, ships2* head2, int player){
         }
     }
     if(player == 4) {//auto for player1
-        int counter = 0, arr[4], check, limit, count_loops = 0, is_locatable, temp_array[2], temp_array1[2], temp_array2[2], temp_array3[2], temp_array4[2], k, arr_size2[26] = {0}, locatable[map_size][map_size];//arr_size[size of ship][number of this ship]
+        int counter = 0, arr[4], check, limit, count_loops = 0, is_locatable, temp_array[2], temp_array1[2], temp_array2[2], temp_array3[2], temp_array4[2], k, arr_size2[30] = {0}, locatable[map_size][map_size];//arr_size[size of ship][number of this ship]
 
-        for(int i = 0;i < 26;i++)
+        for(int i = 0;i < 30;i++)
             arr_size2[i] = arr_size[i];
 
         count_loops2 = 0;
@@ -715,7 +690,7 @@ void get_inputs(ships1* head1, ships2* head2, int player){
                         board2[i][j] = '\0';
                 }
 
-                for(int i = 0;i < 26;i++)
+                for(int i = 0;i < 30;i++)
                     arr_size2[i] = arr_size[i];
 
                 counter = 0;
@@ -756,7 +731,7 @@ void get_inputs(ships1* head1, ships2* head2, int player){
                 }
                 k = 0;
 
-                for(int i = 0;i < 26;i++)
+                for(int i = 0;i < 30;i++)
                     if(arr_size2[i] != 0 && i > k)
                         k = i;
 
@@ -819,7 +794,7 @@ void get_inputs(ships1* head1, ships2* head2, int player){
                         board2[i][j] = '\0';
                 }
 
-                for(int i = 0;i < 26;i++)
+                for(int i = 0;i < 30;i++)
                     arr_size2[i] = arr_size[i];
 
                 counter = 0;
@@ -1109,13 +1084,17 @@ void save_it(ships1** head11, ships2** head22, int turn){
     strcpy(curr.name1, name1);
     strcpy(curr.name2, name2);
 
-    for(int i = 0;i < 10;i++){
-        for(int j = 0;j < 10;j++)
+    for(int i = 0;i < map_size;i++){
+        for(int j = 0;j < map_size;j++)
         {
             curr.board1[i][j] = board1[i][j];
             curr.board2[i][j] = board2[i][j];
         }
     }
+
+    for(int i = 0;i < 30;i++)
+        curr.shot_point[i] = shot_point[i];
+
     curr.score1 = point1;
     curr.score2 = point2;
     curr.map_size = map_size;
@@ -1123,13 +1102,10 @@ void save_it(ships1** head11, ships2** head22, int turn){
     curr.rocket2 = rocket2;
     curr.turn = turn;
 
-    ships1* head1 = (*head11);
-    ships2* head2 = (*head22);
+    ships1* curr1 = (*head11);
+    ships2* curr2 = (*head22);
 
-    ships1* curr1 = head1;
-    ships2* curr2 = head2;
-
-    for(int i = 0;i < 10;i++){
+    for(int i = 0;i < 30;i++){
         if(curr1 != NULL)
         {
             curr.arr1[i][0] = curr1->arr1[0];
@@ -1206,8 +1182,6 @@ void mutual_play(ships1** head11, ships2** head22, int save){
                         printf("\nyou can not use rocket\n");
                         a = 0;
                         turn = 1;
-                        point1 += 100;
-                        rocket1--;
                     }
                     else{
                         turn = 0;
@@ -1366,7 +1340,7 @@ void mutual_play(ships1** head11, ships2** head22, int save){
         }
         int temp_arr[4];
 
-        for (int i = 0; i < 26; i++) {
+        for (int i = 0; i < 30; i++) {
             if (head1 != NULL) {
                 temp_arr[0] = head1->arr1[0];
                 temp_arr[1] = head1->arr1[1];
@@ -1395,7 +1369,7 @@ void bot_play(ships1** head11, ships2** head22, int save){
     int a;
     srand(time(0));
 
-    printf("\n\n\n\n\n\n\n\n\n\n\n\n lets begin the game. player1 will start the game. every turn you have to choose a correct location to attack. if you   shot any ship you will get points and be able to shot the other player again. you have to enter the row and the column of your location in this way:row column. if you want to use a rocket enter:-2 -2.then you can decide whether to attack your enemy in a vertical or horizontal way. enter:v column or h row. you can use rocket once(it would cost 100 point). if you got any problem enter your target column again and a junk number. if you want to save the game enter:-1 -1\nsimple shot:row column\nsave:-1 -1\nrocket:-2 -2  -> then:h row  or:v column\n");
+    printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n lets begin the game. player1 will start the game. every turn you have to choose a correct location to attack. if you   shot any ship you will get points and be able to shot the other player again. you have to enter the row and the column of your location in this way:row column. if you want to use a rocket enter:-2 -2.then you can decide whether to attack your enemy in a vertical or horizontal way. enter:v column or h row. you can use rocket once(it would cost 100 point). if you got any problem enter your target column again and a junk number. if you want to save the game enter:-1 -1\nsimple shot:row column\nsave:-1 -1\nrocket:-2 -2  -> then:h row  or:v column\n");
 
     while(head1 != NULL && head2 != NULL && save != -1){
         int temp_row, temp_column, temp, turn;
@@ -1408,8 +1382,8 @@ void bot_play(ships1** head11, ships2** head22, int save){
                 printf("%s chose your target:\n", name1);
                 fflush(stdin);
                 scanf("%d %d", &temp_row, &temp_column);
-                fflush(stdin);
                 save = 0;
+
                 if(temp_column == -1 && temp_row == -1) {
                     save_it(head11, head22, 3);
                     save = -1;
@@ -1419,8 +1393,6 @@ void bot_play(ships1** head11, ships2** head22, int save){
                         printf("\nyou can not use rocket\n");
                         a = 0;
                         turn = 1;
-                        point1 += 100;
-                        rocket1--;
                     }
                     else{
                         turn = 0;
@@ -1600,7 +1572,7 @@ void bot_play(ships1** head11, ships2** head22, int save){
     }
     int temp_arr[4];
 
-    for(int i = 0;i < 26;i++) {
+    for(int i = 0;i < 30;i++) {
         if (head1 != NULL) {
             temp_arr[0] = head1->arr1[0];
             temp_arr[1] = head1->arr1[1];
@@ -1648,6 +1620,8 @@ int main(void){
 ////basic settings
 //get_inputs(head1, head2, 3);
 //print(1);
+//    get_inputs(head1, head2, 4);
+//    print(2);
 // be careful about map size errors
     int choice = 0;
 
@@ -1937,64 +1911,127 @@ int main(void){
             choice = 10;
         }
         if (choice == 3) {
-            int num;
-            FILE* number = fopen("games_number.bin", "rb+");
-            fread(&num, 4, 1, number);
-            fclose(number);
-
-            FILE* games = fopen("games.bin", "rb+");
-            game temp;
-
-            for(int i = 0;i < num;i++){
-                fread(&temp, sizeof(game), 1, games);
-                printf("\n%d. %s --  %s", i + 1, temp.name1, temp.name2);
-            }
-            printf("\nplease choose one game:");
+            printf("\nplease decide:\n1. loading a saved game\n2. removing a game\n");
             scanf("%d", &choice);
+
+            if(choice == 1) {
+                int num;
+                FILE *number = fopen("games_number.bin", "rb+");
+                fread(&num, 4, 1, number);
+                fclose(number);
+
+                FILE *games = fopen("games.bin", "rb+");
+                game temp;
+
+                for (int i = 0;i < num;i++) {
+                    fread(&temp, sizeof(game), 1, games);
+                    printf("\n%d. %s --  %s", i + 1, temp.name1, temp.name2);
+                }
+                printf("\nplease choose one game:");
+                scanf("%d", &choice);
 
                 fseek(games, (choice - 1) * sizeof(temp), SEEK_SET);
                 fread(&temp, sizeof(temp), 1, games);
 
-            point1 = temp.score1;
-            point2 = temp.score2;
-            map_size = temp.map_size;
-            rocket1 = temp.rocket1;
-            rocket2 = temp.rocket2;
-            strcpy(name1, temp.name1);
-            strcpy(name2, temp.name2);
+                point1 = temp.score1;
+                point2 = temp.score2;
+                map_size = temp.map_size;
+                rocket1 = temp.rocket1;
+                rocket2 = temp.rocket2;
+                strcpy(name1, temp.name1);
+                strcpy(name2, temp.name2);
 
-            int save = temp.turn;
+                for(int i = 0;i < 30;i++)
+                    shot_point[i] = temp.shot_point[i];
 
-            for(int i = 0;i < map_size;i++){
-                for(int j = 0;j < map_size;j++){
-                    board1[i][j] = temp.board1[i][j];
-                    board2[i][j] = temp.board2[i][j];
+                int save = temp.turn;
+
+                for (int i = 0; i < map_size; i++) {
+                    for (int j = 0; j < map_size; j++) {
+                        board1[i][j] = temp.board1[i][j];
+                        board2[i][j] = temp.board2[i][j];
+                    }
                 }
-            }
-            ships1* curr1 = head1;
-            ships2* curr2 = head2;
-            int temp_arr1[4], temp_arr2[4];
+                ships1 *curr1 = head1;
+                ships2 *curr2 = head2;
+                int temp_arr1[4], temp_arr2[4];
 
-            for(int j = 0;j < 4;j++) {
-                head1->arr1[j] = temp.arr1[0][j];
-                head2->arr2[j] = temp.arr2[0][j];
-            }
-            for(int i = 1;i < map_size;i++){
-                for(int j = 0;j < 4;j++){
-                    temp_arr1[j] = temp.arr1[i][j];
-                    temp_arr2[j] = temp.arr2[i][j];
+                for (int j = 0; j < 4; j++) {
+                    head1->arr1[j] = temp.arr1[0][j];
+                    head2->arr2[j] = temp.arr2[0][j];
                 }
-                if(temp_arr1[0] != -10)
-                add_end1(head1, new_ship1(temp_arr1));
-                if(temp_arr2[0] != -10)
-                add_end2(head2, new_ship2(temp_arr2));
-            }
-            if(save == 1 || save == 2)
-                mutual_play(&head1, &head2, save);
-            else
-                bot_play(&head1, &head2, save);
 
-            choice == 10;
+                for (int i = 1; i < 30; i++) {
+                    for (int j = 0; j < 4; j++) {
+                        temp_arr1[j] = temp.arr1[i][j];
+                        temp_arr2[j] = temp.arr2[i][j];
+                    }
+                    if (temp_arr1[0] != -10)
+                        add_end1(head1, new_ship1(temp_arr1));
+                    if (temp_arr2[0] != -10)
+                        add_end2(head2, new_ship2(temp_arr2));
+                }
+                if (save == 1 || save == 2)
+                    mutual_play(&head1, &head2, save);
+                else
+                    bot_play(&head1, &head2, save);
+
+                choice == 10;
+            }
+
+            if(choice == 2){
+                FILE* games = fopen("games.bin", "rb+");
+                FILE* num = fopen("games_number.bin", "rb+");
+
+                int number, check;
+                game data[50];
+
+                check =  fread(&number, 4, 1, num);
+                fclose(num);
+
+                if(check == 0 || number == 0)
+                    printf("\nthere is no game\n");
+
+                else{
+                    int i = 0, check = 1;
+                    printf("\n");
+
+                    while(check){
+                        check = fread(&data[i], sizeof(game), 1, games);
+
+                        if(check)
+                        printf("%d. %s -- %s\n", i + 1, data[i].name1, data[i].name2);
+
+                        i++;
+                    }
+                    fclose(games);
+
+                    printf("please choose a game:\n");
+                    scanf("%d", &choice);
+
+                    games = fopen("games.bin", "wb+");
+
+                    i = 0;
+
+                    while(i != number) {
+                        if (i + 1 != choice)
+                            fwrite(&data[i], sizeof(game), 1, games);
+
+                        i++;
+                    }
+
+                    fclose(games);
+
+                    number--;
+
+                    num = fopen("games_number.bin", "wb+");
+                    fwrite(&number, 4, 1, num);
+                    fclose(num);
+
+                    printf("\nthe games is removed properly\n");
+                }
+                choice = 10;
+            }
         }
         if (choice == 4) {
             int num;
@@ -2013,8 +2050,12 @@ int main(void){
             map_size = temp.map_size;
             rocket1 = temp.rocket1;
             rocket2 = temp.rocket2;
+
             strcpy(name1, temp.name1);
             strcpy(name2, temp.name2);
+
+            for(int i = 0;i < 30;i++)
+                shot_point[i] = temp.shot_point[i];
 
             int save = temp.turn;
 
@@ -2061,10 +2102,10 @@ int main(void){
                 int temp = 1, temp_num;
                 printf("\nplease enter the new ships with their length(finish your input with 0 as length). the maximum length is 25:");
 
-                for(int i = 0;i < 26;i++)
+                for(int i = 0;i < 30;i++)
                     arr_size[i] = 0;
 
-                for(int i = 0;i < 26;i++)
+                for(int i = 0;i < 30;i++)
                     shot_point[i] = 0;
 
                 printf("\nplease enter the length of the ship you want to have:");
@@ -2079,19 +2120,19 @@ int main(void){
                     printf("\nplease enter the length of the ship you want to have:");
                     scanf("%d", &temp);
                 }
-                for(int i = 0;i < 26;i++) {
+                for(int i = 0;i < 30;i++) {
                     if (arr_size[i] != 0)
                         temp = i;
                 }
 
                 max_size = temp;
 
-                for(int i = 0;i < 26;i++)
+                for(int i = 0;i < 30;i++)
                     if(arr_size[i] != 0)
                         shot_point[i] = (5 * temp) / i;
 
                 ships_sum = 0;
-                for(int i = 0;i < 26;i++)
+                for(int i = 0;i < 30;i++)
                     if(arr_size[i] != 0)
                         ships_sum += i * arr_size[i];
 
@@ -2105,7 +2146,12 @@ int main(void){
                     printf("\nplease enter the new map size:");
                     scanf("%d", &temp);
 
-                    if(temp * temp > ships_sum * 2)
+                    int count = 0;
+
+                    for(int i = 0;i < 30;i++)
+                            count += arr_size[i];
+
+                    if(temp * temp > count + ships_sum * 2)
                         check = 0;
                     else
                         printf("\nyour input is not acceptable.");
@@ -2115,41 +2161,10 @@ int main(void){
             }
         }
         if (choice == 6) {
-            printf("\nplease decide:\n1. removing a person from scoreboard\n2. show scoreboard\n");
+            printf("\nplease decide:\n1. show scoreboard\n2. removing a person from scoreboard\n");
             scanf("%d", &choice);
-            if(choice == 1){
-                char name_data[500][50], temp_name[50];
-                int score_data[500] = {0}, temp;
-                int num, i = 0, line;
 
-                FILE *users = fopen("users.txt", "r+");
-                FILE *number = fopen("number.txt", "r+");
-                fscanf(number, "%d", &num);
-
-                while (i != num) {
-                    fscanf(users, "%s %d\n", name_data[i], &score_data[i]);
-                    printf("\n%d. %s %d", i + 1, name_data[i], score_data[i]);
-                    i++;
-                }
-                fclose(users);
-                fclose(number);
-
-                printf("\nplease enter the index of the person you want to remove:");
-                scanf("%d", &line);
-
-                users = fopen("users.txt", "w+");
-
-                for(int k = 0;k < num;k++)
-                    if(k != line - 1)
-                        fprintf(users, "%s %d\n", name_data[k], score_data[k]);
-
-                fclose(users);
-                users = fopen("number.txt", "w+");
-                fprintf(users, "%d", num - 1);
-                fclose(users);
-                printf("\nDONE\n");
-            }
-            if(choice == 2) {
+            if(choice == 1) {
                 char name_data[500][50], temp_name[50];
                 int score_data[500] = {0}, temp;
                 int num, i = 0;
@@ -2181,6 +2196,39 @@ int main(void){
                     printf("\n%d. %s %d", i + 1, name_data[i], score_data[i]);
                 printf("\n");
             }
+            if(choice == 2){
+                char name_data[500][50], temp_name[50];
+                int score_data[500] = {0}, temp;
+                int num, i = 0, line;
+
+                FILE *users = fopen("users.txt", "r+");
+                FILE *number = fopen("number.txt", "r+");
+                fscanf(number, "%d", &num);
+
+                while (i != num) {
+                    fscanf(users, "%s %d\n", name_data[i], &score_data[i]);
+                    printf("\n%d. %s %d", i + 1, name_data[i], score_data[i]);
+                    i++;
+                }
+                fclose(users);
+                fclose(number);
+
+                printf("\nplease enter the index of the person you want to remove:");
+                scanf("%d", &line);
+
+                users = fopen("users.txt", "w+");
+
+                for(int k = 0;k < num;k++)
+                    if(k != line - 1)
+                        fprintf(users, "%s %d\n", name_data[k], score_data[k]);
+
+                fclose(users);
+                users = fopen("number.txt", "w+");
+                fprintf(users, "%d", num - 1);
+                fclose(users);
+                printf("\nDONE\n");
+            }
+
             choice = 10;
         }
     }
